@@ -572,7 +572,6 @@ const Home = (props) => {
               </p>
               <div className="cta-form-wrapper">
                 <form
-                <form
                   onSubmit={(e) => {
                     e.preventDefault();
                     const email = e.target.elements.email.value;
