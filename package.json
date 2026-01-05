@@ -10,7 +10,8 @@
     "react-helmet": "^6.1.0",
     "dangerous-html": "0.1.13",
     "@teleporthq/react-components": "latest",
-    "next": "^12.1.10"
+    "next": "^12.1.10",
+    "serve": "^14.2.1"
   },
   "scripts": {
     "start": "craco start",
