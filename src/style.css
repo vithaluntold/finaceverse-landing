@@ -514,10 +514,12 @@
 }
  
 .thq-mask-image-vertical {
+  -webkit-mask-image: linear-gradient(to bottom, transparent, black 1%, black 99%, transparent);
   mask-image: linear-gradient(to bottom, transparent, black 1%, black 99%, transparent);
 }
  
 .thq-mask-image-horizontal {
+  -webkit-mask-image: linear-gradient(to right, transparent, black 1%, black 99%, transparent);
   mask-image: linear-gradient(to right, transparent, black 1%, black 99%, transparent);
 }
  
@@ -609,6 +611,9 @@
   font-family: var(--font-family-body);
   font-weight: var(--font-weight-medium);
   line-height: var(--line-height-body);
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
   user-select: none;
   white-space: nowrap;
   border-radius: var(--border-radius-control);
@@ -747,6 +752,7 @@
   top: 0;
   width: 100%;
   z-index: 1000;
+  position: -webkit-sticky;
   position: sticky;
   background: var(--color-surface);
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
@@ -857,6 +863,7 @@
   display: flex;
   padding: var(--spacing-md) var(--spacing-xl);
   z-index: 1110;
+  position: -webkit-sticky;
   position: sticky;
   background: var(--color-surface);
   align-items: center;
@@ -1200,6 +1207,7 @@
   background: var(--color-scrim);
   min-height: 80vh;
   align-items: center;
+  -webkit-backdrop-filter: blur(10px);
   backdrop-filter: blur(10px);
 }
  
@@ -1936,6 +1944,7 @@
   transition: transform 0.3s ease, background 0.3s ease;
   grid-column: span 1;
   border-radius: var(--border-radius-lg);
+  -webkit-backdrop-filter: blur(12px);
   backdrop-filter: blur(12px);
 }
  
@@ -2508,6 +2517,7 @@
   box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
   transition: transform 0.5s ease;
   border-radius: var(--border-radius-lg);
+  -webkit-backdrop-filter: blur(10px);
   backdrop-filter: blur(10px);
 }
  
