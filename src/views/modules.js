@@ -518,7 +518,8 @@ const Modules = (props) => {
               fill="#2874DE"
             ></path>
           </svg>
-          <span className="modules-text29">Built in TeleportHQ</span>
+          <img src="/logo.svg" alt="FinACEverse" style={{width: '20px', height: '20px', marginRight: '8px'}} />
+          <span className="modules-text29">Propel Past Paradigms</span>
         </div>
       </a>
     </div>

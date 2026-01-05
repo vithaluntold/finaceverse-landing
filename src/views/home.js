@@ -57,7 +57,7 @@ const Home = (props) => {
               operations.
             </p>
             <div className="hero-actions">
-              <a href="mailto:hello@finaceverse.io?subject=Demo Request&body=I'm interested in scheduling a demo of FinACEverse." className="btn btn-primary btn-lg">Request Demo</a>
+              <a href="mailto:vithal@finaceverse.com?subject=Demo Request&body=I'm interested in scheduling a demo of FinACEverse." className="btn btn-primary btn-lg">Request Demo</a>
               <a href="/tailored-pilots" className="btn btn-lg btn-outline">
                 Join Pilot Program
               </a>
@@ -580,7 +580,7 @@ const Home = (props) => {
                   onSubmit={(e) => {
                     e.preventDefault();
                     const email = e.target.elements.email.value;
-                    window.location.href = `mailto:hello@finaceverse.io?subject=Demo Request from ${email}&body=Business email: ${email}%0D%0A%0D%0AI'm interested in scheduling a demo of FinACEverse.`;
+                    window.location.href = `mailto:vithal@finaceverse.com?subject=Demo Request from ${email}&body=Business email: ${email}%0D%0A%0D%0AI'm interested in scheduling a demo of FinACEverse.`;
                   }}
                   className="cta-form"
                 >
@@ -772,7 +772,8 @@ const Home = (props) => {
               fill="#2874DE"
             ></path>
           </svg>
-          <span className="home-text28">Built in TeleportHQ</span>
+          <img src="/logo.svg" alt="FinACEverse" style={{width: '20px', height: '20px', marginRight: '8px'}} />
+          <span className="home-text28">Propel Past Paradigms</span>
         </div>
       </a>
     </div>

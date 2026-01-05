@@ -88,6 +88,20 @@
   --dl-layout-radius-buttonradius: 24px;
   --dl-layout-space-oneandhalfunits: 24px;
 }
+
+[data-theme="light"] {
+  --color-border: #d0d7de;
+  --color-surface: #f6f8fa;
+  --color-on-surface: #1f2328;
+  --color-surface-elevated: #ffffff;
+  --color-on-surface-secondary: #57606a;
+  --color-overlay: color-mix(in oklab, #000000 40%, transparent);
+  --color-scrim: color-mix(in oklab, #000000 70%, transparent);
+  --color-backplate: color-mix(in oklab, #000000 60%, transparent);
+  --shadow-level-1: 0 1px 3px rgba(0, 0, 0, 0.12);
+  --shadow-level-2: 0 4px 12px rgba(0, 0, 0, 0.15);
+  --shadow-level-3: 0 8px 24px rgba(0, 0, 0, 0.2);
+}
  
 .button {
   color: var(--dl-color-theme-neutral-dark);
@@ -827,6 +841,31 @@
   gap: var(--spacing-md);
   display: flex;
   align-items: center;
+}
+
+.theme-toggle-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  border: none;
+  border-radius: var(--border-radius-sm);
+  background-color: transparent;
+  color: var(--color-on-surface);
+  cursor: pointer;
+  transition: all 0.2s ease;
+  padding: 0;
+}
+
+.theme-toggle-btn:hover {
+  background-color: var(--color-surface-elevated);
+  transform: scale(1.05);
+}
+
+.theme-toggle-btn svg {
+  width: 20px;
+  height: 20px;
 }
  
 
