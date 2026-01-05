@@ -57,9 +57,9 @@ const Home = (props) => {
               operations.
             </p>
             <div className="hero-actions">
-              <button className="btn btn-primary btn-lg">Explore the OS</button>
+              <button className="btn btn-primary btn-lg">Request Demo</button>
               <button className="btn btn-lg btn-outline">
-                Watch VAMN in Action
+                Join Pilot Program
               </button>
             </div>
           </div>
