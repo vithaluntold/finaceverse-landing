@@ -11,8 +11,8 @@ const Home = (props) => {
   return (
     <div className="home-container1">
       <Helmet>
-        <title>Scary Impeccable Ibex</title>
-        <meta property="og:title" content="Scary Impeccable Ibex" />
+        <title>FinACEverse - Cognitive Operating System for Finance</title>
+        <meta property="og:title" content="FinACEverse - Cognitive Operating System for Finance" />
         <link
           rel="canonical"
           href="https://scary-impeccable-ibex-vzbllw.teleporthq.app/"

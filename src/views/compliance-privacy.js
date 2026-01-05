@@ -11,10 +11,10 @@ const CompliancePrivacy = (props) => {
   return (
     <div className="compliance-privacy-container1">
       <Helmet>
-        <title>Compliance-Privacy - Scary Impeccable Ibex</title>
+        <title>Compliance & Privacy - FinACEverse</title>
         <meta
           property="og:title"
-          content="Compliance-Privacy - Scary Impeccable Ibex"
+          content="Compliance & Privacy - FinACEverse"
         />
         <link
           rel="canonical"

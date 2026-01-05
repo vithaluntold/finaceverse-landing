@@ -11,8 +11,8 @@ const Modules = (props) => {
   return (
     <div className="modules-container1">
       <Helmet>
-        <title>Modules - Scary Impeccable Ibex</title>
-        <meta property="og:title" content="Modules - Scary Impeccable Ibex" />
+        <title>Modules - FinACEverse</title>
+        <meta property="og:title" content="Modules - FinACEverse" />
         <link
           rel="canonical"
           href="https://scary-impeccable-ibex-vzbllw.teleporthq.app/modules"
