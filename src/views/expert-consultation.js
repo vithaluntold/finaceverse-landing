@@ -161,64 +161,24 @@ const ExpertConsultation = (props) => {
           <h2 className="section-title">Schedule Your Consultation</h2>
           <p className="consultation-booking-text">
             Book a 45-minute strategic consultation with one of our Cognitive OS
-            architects. No sales pressure—just expert guidance.
+            architects. Select your preferred time.
           </p>
-          <form className="consultation-form">
-            <div className="form-row">
-              <input
-                type="text"
-                placeholder="Full Name"
-                required
-                className="form-input"
-              />
-              <input
-                type="email"
-                placeholder="Business Email"
-                required
-                className="form-input"
-              />
-            </div>
-            <div className="form-row">
-              <input
-                type="text"
-                placeholder="Company Name"
-                required
-                className="form-input"
-              />
-              <input
-                type="text"
-                placeholder="Role/Title"
-                required
-                className="form-input"
-              />
-            </div>
-            <div className="form-row">
-              <input
-                type="tel"
-                placeholder="Phone Number"
-                className="form-input"
-              />
-              <select className="form-input" required>
-                <option value="">Preferred Time Zone</option>
-                <option value="EST">Eastern (EST)</option>
-                <option value="CST">Central (CST)</option>
-                <option value="MST">Mountain (MST)</option>
-                <option value="PST">Pacific (PST)</option>
-                <option value="UTC">UTC/GMT</option>
-                <option value="IST">India (IST)</option>
-                <option value="SGT">Singapore (SGT)</option>
-              </select>
-            </div>
-            <textarea
-              placeholder="What specific challenges or questions do you want to address?"
-              required
-              className="form-textarea"
-              rows="4"
-            ></textarea>
-            <button type="submit" className="btn btn-primary btn-lg">
-              Schedule Consultation
-            </button>
-          </form>
+          
+          <div className="google-calendar-container">
+            <iframe 
+              src="https://calendar.google.com/calendar/appointments/schedules/YOUR_SCHEDULE_ID?gv=true" 
+              style={{border: 0, width: '100%', height: '600px'}}
+              frameBorder="0"
+              scrolling="no"
+              title="Google Calendar Appointment Scheduling"
+            ></iframe>
+          </div>
+          
+          <div className="booking-note">
+            <p className="section-content">
+              After selecting a time, you'll receive a Google Calendar invite with video conferencing details.
+            </p>
+          </div>
         </div>
       </section>
 

@@ -199,6 +199,21 @@ select.form-input {
   padding-right: 2.5rem;
 }
 
+.google-calendar-container {
+  max-width: 800px;
+  margin: 0 auto;
+  border-radius: var(--border-radius-lg);
+  overflow: hidden;
+  box-shadow: var(--shadow-level-2);
+}
+
+.booking-note {
+  max-width: 700px;
+  margin: var(--spacing-2xl) auto 0;
+  text-align: center;
+  color: var(--color-on-surface-secondary);
+}
+
 @media (max-width: 768px) {
   .form-row {
     grid-template-columns: 1fr;
@@ -206,5 +221,9 @@ select.form-input {
 
   .value-grid {
     grid-template-columns: 1fr;
+  }
+  
+  .google-calendar-container {
+    margin: 0 var(--spacing-md);
   }
 }
