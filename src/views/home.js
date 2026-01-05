@@ -572,10 +572,6 @@ const Home = (props) => {
               </p>
               <div className="cta-form-wrapper">
                 <form
-                  action="/demo"
-                  method="POST"
-                  data-form-id="0f94eb23-bbc7-4728-8b56-6e02155b8f00"
-                  className="cta-form"
                 <form
                   onSubmit={(e) => {
                     e.preventDefault();
