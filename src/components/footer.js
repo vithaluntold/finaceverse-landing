@@ -90,24 +90,24 @@ const Footer = (props) => {
                 Ecosystem
               </h2>
               <nav className="footer-nav-list">
-                <a href="index.html">
+                <a href="/">
                   <div className="footer-nav-link">
-                    <span>Homepage</span>
+                    <span>Home</span>
                   </div>
                 </a>
-                <a href="modules.html">
+                <a href="/modules">
                   <div className="footer-nav-link">
-                    <span>Core Modules</span>
+                    <span>Modules</span>
                   </div>
                 </a>
-                <a href="#">
+                <a href="/tailored-pilots">
                   <div className="footer-nav-link">
-                    <span>VAMN Network</span>
+                    <span>Pilot Programs</span>
                   </div>
                 </a>
-                <a href="#">
+                <a href="/expert-consultation">
                   <div className="footer-nav-link">
-                    <span>Partner Program</span>
+                    <span>Expert Consultation</span>
                   </div>
                 </a>
               </nav>
@@ -181,7 +181,7 @@ const Footer = (props) => {
                     </g>
                   </svg>
                   <span className="section-content">
-                    intelligence@finaceverse.ai
+                    vithal@finacegroup.com
                   </span>
                 </div>
               </div>

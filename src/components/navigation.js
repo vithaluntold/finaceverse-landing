@@ -48,16 +48,16 @@ const Navigation = (props) => {
                 </a>
               </li>
               <li className="navigation-item">
-                <a href="#cognitive-os">
+                <a href="/tailored-pilots">
                   <div className="navigation-link">
-                    <span>Cognitive OS</span>
+                    <span>Pilot Programs</span>
                   </div>
                 </a>
               </li>
               <li className="navigation-item">
-                <a href="#compliance">
+                <a href="/expert-consultation">
                   <div className="navigation-link">
-                    <span>Compliance</span>
+                    <span>Consultation</span>
                   </div>
                 </a>
               </li>
@@ -73,11 +73,6 @@ const Navigation = (props) => {
                   <path fill="currentColor" d="M12 17q-2.075 0-3.537-1.463T7 12t1.463-3.537T12 7t3.538 1.463T17 12t-1.463 3.538T12 17m-7-4H1v-2h4zm18 0h-4v-2h4zM11 5V1h2v4zm0 18v-4h2v4zM6.4 7.75L3.875 5.325L5.3 3.85l2.4 2.5zm12.3 12.4l-2.425-2.525L17.6 16.25l2.525 2.425zM16.25 6.4l2.425-2.525L20.15 5.3l-2.5 2.4zM3.85 18.7l2.525-2.425L7.75 17.6l-2.425 2.525z"/>
                 </svg>
               </button>
-              <a href="#portal">
-                <div className="btn btn-outline btn-sm">
-                  <span>Client Portal</span>
-                </div>
-              </a>
               <a href="#demo">
                 <div className="btn btn-sm btn-primary">
                   <span>Request Demo</span>
@@ -163,34 +158,22 @@ const Navigation = (props) => {
               </a>
             </li>
             <li className="navigation-mobile-item">
-              <a href="#cognitive-os">
+              <a href="/tailored-pilots">
                 <div className="navigation-mobile-link">
-                  <span>Cognitive OS</span>
+                  <span>Pilot Programs</span>
                 </div>
               </a>
             </li>
             <li className="navigation-mobile-item">
-              <a href="#compliance">
+              <a href="/expert-consultation">
                 <div className="navigation-mobile-link">
-                  <span>Compliance</span>
-                </div>
-              </a>
-            </li>
-            <li className="navigation-mobile-item">
-              <a href="#about">
-                <div className="navigation-mobile-link">
-                  <span>Our Paradigm</span>
+                  <span>Consultation</span>
                 </div>
               </a>
             </li>
           </ul>
           <div className="navigation-mobile-actions">
-            <a href="#portal">
-              <div className="btn btn-outline btn-lg">
-                <span>Client Portal</span>
-              </div>
-            </a>
-            <a href="#demo">
+            <a href="mailto:vithal@finacegroup.com?subject=Demo Request">
               <div className="btn btn-primary btn-lg">
                 <span>Request Demo</span>
               </div>
