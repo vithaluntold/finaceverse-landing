@@ -12,24 +12,7 @@ const Navigation = (props) => {
           <a href="/">
             <div aria-label="FinACEverse Homepage" className="navigation-brand">
               <div className="navigation-logo-icon">
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  width="24"
-                  height="24"
-                  viewBox="0 0 24 24"
-                >
-                  <g
-                    fill="none"
-                    stroke="currentColor"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth="2"
-                  >
-                    <path d="M12 20v2m0-20v2m5 16v2m0-20v2M2 12h2m-2 5h2M2 7h2m16 5h2m-2 5h2M20 7h2M7 20v2M7 2v2"></path>
-                    <rect width="16" height="16" x="4" y="4" rx="2"></rect>
-                    <rect width="8" height="8" x="8" y="8" rx="1"></rect>
-                  </g>
-                </svg>
+                <img src="/logo.svg" alt="FinACEverse Logo" style={{width: '100%', height: '100%'}} />
               </div>
               <span className="navigation-brand-text section-title">
                 FinACEverse
@@ -110,24 +93,7 @@ const Navigation = (props) => {
           <a href="/">
             <div className="navigation-brand">
               <div className="navigation-logo-icon">
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  width="24"
-                  height="24"
-                  viewBox="0 0 24 24"
-                >
-                  <g
-                    fill="none"
-                    stroke="currentColor"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth="2"
-                  >
-                    <path d="M12 20v2m0-20v2m5 16v2m0-20v2M2 12h2m-2 5h2M2 7h2m16 5h2m-2 5h2M20 7h2M7 20v2M7 2v2"></path>
-                    <rect width="16" height="16" x="4" y="4" rx="2"></rect>
-                    <rect width="8" height="8" x="8" y="8" rx="1"></rect>
-                  </g>
-                </svg>
+                <img src="/logo.svg" alt="FinACEverse Logo" style={{width: '100%', height: '100%'}} />
               </div>
               <span className="navigation-brand-text section-title">
                 FinACEverse
