@@ -1,0 +1,528 @@
+import React from 'react'
+
+import Script from 'dangerous-html/react'
+import { Helmet } from 'react-helmet'
+
+import Navigation from '../components/navigation'
+import Footer from '../components/footer'
+import './modules.css'
+
+const Modules = (props) => {
+  return (
+    <div className="modules-container1">
+      <Helmet>
+        <title>Modules - Scary Impeccable Ibex</title>
+        <meta property="og:title" content="Modules - Scary Impeccable Ibex" />
+        <link
+          rel="canonical"
+          href="https://scary-impeccable-ibex-vzbllw.teleporthq.app/modules"
+        />
+      </Helmet>
+      <Navigation></Navigation>
+      <section className="modules-hero">
+        <video
+          autoPlay="true"
+          muted="true"
+          loop="true"
+          playsInline="true"
+          poster="https://images.pexels.com/videos/34127887/pictures/preview-0.jpg"
+          src="https://videos.pexels.com/video-files/34127887/14471394_640_360_30fps.mp4"
+          className="modules-hero-video"
+        ></video>
+        <div className="modules-hero-overlay"></div>
+        <div className="modules-hero-container">
+          <div className="modules-hero-bento">
+            <div className="modules-hero-main">
+              <h1 className="hero-title">Unified Cognitive Intelligence</h1>
+              <p className="hero-subtitle">
+                Experience the future of finance with FinACEverse. Our
+                integrated Cognitive Operating System harmonizes accounting,
+                finance, and taxation into a single source of truth.
+              </p>
+              <div className="modules-hero-actions">
+                <a href="#capabilities">
+                  <div className="btn btn-primary btn-lg">
+                    <span>Explore Capabilities</span>
+                  </div>
+                </a>
+                <a href="#integration">
+                  <div className="btn btn-lg btn-outline">
+                    <span>System Architecture</span>
+                  </div>
+                </a>
+              </div>
+            </div>
+            <div className="modules-hero-card modules-hero-accute">
+              <div className="modules-hero-card-icon">
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  width="24"
+                  height="24"
+                  viewBox="0 0 24 24"
+                >
+                  <g
+                    fill="none"
+                    stroke="currentColor"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth="2"
+                  >
+                    <path d="M12 20v2m0-20v2m5 16v2m0-20v2M2 12h2m-2 5h2M2 7h2m16 5h2m-2 5h2M20 7h2M7 20v2M7 2v2"></path>
+                    <rect width="16" height="16" x="4" y="4" rx="2"></rect>
+                    <rect width="8" height="8" x="8" y="8" rx="1"></rect>
+                  </g>
+                </svg>
+              </div>
+              <h3 className="section-subtitle">Accute</h3>
+              <p className="section-content">
+                The operational core orchestrating complex financial workflows.
+              </p>
+            </div>
+            <div className="modules-hero-card modules-hero-vamn">
+              <div className="modules-hero-card-icon">
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  width="24"
+                  height="24"
+                  viewBox="0 0 24 24"
+                >
+                  <g
+                    fill="none"
+                    stroke="currentColor"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth="2"
+                  >
+                    <ellipse cx="12" cy="5" rx="9" ry="3"></ellipse>
+                    <path d="M3 5v14a9 3 0 0 0 18 0V5"></path>
+                    <path d="M3 12a9 3 0 0 0 18 0"></path>
+                  </g>
+                </svg>
+              </div>
+              <h3 className="section-subtitle">VAMN</h3>
+              <p className="section-content">
+                Verifiable Arithmetic Multi-Stream Network for intelligence.
+              </p>
+            </div>
+            <div className="modules-hero-card modules-hero-cyloid">
+              <div className="modules-hero-card-icon">
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  width="24"
+                  height="24"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    fill="none"
+                    stroke="currentColor"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth="2"
+                    d="M20 13c0 5-3.5 7.5-7.66 8.95a1 1 0 0 1-.67-.01C7.5 20.5 4 18 4 13V6a1 1 0 0 1 1-1c2 0 4.5-1.2 6.24-2.72a1.17 1.17 0 0 1 1.52 0C14.51 3.81 17 5 19 5a1 1 0 0 1 1 1z"
+                  ></path>
+                </svg>
+              </div>
+              <h3 className="section-subtitle">Cyloid</h3>
+              <p className="section-content">
+                Transforming documents into indisputable mathematical facts.
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+      <section id="capabilities" className="capabilities-grid">
+        <div className="capabilities-header">
+          <h2 className="section-title">Modular Capabilities</h2>
+          <p className="section-content">
+            Our seven specialized modules work in perfect synchronicity to
+            redefine your capacity.
+          </p>
+        </div>
+        <div className="capabilities-bento">
+          <div className="capabilities-cell cell-large">
+            <div className="cell-content">
+              <span className="cell-tag">Foundation</span>
+              <h3 className="section-subtitle">Accute &amp; VAMN</h3>
+              <p className="section-content">
+                The heartbeat of FinACEverse. Accute establishes a shared
+                ontology while VAMN provides specialized cognitive streams for
+                multi-layered financial intelligence.
+              </p>
+              <ul className="cell-list">
+                <li className="section-content">
+                  <span>Regulatory Compliance Streams</span>
+                </li>
+                <li className="section-content">
+                  <span>Shared Financial Ontology</span>
+                </li>
+                <li className="section-content">
+                  <span>Cross-cycle Orchestration</span>
+                </li>
+              </ul>
+            </div>
+            <img
+              src="https://images.pexels.com/photos/18069816/pexels-photo-18069816.png?auto=compress&amp;cs=tinysrgb&amp;w=1500"
+              alt="Data flow visualization"
+              className="cell-image"
+            />
+          </div>
+          <div className="capabilities-cell cell-medium">
+            <div className="cell-content">
+              <span className="cell-tag">Intelligence</span>
+              <h3 className="section-subtitle">Luca</h3>
+              <p className="section-content">
+                Domain intelligence that understands the nuances of accounting
+                history and future taxation impacts.
+              </p>
+            </div>
+          </div>
+          <div className="capabilities-cell cell-small">
+            <div className="cell-content">
+              <span className="cell-tag">Scale</span>
+              <h3 className="section-subtitle">Finaid Hub</h3>
+              <p className="section-content">
+                Execution at scale without increasing headcount.
+              </p>
+            </div>
+          </div>
+          <div className="capabilities-cell cell-medium">
+            <div className="cell-content">
+              <span className="cell-tag">Verification</span>
+              <h3 className="section-subtitle">Cyloid</h3>
+              <p className="section-content">
+                Ensuring mathematical verification for every entry into the
+                financial system.
+              </p>
+            </div>
+          </div>
+          <div className="capabilities-cell cell-small">
+            <div className="cell-content">
+              <span className="cell-tag">Communication</span>
+              <h3 className="section-subtitle">Sumbuddy</h3>
+              <p className="section-content">
+                Smart collaboration and unified communication layer.
+              </p>
+            </div>
+          </div>
+          <div className="capabilities-cell cell-medium">
+            <div className="cell-content">
+              <span className="cell-tag">Insights</span>
+              <h3 className="section-subtitle">Finory &amp; EPI-Q</h3>
+              <p className="section-content">
+                Advanced reporting and predictive analytics for modern
+                enterprise operations.
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+      <section className="workflows-section">
+        <div className="workflows-container">
+          <h2 className="section-title">Operational Workflows</h2>
+          <div className="workflows-bento">
+            <div className="workflow-card">
+              <div className="workflow-icon">
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  width="24"
+                  height="24"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    fill="none"
+                    stroke="currentColor"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth="2"
+                    d="M3 3v16a2 2 0 0 0 2 2h16M7 16h8m-8-5h12M7 6h3"
+                  ></path>
+                </svg>
+              </div>
+              <h3 className="section-subtitle">Corporate Finance</h3>
+              <p className="section-content">
+                Automate month-end closing and consolidate global entities with
+                real-time tax provision calculations.
+              </p>
+            </div>
+            <div className="workflow-card featured">
+              <div className="workflow-icon">
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  width="24"
+                  height="24"
+                  viewBox="0 0 24 24"
+                >
+                  <g
+                    fill="none"
+                    stroke="currentColor"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth="2"
+                  >
+                    <path d="M12.83 2.18a2 2 0 0 0-1.66 0L2.6 6.08a1 1 0 0 0 0 1.83l8.58 3.91a2 2 0 0 0 1.66 0l8.58-3.9a1 1 0 0 0 0-1.83z"></path>
+                    <path d="M2 12a1 1 0 0 0 .58.91l8.6 3.91a2 2 0 0 0 1.65 0l8.58-3.9A1 1 0 0 0 22 12"></path>
+                    <path d="M2 17a1 1 0 0 0 .58.91l8.6 3.91a2 2 0 0 0 1.65 0l8.58-3.9A1 1 0 0 0 22 17"></path>
+                  </g>
+                </svg>
+              </div>
+              <h3 className="section-subtitle">Audit &amp; Compliance</h3>
+              <p className="section-content">
+                Continuous auditing enabled by Cyloid&apos;s verification,
+                reducing seasonal spikes and ensuring 100% audit readiness.
+              </p>
+            </div>
+            <div className="workflow-card">
+              <div className="workflow-icon">
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  width="24"
+                  height="24"
+                  viewBox="0 0 24 24"
+                >
+                  <g
+                    fill="none"
+                    stroke="currentColor"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth="2"
+                  >
+                    <path d="M4.5 16.5c-1.5 1.26-2 5-2 5s3.74-.5 5-2c.71-.84.7-2.13-.09-2.91a2.18 2.18 0 0 0-2.91-.09M12 15l-3-3a22 22 0 0 1 2-3.95A12.88 12.88 0 0 1 22 2c0 2.72-.78 7.5-6 11a22.4 22.4 0 0 1-4 2"></path>
+                  </g>
+                </svg>
+              </div>
+              <h3 className="section-subtitle">Tax Practice</h3>
+              <p className="section-content">
+                Scale tax preparation capacity with Sumbuddy&apos;s
+                collaborative tools and VAMN&apos;s regulatory intelligence.
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+      <section id="integration" className="integration-section">
+        <div className="integration-wrapper">
+          <div className="integration-intro">
+            <h2 className="section-title">Seamless Ecosystem</h2>
+            <p className="section-content">
+              FinACEverse integrates with your existing tech stack while
+              providing a unified data layer through VAMN.
+            </p>
+          </div>
+          <div className="integration-bento">
+            <div className="integration-cell api-cell">
+              <h3 className="section-subtitle">Next-Gen APIs</h3>
+              <p className="section-content">
+                Connect ERPs, CRMs, and legacy accounting software directly into
+                the VAMN network for real-time data streaming.
+              </p>
+              <div className="api-visual">
+                <code>GET /v1/vamn/intelligence/stream</code>
+                <code>POST /v1/cyloid/verify/document</code>
+              </div>
+            </div>
+            <div className="integration-cell data-flow">
+              <h3 className="section-subtitle">VAMN Data Flow</h3>
+              <p className="section-content">
+                Specialized cognitive streams process raw financial data into
+                verifiable facts for all downstream modules.
+              </p>
+            </div>
+            <div className="integration-cell deployment">
+              <h3 className="section-subtitle">Deployment Patterns</h3>
+              <p className="section-content">
+                Hybrid-cloud or full SaaS options tailored to enterprise
+                security requirements.
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+      <section className="compliance-stats">
+        <div className="compliance-container">
+          <div className="compliance-bento">
+            <div className="compliance-main">
+              <h2 className="section-title">Verifiable Arithmetic</h2>
+              <p className="section-content">
+                Cyloid and VAMN form a dual-shield of auditability. Every
+                calculation is traced back to a verified document, ensuring
+                regulatory compliance through mathematical verification rather than
+                manual processes.
+              </p>
+            </div>
+            <div className="compliance-stat-card">
+              <div className="stat-value">
+                <span>100%</span>
+              </div>
+              <div className="stat-label">
+                <span>Verification Rate</span>
+              </div>
+            </div>
+            <div className="compliance-stat-card">
+              <div className="stat-value">
+                <span>0%</span>
+              </div>
+              <div className="stat-label">
+                <span>Calculation Errors</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+      <section className="modules-testimonials-carousel">
+        <div className="carousel-header">
+          <h2 className="section-title">Module Impact</h2>
+          <p className="section-subtitle" style={{opacity: 0.7}}>
+            Customer testimonials coming soon from pilot program participants
+          </p>
+        </div>
+        <div className="modules-carousel-container">
+          <div className="modules-testimonial-card">
+            <p className="section-content" style={{opacity: 0.5, fontStyle: 'italic'}}>
+              Early feedback and success stories from pilot program participants will be shared here as we validate the system with real-world implementations.
+            </p>
+            <div className="modules-testimonial-author">
+              <span className="modules-author-name">Testimonials Coming Soon</span>
+              <span className="modules-author-role">
+                Pilot Program In Progress
+              </span>
+            </div>
+          </div>
+        </div>
+      </section>
+      <section className="modules-process-timeline">
+        <div className="process-container">
+          <h2 className="section-title">Onboarding Journey</h2>
+          <div className="modules-timeline-wrapper">
+            <div className="modules-timeline-line"></div>
+            <div className="modules-timeline-item left">
+              <div className="modules-timeline-dot"></div>
+              <div className="modules-timeline-content">
+                <h3 className="section-subtitle">Phase 1: Discovery</h3>
+                <p className="section-content">
+                  Analysis of existing tech stack and workflow fragmentation.
+                  Identification of key module bundles.
+                </p>
+                <span className="timeline-time">Week 1-2</span>
+              </div>
+            </div>
+            <div className="modules-timeline-item right">
+              <div className="modules-timeline-dot"></div>
+              <div className="modules-timeline-content">
+                <h3 className="section-subtitle">Phase 2: VAMN Integration</h3>
+                <p className="section-content">
+                  Establishing the data layer and connecting specialized
+                  cognitive streams to your core systems.
+                </p>
+                <span className="timeline-time">Week 3-5</span>
+              </div>
+            </div>
+            <div className="modules-timeline-item left">
+              <div className="modules-timeline-dot"></div>
+              <div className="modules-timeline-content">
+                <h3 className="section-subtitle">Phase 3: Module Activation</h3>
+                <p className="section-content">
+                  Sequential rollout of Accute, Cyloid, and Luca modules with
+                  tailored training programs.
+                </p>
+                <span className="timeline-time">Week 6-8</span>
+              </div>
+            </div>
+            <div className="modules-timeline-item right">
+              <div className="modules-timeline-dot"></div>
+              <div className="modules-timeline-content">
+                <h3 className="section-subtitle">Phase 4: Optimization</h3>
+                <p className="section-content">
+                  Success milestone review and performance tuning for maximum
+                  efficiency gains.
+                </p>
+                <span className="timeline-time">Week 9+</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+      <section className="modules-cta">
+        <div className="cta-container">
+          <div className="cta-grid">
+            <div className="cta-main">
+              <h2 className="section-title">
+                Ready to Transform Your Operations?
+              </h2>
+              <p className="section-content">
+                Join the pioneers of the Cognitive Operating System. Whether
+                you&apos;re a professional firm or an enterprise department,
+                FinACEverse is built for your scale.
+              </p>
+              <div className="cta-buttons">
+                <a href="#">
+                  <div className="btn btn-accent btn-xl">
+                    <span>Request Enterprise Pilot</span>
+                  </div>
+                </a>
+                <a href="#">
+                  <div className="btn btn-outline btn-xl">
+                    <span>Speak to a Technical Expert</span>
+                  </div>
+                </a>
+              </div>
+            </div>
+            <div className="cta-side">
+              <div className="cta-box">
+                <h4 className="section-subtitle">Module Bundles</h4>
+                <ul className="cta-list">
+                  <li className="section-content">
+                    <span>Audit Excellence Pack</span>
+                  </li>
+                  <li className="section-content">
+                    <span>Tax Scale Accelerator</span>
+                  </li>
+                  <li className="section-content">
+                    <span>Corporate OS Suite</span>
+                  </li>
+                </ul>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+      <div className="modules-container2">
+        <div className="modules-container3">
+          <Script
+            html={`<script defer data-name="modules-interactions">
+// Placeholder for future interactions
+</script>`}
+          ></Script>
+        </div>
+      </div>
+      <Footer></Footer>
+      <a href="https://play.teleporthq.io/signup">
+        <div aria-label="Sign up to TeleportHQ" className="modules-container4">
+          <svg
+            width="24"
+            height="24"
+            viewBox="0 0 19 21"
+            fill="none"
+            xmlns="http://www.w3.org/2000/svg"
+            className="modules-icon36"
+          >
+            <path
+              d="M9.1017 4.64355H2.17867C0.711684 4.64355 -0.477539 5.79975 -0.477539 7.22599V13.9567C-0.477539 15.3829 0.711684 16.5391 2.17867 16.5391H9.1017C10.5687 16.5391 11.7579 15.3829 11.7579 13.9567V7.22599C11.7579 5.79975 10.5687 4.64355 9.1017 4.64355Z"
+              fill="#B23ADE"
+            ></path>
+            <path
+              d="M10.9733 12.7878C14.4208 12.7878 17.2156 10.0706 17.2156 6.71886C17.2156 3.3671 14.4208 0.649963 10.9733 0.649963C7.52573 0.649963 4.73096 3.3671 4.73096 6.71886C4.73096 10.0706 7.52573 12.7878 10.9733 12.7878Z"
+              fill="#FF5C5C"
+            ></path>
+            <path
+              d="M17.7373 13.3654C19.1497 14.1588 19.1497 15.4634 17.7373 16.2493L10.0865 20.5387C8.67402 21.332 7.51855 20.6836 7.51855 19.0968V10.5141C7.51855 8.92916 8.67402 8.2807 10.0865 9.07221L17.7373 13.3654Z"
+              fill="#2874DE"
+            ></path>
+          </svg>
+          <span className="modules-text29">Built in TeleportHQ</span>
+        </div>
+      </a>
+    </div>
+  )
+}
+
+export default Modules
