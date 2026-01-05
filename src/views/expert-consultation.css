@@ -1,0 +1,210 @@
+.consultation-container {
+  width: 100%;
+  display: flex;
+  overflow: auto;
+  min-height: 100vh;
+  align-items: center;
+  flex-direction: column;
+  background-color: var(--color-surface);
+}
+
+.consultation-hero {
+  width: 100%;
+  height: 60vh;
+  display: flex;
+  position: relative;
+  align-items: center;
+  justify-content: center;
+  min-height: 500px;
+}
+
+.consultation-hero-bg {
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  position: absolute;
+  overflow: hidden;
+}
+
+.consultation-hero-bg video {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.consultation-hero-overlay {
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  position: absolute;
+  background: linear-gradient(135deg, rgba(10, 10, 10, 0.85), rgba(39, 32, 68, 0.75));
+}
+
+.consultation-hero-content {
+  z-index: 2;
+  display: flex;
+  max-width: 800px;
+  position: relative;
+  align-items: center;
+  padding: var(--spacing-3xl);
+  flex-direction: column;
+  text-align: center;
+}
+
+.consultation-badge {
+  color: #70a9e0;
+  padding: var(--spacing-xs) var(--spacing-md);
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-medium);
+  border-radius: var(--border-radius-full);
+  border: 1px solid #70a9e0;
+  margin-bottom: var(--spacing-lg);
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+}
+
+.consultation-description {
+  color: var(--color-on-surface-secondary);
+  font-size: var(--font-size-lg);
+  margin-top: var(--spacing-lg);
+  line-height: 1.8;
+}
+
+.consultation-value {
+  width: 100%;
+  padding: var(--spacing-4xl) var(--spacing-2xl);
+}
+
+.content-container {
+  width: 100%;
+  max-width: var(--content-max-width);
+  margin: 0 auto;
+}
+
+.value-grid {
+  display: grid;
+  gap: var(--spacing-2xl);
+  margin-top: var(--spacing-3xl);
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+}
+
+.value-card {
+  padding: var(--spacing-2xl);
+  border-radius: var(--border-radius-lg);
+  background-color: var(--color-surface-elevated);
+  border: 1px solid var(--color-border);
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.value-card:hover {
+  transform: translateY(-4px);
+  box-shadow: var(--shadow-level-2);
+}
+
+.value-icon {
+  color: #70a9e0;
+  margin-bottom: var(--spacing-lg);
+}
+
+.consultation-topics {
+  width: 100%;
+  padding: var(--spacing-4xl) var(--spacing-2xl);
+  background-color: var(--color-surface-elevated);
+}
+
+.topics-list {
+  display: flex;
+  gap: var(--spacing-2xl);
+  margin-top: var(--spacing-3xl);
+  flex-direction: column;
+}
+
+.topic-item {
+  display: flex;
+  gap: var(--spacing-lg);
+  align-items: flex-start;
+}
+
+.topic-bullet {
+  width: 12px;
+  height: 12px;
+  flex-shrink: 0;
+  margin-top: 8px;
+  border-radius: 50%;
+  background-color: #70a9e0;
+}
+
+.topic-content {
+  flex: 1;
+}
+
+.consultation-booking {
+  width: 100%;
+  padding: var(--spacing-4xl) var(--spacing-2xl);
+  text-align: center;
+}
+
+.consultation-booking-text {
+  color: var(--color-on-surface-secondary);
+  font-size: var(--font-size-lg);
+  margin: var(--spacing-xl) auto var(--spacing-3xl);
+  max-width: 700px;
+}
+
+.consultation-form {
+  max-width: 700px;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-xl);
+}
+
+.form-row {
+  display: grid;
+  gap: var(--spacing-lg);
+  grid-template-columns: 1fr 1fr;
+}
+
+.form-input,
+.form-textarea {
+  padding: var(--spacing-md) var(--spacing-lg);
+  border-radius: var(--border-radius-control);
+  border: 1px solid var(--color-border);
+  background-color: var(--color-surface-elevated);
+  color: var(--color-on-surface);
+  font-size: var(--font-size-base);
+  font-family: var(--font-family-body);
+  transition: border-color 0.2s ease;
+}
+
+.form-input:focus,
+.form-textarea:focus {
+  outline: none;
+  border-color: #70a9e0;
+}
+
+.form-textarea {
+  resize: vertical;
+  min-height: 120px;
+}
+
+select.form-input {
+  cursor: pointer;
+  appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%2370a9e0' d='M6 9L1 4h10z'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 1rem center;
+  padding-right: 2.5rem;
+}
+
+@media (max-width: 768px) {
+  .form-row {
+    grid-template-columns: 1fr;
+  }
+
+  .value-grid {
+    grid-template-columns: 1fr;
+  }
+}

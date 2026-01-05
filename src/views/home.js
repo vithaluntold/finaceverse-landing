@@ -57,10 +57,10 @@ const Home = (props) => {
               operations.
             </p>
             <div className="hero-actions">
-              <button className="btn btn-primary btn-lg">Request Demo</button>
-              <button className="btn btn-lg btn-outline">
+              <a href="mailto:hello@finaceverse.io?subject=Demo Request&body=I'm interested in scheduling a demo of FinACEverse." className="btn btn-primary btn-lg">Request Demo</a>
+              <a href="/tailored-pilots" className="btn btn-lg btn-outline">
                 Join Pilot Program
-              </button>
+              </a>
             </div>
           </div>
           <div className="hero-visual-right">
@@ -282,13 +282,13 @@ const Home = (props) => {
                 <div className="module-header">
                   <span className="module-name">Accute</span>
                   <div className="module-tag">
-                    <span>Core</span>
+                    <span>Orchestrator</span>
                   </div>
                 </div>
-                <h3 className="module-benefit">Operational Source of Truth</h3>
+                <h3 className="module-benefit">Operational Orchestration</h3>
                 <p className="section-content">
-                  The central nervous system of FinACEverse, orchestrating every
-                  financial cycle with unified compliance logic.
+                  Orchestrates every financial cycle with unified compliance logic,
+                  coordinating VAMN's cognitive intelligence across workflows.
                 </p>
                 <img
                   src="https://images.pexels.com/photos/30547598/pexels-photo-30547598.jpeg?auto=compress&amp;cs=tinysrgb&amp;w=1500"
@@ -299,20 +299,23 @@ const Home = (props) => {
             <div className="masonry-item item-sm">
               <div className="module-card secondary">
                 <span className="module-name">VAMN</span>
-                <h3 className="module-benefit">Verifiable Arithmetic</h3>
+                <div className="module-tag">
+                  <span>Core</span>
+                </div>
+                <h3 className="module-benefit">Cognitive Brain</h3>
                 <p className="section-content">
-                  Multi-stream network for rigorous financial intelligence and
-                  calculation accuracy.
+                  The central brain of FinACEverse - multi-stream network for
+                  rigorous financial intelligence and calculation accuracy.
                 </p>
               </div>
             </div>
             <div className="masonry-item item-md">
               <div className="module-card accent">
                 <span className="module-name">Cyloid</span>
-                <h3 className="module-benefit">Mathematical Verification</h3>
+                <h3 className="module-benefit">Verification Eyes</h3>
                 <p className="section-content">
-                  Turns every incoming document into an indisputable fact
-                  through verification.
+                  The eyes of FinACEverse - turns every incoming document into an
+                  indisputable fact through mathematical verification.
                 </p>
                 <img
                   src="https://images.pexels.com/photos/30547616/pexels-photo-30547616.jpeg?auto=compress&amp;cs=tinysrgb&amp;w=1500"
@@ -573,13 +576,20 @@ const Home = (props) => {
                   method="POST"
                   data-form-id="0f94eb23-bbc7-4728-8b56-6e02155b8f00"
                   className="cta-form"
+                <form
+                  onSubmit={(e) => {
+                    e.preventDefault();
+                    const email = e.target.elements.email.value;
+                    window.location.href = `mailto:hello@finaceverse.io?subject=Demo Request from ${email}&body=Business email: ${email}%0D%0A%0D%0AI'm interested in scheduling a demo of FinACEverse.`;
+                  }}
+                  className="cta-form"
                 >
                   <input
                     type="email"
                     placeholder="Enter your business email"
                     required="true"
                     id="thq_textinput__w1K"
-                    name="textinput"
+                    name="email"
                     data-form-field-id="thq_textinput__w1K"
                     className="cta-input"
                   />
@@ -605,7 +615,7 @@ const Home = (props) => {
                   Request a custom pilot program for your enterprise or
                   professional service firm.
                 </p>
-                <a href="#">
+                <a href="/tailored-pilots">
                   <div className="btn btn-link">
                     <span>
                       {' '}
@@ -639,7 +649,7 @@ const Home = (props) => {
                 <p className="section-content">
                   Speak with a Cognitive OS architect to map your transition.
                 </p>
-                <a href="#">
+                <a href="/expert-consultation">
                   <div className="btn btn-link">
                     <span>
                       {' '}

@@ -75,7 +75,7 @@ const Modules = (props) => {
               </div>
               <h3 className="section-subtitle">Accute</h3>
               <p className="section-content">
-                The operational core orchestrating complex financial workflows.
+                Operational orchestrator coordinating VAMN's cognitive streams across complex financial workflows.
               </p>
             </div>
             <div className="modules-hero-card modules-hero-vamn">
@@ -142,11 +142,11 @@ const Modules = (props) => {
           <div className="capabilities-cell cell-large">
             <div className="cell-content">
               <span className="cell-tag">Foundation</span>
-              <h3 className="section-subtitle">Accute &amp; VAMN</h3>
+              <h3 className="section-subtitle">VAMN &amp; Accute</h3>
               <p className="section-content">
-                The heartbeat of FinACEverse. Accute establishes a shared
-                ontology while VAMN provides specialized cognitive streams for
-                multi-layered financial intelligence.
+                The cognitive brain of FinACEverse. VAMN provides the core
+                intelligence through specialized cognitive streams while Accute
+                orchestrates workflows across the financial ecosystem.
               </p>
               <ul className="cell-list">
                 <li className="section-content">

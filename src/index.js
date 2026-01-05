@@ -11,6 +11,8 @@ import './style.css'
 import Home from './views/home'
 import Modules from './views/modules'
 import CompliancePrivacy from './views/compliance-privacy'
+import TailoredPilots from './views/tailored-pilots'
+import ExpertConsultation from './views/expert-consultation'
 import NotFound from './views/not-found'
 
 const App = () => {
@@ -20,6 +22,8 @@ const App = () => {
         <Route component={Home} exact path="/" />
         <Route component={Modules} exact path="/modules" />
         <Route component={CompliancePrivacy} exact path="/compliance-privacy" />
+        <Route component={TailoredPilots} exact path="/tailored-pilots" />
+        <Route component={ExpertConsultation} exact path="/expert-consultation" />
         <Route component={NotFound} path="**" />
         <Redirect to="**" />
       </Switch>

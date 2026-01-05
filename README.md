@@ -3,7 +3,7 @@
 A modern React landing page for FinACEverse - The World's First Cognitive Operating System for Finance.
 
 ## Features
-- 7 Core Modules: Accute, VAMN, Cyloid, Luca, Finaid Hub, Finory & EPI-Q, Sumbuddy
+- 7 Core Modules: VAMN (Brain), Cyloid (Eyes), Accute, Luca, Finaid Hub, Finory & EPI-Q, Sumbuddy
 - Responsive design with video backgrounds
 - Interactive UI components
 - SEO optimized with React Helmet
