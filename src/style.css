@@ -1012,6 +1012,7 @@
   border-top: 1px solid var(--color-border);
   align-items: center;
   padding-top: var(--spacing-2xl);
+  padding-bottom: var(--spacing-xl);
   justify-content: space-between;
 }
  

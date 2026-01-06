@@ -82,11 +82,35 @@
   border-radius: 8px;
   padding-right: 12px;
   padding-bottom: 8px;
+  -webkit-backdrop-filter: blur(6px);
   backdrop-filter: blur(6px);
-  background-color: rgba(0, 0, 0, 0.6);
+  background-color: rgba(41, 41, 41, 0.41);
   white-space: nowrap;
   overflow: hidden;
-  background-color: rgba(41, 41, 41, 0.41);
+}
+
+@media (max-width: 991px) {
+  .home-container6 {
+    right: 20px;
+    bottom: 20px;
+  }
+}
+
+@media (max-width: 767px) {
+  .home-container6 {
+    right: 15px;
+    bottom: 15px;
+    padding: 6px 10px;
+  }
+  
+  .home-container6 img {
+    width: 20px !important;
+    height: 20px !important;
+  }
+  
+  .home-text28 {
+    font-size: 11px;
+  }
 }
  
 .home-icon31 {

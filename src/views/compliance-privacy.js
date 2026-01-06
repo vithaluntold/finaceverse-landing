@@ -487,7 +487,7 @@ const CompliancePrivacy = (props) => {
               <button className="btn btn-primary btn-xl">
                 Schedule Briefing
               </button>
-              <button className="btn btn-outline btn-xl">Request Demo</button>
+              <a href="/request-demo" className="btn btn-outline btn-xl">Request Demo</a>
             </div>
           </div>
         </div>

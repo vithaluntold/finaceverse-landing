@@ -57,7 +57,7 @@ const Home = (props) => {
               operations.
             </p>
             <div className="hero-actions">
-              <a href="mailto:vithal@finacegroup.com?subject=Demo Request&body=I'm interested in scheduling a demo of FinACEverse." className="btn btn-primary btn-lg">Request Demo</a>
+              <a href="/request-demo" className="btn btn-primary btn-lg">Request Demo</a>
               <a href="/tailored-pilots" className="btn btn-lg btn-outline">
                 Join Pilot Program
               </a>
@@ -641,7 +641,7 @@ const Home = (props) => {
                     data-form-field-id="thq_button_QbF1"
                     className="btn btn-lg btn-accent"
                   >
-                    Request Demo
+                    <a href="/request-demo" style={{color: 'inherit', textDecoration: 'none'}}>Request Demo</a>
                   </button>
                 </form>
                 <p className="form-disclaimer">
