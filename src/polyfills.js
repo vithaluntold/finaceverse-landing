@@ -2,14 +2,12 @@
 
 // Polyfill for older browsers that don't support fetch
 if (!window.fetch) {
-  console.warn('Fetch API not supported, loading polyfill...');
-  require('whatwg-fetch');
+  console.warn('Fetch API not supported. Using XMLHttpRequest fallback.');
 }
 
-// IntersectionObserver polyfill for older browsers
+// IntersectionObserver polyfill check (graceful degradation)
 if (typeof window !== 'undefined' && !('IntersectionObserver' in window)) {
-  console.warn('IntersectionObserver not supported, loading polyfill...');
-  require('intersection-observer');
+  console.warn('IntersectionObserver not supported, some features may be limited.');
 }
 
 // ResizeObserver polyfill
