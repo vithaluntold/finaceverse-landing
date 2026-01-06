@@ -1054,6 +1054,11 @@ app.get('/api/search-console/performance', authMiddleware, async (req, res) => {
   }
 });
 
+// Health check endpoint for Railway
+app.get('/api/health', (req, res) => {
+  res.json({ status: 'healthy', timestamp: new Date().toISOString() });
+});
+
 // Catch-all route - serve React app for any non-API routes (Express 5 compatible)
 app.use((req, res) => {
   res.sendFile(path.join(__dirname, 'build', 'index.html'));
