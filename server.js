@@ -1119,7 +1119,7 @@ async function startServer() {
     
     startScheduledJobs();
     
-    server.listen(PORT, () => {
+    server.listen(PORT, '0.0.0.0', () => {
       console.log(`🚀 Analytics API running on port ${PORT}`);
       console.log(`🔌 WebSocket server ready`);
     });
