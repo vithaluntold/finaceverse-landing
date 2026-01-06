@@ -28,7 +28,8 @@
     "web-vitals": "^5.1.0"
   },
   "scripts": {
-    "start": "craco start",
+    "start": "node server.js",
+    "dev": "craco start",
     "build": "craco build",
     "test": "craco test --env=jsdom",
     "eject": "craco eject"
