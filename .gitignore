@@ -40,3 +40,10 @@ coverage
 .cache
 .temp
 *.tmp
+
+# Credentials and sensitive files
+CREDENTIALS.md
+credentials.txt
+secrets.txt
+*.key
+*.pem
