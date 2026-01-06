@@ -16,9 +16,28 @@ import ExpertConsultation from './views/expert-consultation'
 import RequestDemo from './views/request-demo'
 import Blog from './views/blog'
 import Unsubscribe from './views/unsubscribe'
+import AnalyticsLogin from './views/analytics-login'
+import AnalyticsDashboard from './views/analytics-dashboard'
 import NotFound from './views/not-found'
+import { initGA, trackPageView } from './utils/analytics'
+import { initPerformanceTracking, trackVisit } from './utils/performanceTracker'
+
+// Initialize analytics on app load
+initGA();
+initPerformanceTracking();
+trackVisit();
 
 const App = () => {
+  // Track page views on route change
+  React.useEffect(() => {
+    const handleRouteChange = () => {
+      trackPageView(window.location.pathname);
+    };
+    handleRouteChange(); // Track initial page
+    window.addEventListener('popstate', handleRouteChange);
+    return () => window.removeEventListener('popstate', handleRouteChange);
+  }, []);
+
   return (
     <Router>
       <Switch>
@@ -30,6 +49,8 @@ const App = () => {
         <Route component={RequestDemo} exact path="/request-demo" />
         <Route component={Blog} exact path="/blog" />
         <Route component={Unsubscribe} exact path="/unsubscribe" />
+        <Route component={AnalyticsLogin} exact path="/analytics/login" />
+        <Route component={AnalyticsDashboard} exact path="/analytics/dashboard" />
         <Route component={NotFound} path="**" />
         <Redirect to="**" />
       </Switch>

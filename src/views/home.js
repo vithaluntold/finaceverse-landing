@@ -189,10 +189,10 @@ const Home = (props) => {
           <div className="section-header centered">
             <h2 className="section-title">
               <span>Who </span>
-              <span className="home-thq-text-gradient-elm2">It's Built For</span>
+              <span className="home-thq-text-gradient-elm2">It&apos;s Built For</span>
             </h2>
             <p className="section-subtitle">
-              Whether you're a solo practitioner or a global enterprise, FinACEverse scales to your needs
+              Whether you&apos;re a solo practitioner or a global enterprise, FinACEverse scales to your needs
             </p>
           </div>
           <div className="bento-grid" style={{gap: 'var(--spacing-xl)', marginTop: 'var(--spacing-2xl)'}}>
