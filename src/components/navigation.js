@@ -168,41 +168,6 @@ const Navigation = (props) => {
           </div>
         </div>
       </nav>
-      <div data-thq="thq-mobile-menu" className="navigation-mobile-menu1">
-        <div className="navigation-nav">
-          <div className="navigation-container3">
-            <div className="navigation-image">
-              <img
-                alt={props.imageAlt}
-                src={props.imageSrc}
-                className="navigation-image1"
-              />
-            </div>
-            <button
-              id="navToggle"
-              aria-label="Toggle Menu"
-              aria-expanded="false"
-              className="navigation-mobile-toggle"
-            >
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              width="24"
-              height="24"
-              viewBox="0 0 24 24"
-              className="icon-menu"
-            >
-              <path
-                fill="none"
-                stroke="currentColor"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth="2"
-                d="M4 5h16M4 12h16M4 19h16"
-              ></path>
-            </svg>
-          </button>
-        </div>
-      </nav>
       <div id="mobileOverlay" className="navigation-mobile-overlay">
         <div className="navigation-overlay-header">
           <a href="/">
