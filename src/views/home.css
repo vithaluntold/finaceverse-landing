@@ -83,6 +83,9 @@
   padding-right: 12px;
   padding-bottom: 8px;
   backdrop-filter: blur(6px);
+  background-color: rgba(0, 0, 0, 0.6);
+  white-space: nowrap;
+  overflow: hidden;
   background-color: rgba(41, 41, 41, 0.41);
 }
  
@@ -97,4 +100,5 @@
   font-style: normal;
   font-weight: 500;
   line-height: 24px;
+  white-space: nowrap;
 }
