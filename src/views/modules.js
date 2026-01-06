@@ -323,8 +323,20 @@ const Modules = (props) => {
                 the VAMN network for real-time data streaming.
               </p>
               <div className="api-visual">
-                <code>GET /v1/vamn/intelligence/stream</code>
-                <code>POST /v1/cyloid/verify/document</code>
+                <div style={{display: 'flex', alignItems: 'center', gap: '8px'}}>
+                  <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#4ade80" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <polyline points="16 18 22 12 16 6"></polyline>
+                    <polyline points="8 6 2 12 8 18"></polyline>
+                  </svg>
+                  <code>GET /v1/vamn/intelligence/stream</code>
+                </div>
+                <div style={{display: 'flex', alignItems: 'center', gap: '8px'}}>
+                  <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#4ade80" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <polyline points="16 18 22 12 16 6"></polyline>
+                    <polyline points="8 6 2 12 8 18"></polyline>
+                  </svg>
+                  <code>POST /v1/cyloid/verify/document</code>
+                </div>
               </div>
             </div>
             <div className="integration-cell data-flow">
