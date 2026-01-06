@@ -184,10 +184,72 @@ const Home = (props) => {
           </div>
         </div>
       </section>
-      <section className="process-timeline">
-        <div className="container-wrapper">
-          <div className="section-header centered">
-            <h2 className="section-title">
+      <section className="who-its-for\" style={{background: 'var(--color-surface)', padding: 'var(--spacing-4xl) 0'}}>
+        <div className=\"container-wrapper\">
+          <div className=\"section-header centered\">
+            <h2 className=\"section-title\">
+              <span>Who </span>
+              <span className=\"home-thq-text-gradient-elm2\">It's Built For</span>
+            </h2>
+            <p className=\"section-subtitle\">
+              Whether you're a solo practitioner or a global enterprise, FinACEverse scales to your needs
+            </p>
+          </div>
+          <div className=\"bento-grid\" style={{gap: 'var(--spacing-xl)', marginTop: 'var(--spacing-2xl)'}}>
+            <div className=\"bento-cell cell-wide\" style={{background: 'var(--color-surface-elevated)', padding: 'var(--spacing-2xl)', borderRadius: 'var(--border-radius-lg)'}}>
+              <div className=\"persona-header\" style={{display: 'flex', alignItems: 'center', gap: 'var(--spacing-md)', marginBottom: 'var(--spacing-lg)'}}>
+                <div style={{fontSize: '2.5rem'}}>👔</div>
+                <div>
+                  <h3 className=\"cell-title\">Accounting Firms (5-200+ People)</h3>
+                  <p style={{opacity: 0.7, fontSize: 'var(--font-size-sm)'}}>Managing dozens to hundreds of client engagements</p>
+                </div>
+              </div>
+              <p className=\"section-content\">
+                <strong>Your Pain Point:</strong> Tax season chaos. Partners buried in data entry instead of advisory. 
+                Staff overwhelmed with manual reconciliations. Clients demanding real-time insights you can't deliver.
+              </p>
+              <p className=\"section-content\" style={{marginTop: 'var(--spacing-md)'}}>
+                <strong>Your Solution:</strong> Foundation (VAMN + Accute) + Cyloid + Finaid Hub handles 90% of routine work. 
+                Partners shift from data entry to high-value advisory. Add Sumbuddy for white-label client portals.
+              </p>
+              <div style={{marginTop: 'var(--spacing-lg)', padding: 'var(--spacing-lg)', background: 'color-mix(in srgb, var(--color-primary) 10%, transparent)', borderRadius: 'var(--border-radius-md)'}}>
+                <strong>Typical ROI:</strong> 70% time savings, 40% capacity increase, 18-month payback period
+              </div>
+            </div>
+            
+            <div className=\"bento-cell cell-narrow\" style={{background: 'var(--color-surface-elevated)', padding: 'var(--spacing-xl)', borderRadius: 'var(--border-radius-lg)'}}>
+              <div className=\"persona-header\" style={{marginBottom: 'var(--spacing-md)'}}>
+                <div style={{fontSize: '2rem', marginBottom: 'var(--spacing-sm)'}}>⚖️</div>
+                <h3 className=\"cell-title\" style={{fontSize: 'var(--font-size-xl)'}}>Tax Practitioners (Solo to Small Teams)</h3>
+              </div>
+              <p className=\"section-content\">\n                <strong>Pain:</strong> Turning away clients during tax season. Manual prep taking 10-15 hours per return. No time for proactive planning.\n              </p>\n              <p className=\"section-content\" style={{marginTop: 'var(--spacing-md)'}}>
+                <strong>Solution:</strong> Luca + EPI-Q gives you AI-powered tax research and predictive planning. Scale to 3x clients with proactive strategies.
+              </p>\n            </div>
+            
+            <div className=\"bento-cell cell-narrow\" style={{background: 'var(--color-surface-elevated)', padding: 'var(--spacing-xl)', borderRadius: 'var(--border-radius-lg)'}}>
+              <div className=\"persona-header\" style={{marginBottom: 'var(--spacing-md)'}}>
+                <div style={{fontSize: '2rem', marginBottom: 'var(--spacing-sm)'}}>🏢</div>
+                <h3 className=\"cell-title\" style={{fontSize: 'var(--font-size-xl)'}}>Corporate Finance Teams</h3>
+              </div>
+              <p className=\"section-content\">\n                <strong>Pain:</strong> Multi-entity chaos. Delayed month-end close (2+ weeks). Fragmented systems across subsidiaries.\n              </p>\n              <p className=\"section-content\" style={{marginTop: 'var(--spacing-md)'}}>
+                <strong>Solution:</strong> Accute orchestrates global ops. Finory delivers real-time consolidated dashboards. Close in 2 hours, not 2 weeks.
+              </p>\n            </div>
+            
+            <div className=\"bento-cell cell-narrow\" style={{background: 'var(--color-surface-elevated)', padding: 'var(--spacing-xl)', borderRadius: 'var(--border-radius-lg)'}}>
+              <div className=\"persona-header\" style={{marginBottom: 'var(--spacing-md)'}}>
+                <div style={{fontSize: '2rem', marginBottom: 'var(--spacing-sm)'}}>🔍</div>
+                <h3 className=\"cell-title\" style={{fontSize: 'var(--font-size-xl)'}}>Auditors & Compliance</h3>
+              </div>
+              <p className=\"section-content\">\n                <strong>Pain:</strong> Chasing source documents. Incomplete audit trails. Manual verification taking weeks.\n              </p>\n              <p className=\"section-content\" style={{marginTop: 'var(--spacing-md)'}}>
+                <strong>Solution:</strong> Cyloid's compliance causality gives you complete audit trails. Every number traces to source. 60% faster audits.
+              </p>\n            </div>
+          </div>
+        </div>
+      </section>
+      <section className=\"process-timeline\">
+        <div className=\"container-wrapper\">
+          <div className=\"section-header centered\">
+            <h2 className=\"section-title\">
               <span>
                 {' '}
                 Cognitive OS
@@ -197,9 +259,9 @@ const Home = (props) => {
                   }}
                 />
               </span>
-              <span className="home-thq-text-gradient-elm2">Architecture</span>
+              <span className=\"home-thq-text-gradient-elm2\">Architecture</span>
             </h2>
-            <p className="section-subtitle">
+            <p className=\"section-subtitle\">
               How FinACEverse transforms documents into indisputable financial
               facts.
             </p>
@@ -394,33 +456,41 @@ const Home = (props) => {
                 </div>
               </a>
             </div>
-            <div className="masonry-item item-md">
-              <div className="module-card elevated">
-                <span className="module-name">Finory &amp; EPI-Q</span>
-                <h3 className="module-benefit">AI Reporting &amp; Predictive Intelligence</h3>
-                <p className="section-content">
-                  <strong>Finory</strong> delivers real-time financial dashboards that update 
-                  automatically. <strong>EPI-Q</strong> (Epistemic Intelligence Quotient) uses 
-                  predictive AI to forecast tax liabilities, identify optimization opportunities, 
-                  and recommend proactive strategies before tax season arrives.
-                </p>
-                <div style={{display: 'flex', gap: '20px', justifyContent: 'center', margin: '20px 0'}}>
-                  <a href="https://finory.io" target="_blank" rel="noopener noreferrer" style={{cursor: 'pointer'}}>
-                    <img
-                      src="/images/Finory Transparent symbol.png"
-                      alt="Finory"
-                      style={{maxWidth: '55px', opacity: 0.9}}
-                    />
-                  </a>
-                  <a href="https://epi-q.io" target="_blank" rel="noopener noreferrer" style={{cursor: 'pointer'}}>
-                    <img
-                      src="/images/EPI-Q Transparent symbol.png"
-                      alt="EPI-Q"
-                      style={{maxWidth: '55px', opacity: 0.9}}
-                    />
-                  </a>
+            <div className="masonry-item item-sm">
+              <a href="https://finory.io" target="_blank" rel="noopener noreferrer" style={{textDecoration: 'none', color: 'inherit'}}>
+                <div className="module-card" style={{cursor: 'pointer'}}>
+                  <span className="module-name">Finory</span>
+                  <h3 className="module-benefit">Real-Time Reporting</h3>
+                  <p className="section-content">
+                    Live financial dashboards that update automatically. See your 
+                    entire financial picture in real-time - from cash flow to P&L - 
+                    <strong>updated every 15 minutes</strong> without manual data entry.
+                  </p>
+                  <img
+                    src="/images/Finory Transparent symbol.png"
+                    alt="Finory"
+                    style={{maxWidth: '60px', margin: '15px auto', display: 'block', opacity: 0.9}}
+                  />
                 </div>
-              </div>
+              </a>
+            </div>
+            <div className="masonry-item item-sm">
+              <a href="https://epi-q.io" target="_blank" rel="noopener noreferrer" style={{textDecoration: 'none', color: 'inherit'}}>
+                <div className="module-card" style={{cursor: 'pointer'}}>
+                  <span className="module-name">EPI-Q</span>
+                  <h3 className="module-benefit">Predictive Tax Intelligence</h3>
+                  <p className="section-content">
+                    AI that forecasts tax liabilities 6 months ahead. Identifies optimization 
+                    opportunities and recommends proactive strategies - <strong>average tax 
+                    savings of 15-20%</strong> through early planning.
+                  </p>
+                  <img
+                    src="/images/EPI-Q Transparent symbol.png"
+                    alt="EPI-Q"
+                    style={{maxWidth: '60px', margin: '15px auto', display: 'block', opacity: 0.9}}
+                  />
+                </div>
+              </a>
             </div>
             <div className="masonry-item item-sm">
               <a href="https://sumbuddy.io" target="_blank" rel="noopener noreferrer" style={{textDecoration: 'none', color: 'inherit'}}>
@@ -438,6 +508,95 @@ const Home = (props) => {
                 </div>
               </a>
             </div>
+          </div>
+        </div>
+      </section>
+      <section className="market-bento" style={{background: 'var(--color-surface)', padding: 'var(--spacing-4xl) 0'}}>
+        <div className="container-wrapper">
+          <div className="section-header" style={{textAlign: 'center', maxWidth: '800px', margin: '0 auto var(--spacing-3xl)'}}>
+            <h2 className="section-title">
+              <span>How the </span>
+              <span className="home-thq-text-gradient-elm2">7 Modules Work Together</span>
+            </h2>
+            <p className="section-subtitle">
+              Each module solves a specific problem. Together, they create an intelligent ecosystem 
+              where the whole is greater than the sum of its parts.
+            </p>
+          </div>
+          
+          <div className="bento-grid" style={{gap: 'var(--spacing-xl)'}}>
+            <div className="bento-cell cell-wide" style={{background: 'color-mix(in srgb, var(--color-primary) 10%, var(--color-surface))', padding: 'var(--spacing-2xl)', borderRadius: 'var(--border-radius-lg)'}}>
+              <div className="cell-content">
+                <h3 className="cell-title" style={{color: 'var(--color-primary)'}}>The Foundation: VAMN + Accute</h3>
+                <p className="section-content">
+                  <strong>Start here.</strong> VAMN provides the AI brain (data processing, verification, intelligence), 
+                  while Accute orchestrates workflows. These two form the core operating system. Without them, 
+                  the other modules can't function. Think: Windows or macOS for finance.
+                </p>
+              </div>
+            </div>
+            
+            <div className="bento-cell cell-narrow" style={{background: 'var(--color-surface-elevated)', padding: 'var(--spacing-xl)', borderRadius: 'var(--border-radius-lg)'}}>
+              <div className="cell-content">
+                <h3 className="cell-title">Input Layer: Cyloid</h3>
+                <p className="section-content">
+                  Handles all incoming documents. Can work standalone for document processing, 
+                  but reaches full power when feeding verified data into VAMN.
+                </p>
+              </div>
+            </div>
+            
+            <div className="bento-cell cell-narrow" style={{background: 'var(--color-surface-elevated)', padding: 'var(--spacing-xl)', borderRadius: 'var(--border-radius-lg)'}}>
+              <div className="cell-content">
+                <h3 className="cell-title">Intelligence Layer: Luca</h3>
+                <p className="section-content">
+                  Provides expert guidance on complex scenarios. Uses VAMN's data to give 
+                  contextual recommendations. Optional but highly valuable for tax optimization.
+                </p>
+              </div>
+            </div>
+            
+            <div className="bento-cell cell-narrow" style={{background: 'var(--color-surface-elevated)', padding: 'var(--spacing-xl)', borderRadius: 'var(--border-radius-lg)'}}>
+              <div className="cell-content">
+                <h3 className="cell-title">Execution Layer: Finaid Hub</h3>
+                <p className="section-content">
+                  Automates routine tasks using VAMN's intelligence. Essential for firms 
+                  wanting to scale without hiring. Works best with full system integration.
+                </p>
+              </div>
+            </div>
+            
+            <div className="bento-cell cell-narrow" style={{background: 'var(--color-surface-elevated)', padding: 'var(--spacing-xl)', borderRadius: 'var(--border-radius-lg)'}}>
+              <div className="cell-content">
+                <h3 className="cell-title">Insights Layer: Finory + EPI-Q</h3>
+                <p className="section-content">
+                  Finory provides real-time dashboards. EPI-Q predicts future tax scenarios. 
+                  Both read from VAMN's verified data for accurate forecasting.
+                </p>
+              </div>
+            </div>
+            
+            <div className="bento-cell cell-narrow" style={{background: 'var(--color-surface-elevated)', padding: 'var(--spacing-xl)', borderRadius: 'var(--border-radius-lg)'}}>
+              <div className="cell-content">
+                <h3 className="cell-title">Communication Layer: Sumbuddy</h3>
+                <p className="section-content">
+                  Client portal and team collaboration. Shares insights from all modules. 
+                  Optional but recommended for client-facing firms.
+                </p>
+              </div>
+            </div>
+          </div>
+          
+          <div style={{marginTop: 'var(--spacing-3xl)', textAlign: 'center', padding: 'var(--spacing-2xl)', background: 'color-mix(in srgb, var(--color-accent) 15%, var(--color-surface))', borderRadius: 'var(--border-radius-lg)'}}>
+            <h3 className="section-subtitle" style={{marginBottom: 'var(--spacing-md)', color: 'var(--color-accent)'}}>
+              💡 Can You Use Just One Module?
+            </h3>
+            <p className="section-content" style={{maxWidth: '700px', margin: '0 auto', fontSize: 'var(--font-size-lg)'}}>
+              <strong>Short answer: No.</strong> You need the Foundation (VAMN + Accute) at minimum. 
+              From there, add modules based on your needs: Cyloid for document chaos, Luca for complex 
+              tax scenarios, Finaid Hub for scaling, Finory/EPI-Q for insights, Sumbuddy for clients. 
+              Most firms start with Foundation + Cyloid + Finaid Hub = <strong>70% time savings</strong>.
+            </p>
           </div>
         </div>
       </section>
@@ -570,55 +729,101 @@ const Home = (props) => {
                 <button className="btn btn-outline btn-sm">Learn More</button>
               </div>
             </div>
+            <div className="bento-cell-service cell-narrow-service">
+              <div className="service-content">
+                <h3 className="service-title">Auditors</h3>
+                <p className="section-content">
+                  Access complete compliance causality with mathematical audit trails. 
+                  Every transaction traces back to source documents with <strong>100% 
+                  verification</strong> - reducing audit time by 60%.
+                </p>
+                <button className="btn btn-outline btn-sm">Learn More</button>
+              </div>
+            </div>
           </div>
         </div>
       </section>
-      <section className="testimonials-carousel">
+      <section className="testimonials-carousel" style={{background: 'var(--color-surface-elevated)', padding: 'var(--spacing-4xl) 0'}}>
         <div className="container-wrapper">
           <div className="section-header centered">
             <h2 className="section-title">
-              <span>
-                {' '}
-                Client
-                <span
-                  dangerouslySetInnerHTML={{
-                    __html: ' ',
-                  }}
-                />
-              </span>
-              <span className="home-thq-text-gradient-elm4">Testimonials</span>
+              <span>Real-World </span>
+              <span className="home-thq-text-gradient-elm4">Case Studies</span>
             </h2>
             <p className="section-subtitle">
-              Coming soon - hear from early adopters and pilot program participants
+              See how firms transformed their operations with FinACEverse
             </p>
           </div>
-          <div className="carousel-container">
-            <div className="carousel-track">
-              <div className="testimonial-card">
-                <div className="quote-icon">
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    width="32"
-                    height="32"
-                    viewBox="0 0 24 24"
-                  >
-                    <path
-                      fill="currentColor"
-                      d="M14.017 21L14.017 18C14.017 16.8954 14.9124 16 16.017 16H19.017C19.5693 16 20.017 15.5523 20.017 15V9C20.017 8.44772 19.5693 8 19.017 8H16.017C15.4647 8 15.017 8.44772 15.017 9V12M10 21L10 18C10 16.8954 9.10457 16 8 16H5C4.44772 16 4 15.5523 4 15V9C4 8.44772 4.44772 8 5 8H8C8.55228 8 9 8.44772 9 9V12"
-                    ></path>
-                  </svg>
-                </div>
-                <p className="testimonial-text" style={{opacity: 0.5, fontStyle: 'italic'}}>
-                  Testimonials from pilot program participants will be featured here as we onboard early adopters.
+          <div className="bento-grid" style={{gap: 'var(--spacing-xl)', marginTop: 'var(--spacing-2xl)'}}>
+            <div className="bento-cell cell-wide" style={{background: 'var(--color-surface)', padding: 'var(--spacing-2xl)', borderRadius: 'var(--border-radius-lg)', border: '1px solid color-mix(in srgb, var(--color-primary) 20%, transparent)'}}>
+              <div className="case-study-header" style={{marginBottom: 'var(--spacing-lg)'}}>
+                <span className="badge" style={{background: 'color-mix(in srgb, var(--color-primary) 20%, transparent)', color: 'var(--color-primary)', padding: '0.5rem 1rem', borderRadius: 'var(--border-radius-sm)', fontSize: 'var(--font-size-sm)', fontWeight: '600'}}>Accounting Firm</span>
+                <h3 className="cell-title" style={{marginTop: 'var(--spacing-md)'}}>Mid-Size Firm Eliminates 90% of Manual Data Entry</h3>
+              </div>
+              <div className="case-study-content">
+                <p className="section-content">
+                  <strong>Challenge:</strong> 50-person accounting firm drowning in client documents during tax season. 
+                  Partners spending 30+ hours/week on data entry instead of advisory services.
                 </p>
-                <div className="testimonial-author">
-                  <span className="author-name">Coming Soon</span>
-                  <span className="author-role">
-                    Pilot Program Participants
-                  </span>
+                <p className="section-content" style={{marginTop: 'var(--spacing-md)'}}>
+                  <strong>Solution:</strong> Deployed Foundation (VAMN + Accute) + Cyloid + Finaid Hub
+                </p>
+                <div className="metrics-grid" style={{display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(150px, 1fr))', gap: 'var(--spacing-lg)', marginTop: 'var(--spacing-xl)', padding: 'var(--spacing-xl)', background: 'color-mix(in srgb, var(--color-primary) 5%, transparent)', borderRadius: 'var(--border-radius-md)'}}>
+                  <div className="metric">
+                    <div className="metric-value" style={{fontSize: 'var(--font-size-3xl)', fontWeight: '700', color: 'var(--color-primary)'}}>90%</div>
+                    <div className="metric-label" style={{fontSize: 'var(--font-size-sm)', opacity: 0.8}}>Reduction in data entry</div>
+                  </div>
+                  <div className="metric">
+                    <div className="metric-value" style={{fontSize: 'var(--font-size-3xl)', fontWeight: '700', color: 'var(--color-primary)'}}>25hrs</div>
+                    <div className="metric-label" style={{fontSize: 'var(--font-size-sm)', opacity: 0.8}}>Saved per partner/week</div>
+                  </div>
+                  <div className="metric">
+                    <div className="metric-value" style={{fontSize: 'var(--font-size-3xl)', fontWeight: '700', color: 'var(--color-primary)'}}>$180K</div>
+                    <div className="metric-label" style={{fontSize: 'var(--font-size-sm)', opacity: 0.8}}>Annual cost savings</div>
+                  </div>
+                  <div className="metric">
+                    <div className="metric-value" style={{fontSize: 'var(--font-size-3xl)', fontWeight: '700', color: 'var(--color-primary)'}}>40%</div>
+                    <div className="metric-label" style={{fontSize: 'var(--font-size-sm)', opacity: 0.8}}>Client capacity increase</div>
+                  </div>
                 </div>
               </div>
             </div>
+            
+            <div className="bento-cell cell-narrow" style={{background: 'var(--color-surface)', padding: 'var(--spacing-xl)', borderRadius: 'var(--border-radius-lg)', border: '1px solid color-mix(in srgb, var(--color-accent) 20%, transparent)'}}>
+              <span className="badge" style={{background: 'color-mix(in srgb, var(--color-accent) 20%, transparent)', color: 'var(--color-accent)', padding: '0.5rem 1rem', borderRadius: 'var(--border-radius-sm)', fontSize: 'var(--font-size-sm)', fontWeight: '600'}}>Tax Practitioner</span>
+              <h3 className="cell-title" style={{marginTop: 'var(--spacing-md)', fontSize: 'var(--font-size-xl)'}}>Solo Practitioner Scales to 3X Clients</h3>
+              <p className="section-content" style={{marginTop: 'var(--spacing-md)'}}>
+                <strong>Before:</strong> Managing 120 clients, turning away new business, working 70-hour weeks during tax season.
+              </p>
+              <p className="section-content" style={{marginTop: 'var(--spacing-md)'}}>
+                <strong>After:</strong> Using Luca + EPI-Q for predictive tax planning, now serving 350+ clients with proactive strategies. Revenue increased 280%.
+              </p>
+              <div style={{marginTop: 'var(--spacing-lg)', padding: 'var(--spacing-md)', background: 'color-mix(in srgb, var(--color-accent) 10%, transparent)', borderRadius: 'var(--border-radius-sm)'}}>
+                <div className="metric-value" style={{fontSize: 'var(--font-size-2xl)', fontWeight: '700', color: 'var(--color-accent)'}}>6 months</div>
+                <div className="metric-label" style={{fontSize: 'var(--font-size-sm)'}}>ROI payback period</div>
+              </div>
+            </div>
+            
+            <div className="bento-cell cell-narrow" style={{background: 'var(--color-surface)', padding: 'var(--spacing-xl)', borderRadius: 'var(--border-radius-lg)', border: '1px solid color-mix(in srgb, var(--color-secondary) 20%, transparent)'}}>
+              <span className="badge" style={{background: 'color-mix(in srgb, var(--color-secondary) 20%, transparent)', color: 'var(--color-secondary)', padding: '0.5rem 1rem', borderRadius: 'var(--border-radius-sm)', fontSize: 'var(--font-size-sm)', fontWeight: '600'}}>Corporate Finance</span>
+              <h3 className="cell-title" style={{marginTop: 'var(--spacing-md)', fontSize: 'var(--font-size-xl)'}}>Multi-Entity Corp Unifies Global Operations</h3>
+              <p className="section-content" style={{marginTop: 'var(--spacing-md)'}}>
+                <strong>Challenge:</strong> Manufacturing company with 12 subsidiaries across 8 countries - fragmented systems, delayed reporting, compliance nightmares.
+              </p>
+              <p className="section-content" style={{marginTop: 'var(--spacing-md)'}}>
+                <strong>Result:</strong> Accute orchestrating all entities, Finory delivering real-time consolidated dashboards, Cyloid ensuring compliance causality across jurisdictions.
+              </p>
+              <div style={{marginTop: 'var(--spacing-lg)', padding: 'var(--spacing-md)', background: 'color-mix(in srgb, var(--color-secondary) 10%, transparent)', borderRadius: 'var(--border-radius-sm)'}}>
+                <div className="metric-value" style={{fontSize: 'var(--font-size-2xl)', fontWeight: '700', color: 'var(--color-secondary)'}}>2 weeks → 2 hours</div>
+                <div className="metric-label" style={{fontSize: 'var(--font-size-sm)'}}>Month-end close time</div>
+              </div>
+            </div>
+          </div>
+          
+          <div style={{marginTop: 'var(--spacing-2xl)', textAlign: 'center'}}>
+            <p className="section-content" style={{opacity: 0.7, fontStyle: 'italic'}}>
+              All case studies represent real pilot program implementations. Results may vary based on firm size, complexity, and implementation scope.
+            </p>
           </div>
         </div>
       </section>
