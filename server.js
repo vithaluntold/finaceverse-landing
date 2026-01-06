@@ -210,7 +210,12 @@ const runPageSpeedTest = async (url, strategy = 'mobile') => {
     const response = await fetch(apiUrl);
     
     if (!response.ok) {
-      throw new Error(`PageSpeed API error: ${response.statusText}`);
+      const errorData = await response.json().catch(() => ({}));
+      if (response.status === 403) {
+        console.warn('⚠️  PageSpeed Insights API not enabled. Enable it at: https://console.cloud.google.com/apis/library/pagespeedonline.googleapis.com');
+        return null;
+      }
+      throw new Error(`PageSpeed API error (${response.status}): ${errorData.error?.message || response.statusText}`);
     }
     
     const data = await response.json();
@@ -240,23 +245,27 @@ const startScheduledJobs = () => {
   // Run PageSpeed test immediately on startup
   setTimeout(async () => {
     console.log('🔍 Running PageSpeed test...');
-    const mobileResult = await runPageSpeedTest('https://finaceverse.io', 'mobile');
-    const desktopResult = await runPageSpeedTest('https://finaceverse.io', 'desktop');
-    
-    if (mobileResult) {
-      await pool.query(
-        'INSERT INTO pagespeed_results (url, strategy, score, metrics, timestamp) VALUES (\$1, \$2, \$3, \$4, \$5)',
-        [mobileResult.url, mobileResult.strategy, mobileResult.score, JSON.stringify(mobileResult.metrics), mobileResult.timestamp]
-      );
-    }
-    if (desktopResult) {
-      await pool.query(
-        'INSERT INTO pagespeed_results (url, strategy, score, metrics, timestamp) VALUES (\$1, \$2, \$3, \$4, \$5)',
-        [desktopResult.url, desktopResult.strategy, desktopResult.score, JSON.stringify(desktopResult.metrics), desktopResult.timestamp]
-      );
-    }
-    if (mobileResult || desktopResult) {
-      console.log('✓ PageSpeed test completed');
+    try {
+      const mobileResult = await runPageSpeedTest('https://finaceverse.io', 'mobile');
+      const desktopResult = await runPageSpeedTest('https://finaceverse.io', 'desktop');
+      
+      if (mobileResult) {
+        await pool.query(
+          'INSERT INTO pagespeed_results (url, strategy, score, metrics, timestamp) VALUES ($1, $2, $3, $4, $5)',
+          [mobileResult.url, mobileResult.strategy, mobileResult.score, JSON.stringify(mobileResult.metrics), mobileResult.timestamp]
+        );
+      }
+      if (desktopResult) {
+        await pool.query(
+          'INSERT INTO pagespeed_results (url, strategy, score, metrics, timestamp) VALUES ($1, $2, $3, $4, $5)',
+          [desktopResult.url, desktopResult.strategy, desktopResult.score, JSON.stringify(desktopResult.metrics), desktopResult.timestamp]
+        );
+      }
+      if (mobileResult || desktopResult) {
+        console.log('✓ PageSpeed test completed');
+      }
+    } catch (error) {
+      console.warn('PageSpeed test skipped:', error.message);
     }
   }, 5000); // Wait 5 seconds after startup
   
