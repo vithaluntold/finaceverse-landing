@@ -1,0 +1,12 @@
+# Allow all crawlers
+User-agent: *
+Allow: /
+
+# Disallow API endpoints
+Disallow: /api/
+
+# Sitemap
+Sitemap: https://finaceverse.io/sitemap.xml
+
+# Crawl-delay for polite crawling
+Crawl-delay: 1

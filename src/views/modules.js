@@ -11,12 +11,13 @@ const Modules = (props) => {
   return (
     <div className="modules-container1">
       <Helmet>
-        <title>Modules - FinACEverse</title>
-        <meta property="og:title" content="Modules - FinACEverse" />
-        <link
-          rel="canonical"
-          href="https://scary-impeccable-ibex-vzbllw.teleporthq.app/modules"
-        />
+        <title>FinACEverse Modules - VAMN, Accute, Cyloid & More | Financial AI Solutions</title>
+        <meta name="description" content="Explore FinACEverse's 7 specialized modules: VAMN cognitive intelligence, Accute orchestration, Cyloid verification, Luca AI, Finaid Hub, Finory reporting, and EPI-Q tax optimization." />
+        <meta name="keywords" content="VAMN, Accute, Cyloid, Luca AI, Finaid Hub, Finory, EPI-Q, financial modules, AI finance tools" />
+        <meta property="og:title" content="FinACEverse Modules - AI-Powered Financial Solutions" />
+        <meta property="og:description" content="Seven specialized modules working in harmony to transform your financial operations." />
+        <meta property="og:url" content="https://finaceverse.io/modules" />
+        <link rel="canonical" href="https://finaceverse.io/modules" />
       </Helmet>
       <Navigation></Navigation>
       <section className="modules-hero">

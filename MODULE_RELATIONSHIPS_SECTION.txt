@@ -1,0 +1,91 @@
+// Module relationship explainer section to be inserted after modules grid
+
+<section className="market-bento" style={{background: 'var(--color-surface)', padding: 'var(--spacing-4xl) 0'}}>
+  <div className="container-wrapper">
+    <div className="section-header" style={{textAlign: 'center', maxWidth: '800px', margin: '0 auto var(--spacing-3xl)'}}>
+      <h2 className="section-title">
+        <span>How the </span>
+        <span className="home-thq-text-gradient-elm2">7 Modules Work Together</span>
+      </h2>
+      <p className="section-subtitle">
+        Each module solves a specific problem. Together, they create an intelligent ecosystem 
+        where the whole is greater than the sum of its parts.
+      </p>
+    </div>
+    
+    <div className="bento-grid" style={{gap: 'var(--spacing-xl)'}}>
+      <div className="bento-cell cell-wide" style={{background: 'color-mix(in srgb, var(--color-primary) 10%, var(--color-surface))', padding: 'var(--spacing-2xl)', borderRadius: 'var(--border-radius-lg)'}}>
+        <div className="cell-content">
+          <h3 className="cell-title" style={{color: 'var(--color-primary)'}}>The Foundation: VAMN + Accute</h3>
+          <p className="section-content">
+            <strong>Start here.</strong> VAMN provides the AI brain (data processing, verification, intelligence), 
+            while Accute orchestrates workflows. These two form the core operating system. Without them, 
+            the other modules can't function. Think: Windows or macOS for finance.
+          </p>
+        </div>
+      </div>
+      
+      <div className="bento-cell cell-narrow" style={{background: 'var(--color-surface-elevated)', padding: 'var(--spacing-xl)', borderRadius: 'var(--border-radius-lg)'}}>
+        <div className="cell-content">
+          <h3 className="cell-title">Input Layer: Cyloid</h3>
+          <p className="section-content">
+            Handles all incoming documents. Can work standalone for document processing, 
+            but reaches full power when feeding verified data into VAMN.
+          </p>
+        </div>
+      </div>
+      
+      <div className="bento-cell cell-narrow" style={{background: 'var(--color-surface-elevated)', padding: 'var(--spacing-xl)', borderRadius: 'var(--border-radius-lg)'}}>
+        <div className="cell-content">
+          <h3 className="cell-title">Intelligence Layer: Luca</h3>
+          <p className="section-content">
+            Provides expert guidance on complex scenarios. Uses VAMN's data to give 
+            contextual recommendations. Optional but highly valuable for tax optimization.
+          </p>
+        </div>
+      </div>
+      
+      <div className="bento-cell cell-narrow" style={{background: 'var(--color-surface-elevated)', padding: 'var(--spacing-xl)', borderRadius: 'var(--border-radius-lg)'}}>
+        <div className="cell-content">
+          <h3 className="cell-title">Execution Layer: Finaid Hub</h3>
+          <p className="section-content">
+            Automates routine tasks using VAMN's intelligence. Essential for firms 
+            wanting to scale without hiring. Works best with full system integration.
+          </p>
+        </div>
+      </div>
+      
+      <div className="bento-cell cell-narrow" style={{background: 'var(--color-surface-elevated)', padding: 'var(--spacing-xl)', borderRadius: 'var(--border-radius-lg)'}}>
+        <div className="cell-content">
+          <h3 className="cell-title">Insights Layer: Finory + EPI-Q</h3>
+          <p className="section-content">
+            Finory provides real-time dashboards. EPI-Q predicts future tax scenarios. 
+            Both read from VAMN's verified data for accurate forecasting.
+          </p>
+        </div>
+      </div>
+      
+      <div className="bento-cell cell-narrow" style={{background: 'var(--color-surface-elevated)', padding: 'var(--spacing-xl)', borderRadius: 'var(--border-radius-lg)'}}>
+        <div className="cell-content">
+          <h3 className="cell-title">Communication Layer: Sumbuddy</h3>
+          <p className="section-content">
+            Client portal and team collaboration. Shares insights from all modules. 
+            Optional but recommended for client-facing firms.
+          </p>
+        </div>
+      </div>
+    </div>
+    
+    <div style={{marginTop: 'var(--spacing-3xl)', textAlign: 'center', padding: 'var(--spacing-2xl)', background: 'color-mix(in srgb, var(--color-accent) 15%, var(--color-surface))', borderRadius: 'var(--border-radius-lg)'}}>
+      <h3 className="section-subtitle" style={{marginBottom: 'var(--spacing-md)', color: 'var(--color-accent)'}}>
+        💡 Can You Use Just One Module?
+      </h3>
+      <p className="section-content" style={{maxWidth: '700px', margin: '0 auto', fontSize: 'var(--font-size-lg)'}}>
+        <strong>Short answer: No.</strong> You need the Foundation (VAMN + Accute) at minimum. 
+        From there, add modules based on your needs: Cyloid for document chaos, Luca for complex 
+        tax scenarios, Finaid Hub for scaling, Finory/EPI-Q for insights, Sumbuddy for clients. 
+        Most firms start with Foundation + Cyloid + Finaid Hub = <strong>70% time savings</strong>.
+      </p>
+    </div>
+  </div>
+</section>

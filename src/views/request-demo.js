@@ -8,8 +8,13 @@ const RequestDemo = (props) => {
   return (
     <div className="demo-container">
       <Helmet>
-        <title>Request Demo - FinACEverse</title>
+        <title>Request Demo - FinACEverse | See Cognitive Finance in Action</title>
+        <meta name="description" content="Schedule a personalized demo of FinACEverse. See how VAMN, Accute, and Cyloid transform financial operations with AI-powered automation and verification." />
+        <meta name="keywords" content="FinACEverse demo, financial software demo, VAMN demo, AI finance demo, accounting automation demo" />
         <meta property="og:title" content="Request Demo - FinACEverse" />
+        <meta property="og:description" content="See FinACEverse in action. Watch how our Cognitive OS transforms fragmented financial operations." />
+        <meta property="og:url" content="https://finaceverse.io/request-demo" />
+        <link rel="canonical" href="https://finaceverse.io/request-demo" />
       </Helmet>
       <Navigation></Navigation>
       

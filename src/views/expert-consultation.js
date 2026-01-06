@@ -8,8 +8,13 @@ const ExpertConsultation = (props) => {
   return (
     <div className="consultation-container">
       <Helmet>
-        <title>Expert Consultation - FinACEverse</title>
+        <title>Expert Consultation - FinACEverse | Strategic Financial Transformation</title>
+        <meta name="description" content="Book a 45-minute consultation with FinACEverse Cognitive OS architects. Get strategic guidance for transitioning to intelligent, unified financial operations." />
+        <meta name="keywords" content="financial consultation, finance transformation, FinACEverse consultation, cognitive finance strategy" />
         <meta property="og:title" content="Expert Consultation - FinACEverse" />
+        <meta property="og:description" content="Speak with a Cognitive OS architect to map your transition to intelligent financial operations." />
+        <meta property="og:url" content="https://finaceverse.io/expert-consultation" />
+        <link rel="canonical" href="https://finaceverse.io/expert-consultation" />
       </Helmet>
       <Navigation></Navigation>
       

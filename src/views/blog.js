@@ -50,10 +50,13 @@ const Blog = () => {
   return (
     <div className="blog-container">
       <Helmet>
-        <title>Blog - Cognitive Insights | FinACEverse</title>
-        <meta name="description" content="Stay informed with the latest insights on cognitive operating systems, financial intelligence, and the future of accounting technology." />
-        <meta property="og:title" content="Blog - Cognitive Insights | FinACEverse" />
-        <meta property="og:description" content="Expert insights on transforming financial operations through cognitive AI." />
+        <title>FinACEverse Blog - Insights on Cognitive Finance & AI Automation</title>
+        <meta name="description" content="Stay updated with the latest insights on cognitive finance, AI-powered accounting, tax automation, and financial intelligence from FinACEverse experts." />
+        <meta name="keywords" content="finance blog, AI accounting insights, tax automation news, financial intelligence, FinTech trends" />
+        <meta property="og:title" content="FinACEverse Blog - Cognitive Finance Insights" />
+        <meta property="og:description" content="Expert insights on transforming financial operations with AI and cognitive technology." />
+        <meta property="og:url" content="https://finaceverse.io/blog" />
+        <link rel="canonical" href="https://finaceverse.io/blog" />
       </Helmet>
       
       <Navigation />
