@@ -1110,13 +1110,26 @@ global.broadcastAnalytics = (type, data) => {
 
 // Start server after database initialization
 async function startServer() {
-  await initializeDatabase();
-  startScheduledJobs();
-  
-  server.listen(PORT, () => {
-    console.log(`🚀 Analytics API running on port ${PORT}`);
-    console.log(`🔌 WebSocket server ready`);
-  });
+  try {
+    const dbInitialized = await initializeDatabase();
+    if (!dbInitialized) {
+      console.error('⚠️ Database initialization failed - check DATABASE_URL');
+      console.error('DATABASE_URL:', process.env.DATABASE_URL ? 'set' : 'NOT SET');
+    }
+    
+    startScheduledJobs();
+    
+    server.listen(PORT, () => {
+      console.log(`🚀 Analytics API running on port ${PORT}`);
+      console.log(`🔌 WebSocket server ready`);
+    });
+  } catch (error) {
+    console.error('❌ Fatal error during startup:', error);
+    process.exit(1);
+  }
 }
 
-startServer();
+startServer().catch(err => {
+  console.error('❌ Unhandled error in startServer:', err);
+  process.exit(1);
+});
