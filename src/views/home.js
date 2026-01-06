@@ -298,7 +298,6 @@ const Home = (props) => {
                   />
                 </div>
               </a>
-              </div>
             </div>
             <div className="masonry-item item-sm">
               <a href="https://vamn.io" target="_blank" rel="noopener noreferrer" style={{textDecoration: 'none', color: 'inherit'}}>
@@ -336,7 +335,6 @@ const Home = (props) => {
                   />
                 </div>
               </a>
-              </div>
             </div>
             <div className="masonry-item item-sm">
               <a href="https://askluca.io" target="_blank" rel="noopener noreferrer" style={{textDecoration: 'none', color: 'inherit'}}>
