@@ -1,7 +1,8 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useHistory } from 'react-router-dom';
 import { LineChart, Line, BarChart, Bar, PieChart, Pie, Cell, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
 import { format, subDays } from 'date-fns';
+import io from 'socket.io-client';
 import './analytics-dashboard.css';
 
 const AnalyticsDashboard = () => {
@@ -12,6 +13,10 @@ const AnalyticsDashboard = () => {
   const [pageSpeed, setPageSpeed] = useState(null);
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState('overview');
+  const [realtimeVisits, setRealtimeVisits] = useState([]);
+  const [experiments, setExperiments] = useState([]);
+  const [newExperiment, setNewExperiment] = useState({ name: '', description: '', variants: ['A', 'B'] });
+  const socketRef = useRef(null);
   const history = useHistory();
 
   const API_URL = process.env.REACT_APP_API_URL || 'https://www.finaceverse.io';
@@ -41,9 +46,52 @@ const AnalyticsDashboard = () => {
     }
 
     fetchData();
-    const interval = setInterval(fetchData, 60000); // Refresh every minute
-    return () => clearInterval(interval);
-  }, [history]);
+    
+    // Initialize WebSocket connection
+    const socket = io(API_URL, {
+      transports: ['websocket', 'polling']
+    });
+    
+    socketRef.current = socket;
+    
+    socket.on('connect', () => {
+      console.log('🔌 WebSocket connected');
+      socket.emit('subscribe-analytics');
+    });
+    
+    socket.on('analytics-update', (data) => {
+      console.log('📊 Real-time update:', data);
+      
+      if (data.type === 'visit') {
+        setRealtimeVisits(prev => [{
+          page: data.data.page,
+          country: data.data.country,
+          timestamp: new Date(data.data.timestamp)
+        }, ...prev].slice(0, 10)); // Keep last 10 visits
+        
+        // Update summary count
+        setSummary(prev => prev ? {
+          ...prev,
+          total_visits: parseInt(prev.total_visits) + 1
+        } : null);
+      }
+      
+      if (data.type === 'summary') {
+        setSummary(data.data);
+      }
+    });
+    
+    socket.on('disconnect', () => {
+      console.log('🔌 WebSocket disconnected');
+    });
+    
+    const interval = setInterval(fetchData, 300000); // Refresh every 5 minutes (reduced from 1 minute due to WebSocket)
+    
+    return () => {
+      clearInterval(interval);
+      socket.disconnect();
+    };
+  }, [history, API_URL]);
 
   const fetchData = async () => {
     const token = localStorage.getItem('analytics_token');
@@ -84,6 +132,76 @@ const AnalyticsDashboard = () => {
     localStorage.removeItem('analytics_user');
     history.push('/analytics/login');
   };
+
+  const fetchExperiments = async () => {
+    const token = localStorage.getItem('analytics_token');
+    const headers = {
+      'Authorization': `Bearer ${token}`,
+      'Content-Type': 'application/json',
+    };
+
+    try {
+      const res = await fetch(`${API_URL}/api/experiments`, { headers });
+      if (res.ok) {
+        const data = await res.json();
+        setExperiments(data);
+      }
+    } catch (err) {
+      console.error('Fetch experiments error:', err);
+    }
+  };
+
+  const createExperiment = async () => {
+    const token = localStorage.getItem('analytics_token');
+    const headers = {
+      'Authorization': `Bearer ${token}`,
+      'Content-Type': 'application/json',
+    };
+
+    try {
+      const res = await fetch(`${API_URL}/api/experiments`, {
+        method: 'POST',
+        headers,
+        body: JSON.stringify(newExperiment)
+      });
+
+      if (res.ok) {
+        setNewExperiment({ name: '', description: '', variants: ['A', 'B'] });
+        fetchExperiments();
+      }
+    } catch (err) {
+      console.error('Create experiment error:', err);
+    }
+  };
+
+  const endExperiment = async (id) => {
+    const token = localStorage.getItem('analytics_token');
+    const headers = {
+      'Authorization': `Bearer ${token}`,
+      'Content-Type': 'application/json',
+    };
+
+    try {
+      const res = await fetch(`${API_URL}/api/experiments/${id}/end`, {
+        method: 'POST',
+        headers
+      });
+
+      if (res.ok) {
+        fetchExperiments();
+      }
+    } catch (err) {
+      console.error('End experiment error:', err);
+    }
+  };
+
+  // Load experiments when A/B Testing tab is active
+  useEffect(() => {
+    if (activeTab === 'abtesting') {
+      fetchExperiments();
+    }
+  }, [activeTab]);
+
 
   if (loading) {
     return (
@@ -135,6 +253,12 @@ const AnalyticsDashboard = () => {
           PageSpeed
         </button>
         <button
+          className={activeTab === 'abtesting' ? 'tab-active' : ''}
+          onClick={() => setActiveTab('abtesting')}
+        >
+          A/B Testing
+        </button>
+        <button
           className={activeTab === 'errors' ? 'tab-active' : ''}
           onClick={() => setActiveTab('errors')}
         >
@@ -184,6 +308,25 @@ const AnalyticsDashboard = () => {
                 </div>
               </div>
             </div>
+
+            {/* Real-time Visits Feed */}
+            {realtimeVisits.length > 0 && (
+              <div className="realtime-section">
+                <h2>🔴 Real-time Visits</h2>
+                <div className="realtime-feed">
+                  {realtimeVisits.map((visit, idx) => (
+                    <div key={idx} className="realtime-visit">
+                      <span className="realtime-pulse">●</span>
+                      <span className="realtime-page">{visit.page}</span>
+                      <span className="realtime-country">{visit.country || 'Unknown'}</span>
+                      <span className="realtime-time">
+                        {format(visit.timestamp, 'HH:mm:ss')}
+                      </span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
 
             <div className="recent-activity">
               <h2>Recent Activity (Last 7 Days)</h2>
@@ -488,6 +631,78 @@ const AnalyticsDashboard = () => {
                       <div>Page: {error.page}</div>
                       {error.source && <div>Source: {error.source}:{error.line}</div>}
                     </div>
+                  </div>
+                ))
+              )}
+            </div>
+          </div>
+        )}
+
+        {activeTab === 'abtesting' && (
+          <div className="tab-panel">
+            <h2>🧪 A/B Testing Experiments</h2>
+            
+            {/* Create New Experiment */}
+            <div className="experiment-create">
+              <h3>Create New Experiment</h3>
+              <div className="experiment-form">
+                <input
+                  type="text"
+                  placeholder="Experiment Name"
+                  value={newExperiment.name}
+                  onChange={(e) => setNewExperiment({...newExperiment, name: e.target.value})}
+                />
+                <input
+                  type="text"
+                  placeholder="Description"
+                  value={newExperiment.description}
+                  onChange={(e) => setNewExperiment({...newExperiment, description: e.target.value})}
+                />
+                <div className="variants-input">
+                  <label>Variants (comma-separated):</label>
+                  <input
+                    type="text"
+                    placeholder="A,B"
+                    value={newExperiment.variants.join(',')}
+                    onChange={(e) => setNewExperiment({
+                      ...newExperiment, 
+                      variants: e.target.value.split(',').map(v => v.trim()).filter(v => v)
+                    })}
+                  />
+                </div>
+                <button onClick={createExperiment} className="btn-create-experiment">
+                  Create Experiment
+                </button>
+              </div>
+            </div>
+
+            {/* Experiments List */}
+            <div className="experiments-list">
+              {experiments.length === 0 ? (
+                <div className="no-experiments">No experiments yet. Create one to get started!</div>
+              ) : (
+                experiments.map((exp) => (
+                  <div key={exp.id} className={`experiment-card ${exp.status}`}>
+                    <div className="experiment-header">
+                      <h4>{exp.name}</h4>
+                      <span className={`status-badge ${exp.status}`}>{exp.status}</span>
+                    </div>
+                    <p className="experiment-description">{exp.description}</p>
+                    <div className="experiment-variants">
+                      <strong>Variants:</strong> {exp.variants.join(', ')}
+                    </div>
+                    <div className="experiment-meta">
+                      <span>Created: {new Date(exp.created_at).toLocaleDateString()}</span>
+                      {exp.ended_at && <span>Ended: {new Date(exp.ended_at).toLocaleDateString()}</span>}
+                    </div>
+                    {exp.status === 'active' && (
+                      <button 
+                        onClick={() => endExperiment(exp.id)} 
+                        className="btn-end-experiment"
+                      >
+                        End Experiment
+                      </button>
+                    )}
                   </div>
                 ))
               )}

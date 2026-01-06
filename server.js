@@ -1,11 +1,13 @@
 require('dotenv').config();
 const express = require('express');
 const path = require('path');
+const http = require('http');
 const cors = require('cors');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const { Pool } = require('pg');
 const redis = require('redis');
+const { Server } = require('socket.io');
 
 const app = express();
 const PORT = process.env.PORT || 5000;
@@ -13,6 +15,9 @@ const JWT_SECRET = process.env.JWT_SECRET || 'your-secret-key-change-in-producti
 const DATABASE_URL = process.env.DATABASE_URL || 'postgresql://localhost:5432/finaceverse_analytics';
 const REDIS_URL = process.env.REDIS_URL || 'redis://localhost:6379';
 const GOOGLE_API_KEY = process.env.GOOGLE_API_KEY || '';
+const GOOGLE_CLIENT_ID = process.env.GOOGLE_CLIENT_ID || '';
+const GOOGLE_CLIENT_SECRET = process.env.GOOGLE_CLIENT_SECRET || '';
+const GOOGLE_REFRESH_TOKEN = process.env.GOOGLE_REFRESH_TOKEN || '';
 
 // Middleware
 app.use(cors());
@@ -106,11 +111,41 @@ pool.connect()
         timestamp TIMESTAMP DEFAULT CURRENT_TIMESTAMP
       );
 
+      CREATE TABLE IF NOT EXISTS experiments (
+        id SERIAL PRIMARY KEY,
+        name VARCHAR(255) NOT NULL,
+        description TEXT,
+        variants JSONB NOT NULL,
+        status VARCHAR(20) DEFAULT 'active',
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        ended_at TIMESTAMP
+      );
+
+      CREATE TABLE IF NOT EXISTS experiment_assignments (
+        id SERIAL PRIMARY KEY,
+        experiment_id INTEGER REFERENCES experiments(id),
+        user_id VARCHAR(255) NOT NULL,
+        variant VARCHAR(50) NOT NULL,
+        assigned_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+      );
+
+      CREATE TABLE IF NOT EXISTS experiment_conversions (
+        id SERIAL PRIMARY KEY,
+        experiment_id INTEGER REFERENCES experiments(id),
+        user_id VARCHAR(255) NOT NULL,
+        variant VARCHAR(50) NOT NULL,
+        conversion_type VARCHAR(100),
+        value NUMERIC,
+        converted_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+      );
+
       CREATE INDEX IF NOT EXISTS idx_performance_timestamp ON performance_metrics(timestamp);
       CREATE INDEX IF NOT EXISTS idx_visits_timestamp ON visits(timestamp);
       CREATE INDEX IF NOT EXISTS idx_events_timestamp ON events(timestamp);
       CREATE INDEX IF NOT EXISTS idx_errors_timestamp ON errors(timestamp);
       CREATE INDEX IF NOT EXISTS idx_pagespeed_timestamp ON pagespeed_results(timestamp);
+      CREATE INDEX IF NOT EXISTS idx_experiment_assignments_user ON experiment_assignments(user_id);
+      CREATE INDEX IF NOT EXISTS idx_experiment_conversions_user ON experiment_conversions(user_id);
     `);
     
     client.release();
@@ -374,6 +409,15 @@ app.post('/api/track-visit', async (req, res) => {
         geoData.latitude, geoData.longitude
       ]
     );
+    
+    // Broadcast real-time update via WebSocket
+    if (typeof global.broadcastAnalytics === 'function') {
+      global.broadcastAnalytics('visit', {
+        page,
+        country: geoData.country_name,
+        timestamp: new Date()
+      });
+    }
     
     res.json({ success: true });
   } catch (err) {
@@ -658,11 +702,410 @@ app.get('/health', (req, res) => {
   res.json({ status: 'ok', timestamp: new Date() });
 });
 
+// ========== ML Route Prediction Endpoint (Markov Chain Model) ==========
+
+// Predict next route based on navigation history
+app.post('/api/predict-route', async (req, res) => {
+  try {
+    const { currentPage, userId } = req.body;
+    
+    // Get navigation sequences from visits table
+    const result = await pool.query(`
+      WITH navigation_sequences AS (
+        SELECT 
+          page as current_page,
+          LEAD(page) OVER (PARTITION BY ip ORDER BY timestamp) as next_page
+        FROM visits
+        WHERE timestamp >= NOW() - INTERVAL '30 days'
+      )
+      SELECT 
+        next_page,
+        COUNT(*) as frequency,
+        (COUNT(*) * 100.0 / SUM(COUNT(*)) OVER ()) as probability
+      FROM navigation_sequences
+      WHERE current_page = $1 AND next_page IS NOT NULL
+      GROUP BY next_page
+      ORDER BY frequency DESC
+      LIMIT 5
+    `, [currentPage]);
+    
+    if (result.rows.length === 0) {
+      // Fallback to most popular pages if no patterns found
+      const popularPages = await pool.query(`
+        SELECT page, COUNT(*) as frequency
+        FROM visits
+        WHERE timestamp >= NOW() - INTERVAL '7 days' AND page != $1
+        GROUP BY page
+        ORDER BY frequency DESC
+        LIMIT 3
+      `, [currentPage]);
+      
+      return res.json({
+        predictions: popularPages.rows.map(row => ({
+          route: row.page,
+          confidence: 0.2, // Low confidence for fallback
+          method: 'popularity'
+        }))
+      });
+    }
+    
+    // Return predictions with confidence scores
+    res.json({
+      predictions: result.rows.map(row => ({
+        route: row.next_page,
+        confidence: parseFloat(row.probability) / 100,
+        method: 'markov-chain'
+      }))
+    });
+  } catch (error) {
+    console.error('Route prediction error:', error);
+    res.status(500).json({ error: 'Failed to predict route' });
+  }
+});
+
+// ========== A/B Testing Endpoints ==========
+
+// Create new A/B test experiment
+app.post('/api/experiments', authMiddleware, async (req, res) => {
+  try {
+    const { name, description, variants } = req.body;
+    
+    const result = await pool.query(
+      'INSERT INTO experiments (name, description, variants, status) VALUES ($1, $2, $3, $4) RETURNING *',
+      [name, description, JSON.stringify(variants), 'active']
+    );
+    
+    res.json(result.rows[0]);
+  } catch (error) {
+    console.error('Create experiment error:', error);
+    res.status(500).json({ error: 'Failed to create experiment' });
+  }
+});
+
+// Get all experiments
+app.get('/api/experiments', authMiddleware, async (req, res) => {
+  try {
+    const result = await pool.query(
+      'SELECT * FROM experiments ORDER BY created_at DESC'
+    );
+    res.json(result.rows);
+  } catch (error) {
+    console.error('Get experiments error:', error);
+    res.status(500).json({ error: 'Failed to fetch experiments' });
+  }
+});
+
+// Get experiment by ID with statistics
+app.get('/api/experiments/:id', authMiddleware, async (req, res) => {
+  try {
+    const { id } = req.params;
+    
+    const [experiment, assignments, conversions] = await Promise.all([
+      pool.query('SELECT * FROM experiments WHERE id = $1', [id]),
+      pool.query(
+        'SELECT variant, COUNT(*) as count FROM experiment_assignments WHERE experiment_id = $1 GROUP BY variant',
+        [id]
+      ),
+      pool.query(
+        'SELECT variant, COUNT(*) as count, AVG(value) as avg_value FROM experiment_conversions WHERE experiment_id = $1 GROUP BY variant',
+        [id]
+      )
+    ]);
+    
+    if (experiment.rows.length === 0) {
+      return res.status(404).json({ error: 'Experiment not found' });
+    }
+    
+    const stats = {};
+    experiment.rows[0].variants.forEach(variant => {
+      const assignmentData = assignments.rows.find(a => a.variant === variant);
+      const conversionData = conversions.rows.find(c => c.variant === variant);
+      
+      stats[variant] = {
+        assignments: parseInt(assignmentData?.count || 0),
+        conversions: parseInt(conversionData?.count || 0),
+        conversionRate: assignmentData ? 
+          ((parseInt(conversionData?.count || 0) / parseInt(assignmentData.count)) * 100).toFixed(2) : 0,
+        avgValue: parseFloat(conversionData?.avg_value || 0)
+      };
+    });
+    
+    res.json({
+      ...experiment.rows[0],
+      stats
+    });
+  } catch (error) {
+    console.error('Get experiment error:', error);
+    res.status(500).json({ error: 'Failed to fetch experiment' });
+  }
+});
+
+// Assign user to variant (used by frontend)
+app.post('/api/experiments/:id/assign', async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { userId } = req.body;
+    
+    // Check if user already assigned
+    const existing = await pool.query(
+      'SELECT variant FROM experiment_assignments WHERE experiment_id = $1 AND user_id = $2',
+      [id, userId]
+    );
+    
+    if (existing.rows.length > 0) {
+      return res.json({ variant: existing.rows[0].variant });
+    }
+    
+    // Get experiment variants
+    const experiment = await pool.query('SELECT variants FROM experiments WHERE id = $1 AND status = $2', [id, 'active']);
+    
+    if (experiment.rows.length === 0) {
+      return res.status(404).json({ error: 'Active experiment not found' });
+    }
+    
+    // Random assignment (50/50 split for 2 variants)
+    const variants = experiment.rows[0].variants;
+    const variant = variants[Math.floor(Math.random() * variants.length)];
+    
+    // Save assignment
+    await pool.query(
+      'INSERT INTO experiment_assignments (experiment_id, user_id, variant) VALUES ($1, $2, $3)',
+      [id, userId, variant]
+    );
+    
+    res.json({ variant });
+  } catch (error) {
+    console.error('Assign variant error:', error);
+    res.status(500).json({ error: 'Failed to assign variant' });
+  }
+});
+
+// Track conversion
+app.post('/api/experiments/:id/convert', async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { userId, conversionType, value } = req.body;
+    
+    // Get user's assigned variant
+    const assignment = await pool.query(
+      'SELECT variant FROM experiment_assignments WHERE experiment_id = $1 AND user_id = $2',
+      [id, userId]
+    );
+    
+    if (assignment.rows.length === 0) {
+      return res.status(404).json({ error: 'User not assigned to experiment' });
+    }
+    
+    const variant = assignment.rows[0].variant;
+    
+    // Record conversion
+    await pool.query(
+      'INSERT INTO experiment_conversions (experiment_id, user_id, variant, conversion_type, value) VALUES ($1, $2, $3, $4, $5)',
+      [id, userId, variant, conversionType, value || 1]
+    );
+    
+    res.json({ success: true });
+  } catch (error) {
+    console.error('Track conversion error:', error);
+    res.status(500).json({ error: 'Failed to track conversion' });
+  }
+});
+
+// End experiment
+app.post('/api/experiments/:id/end', authMiddleware, async (req, res) => {
+  try {
+    const { id } = req.params;
+    
+    await pool.query(
+      'UPDATE experiments SET status = $1, ended_at = NOW() WHERE id = $2',
+      ['ended', id]
+    );
+    
+    res.json({ success: true });
+  } catch (error) {
+    console.error('End experiment error:', error);
+    res.status(500).json({ error: 'Failed to end experiment' });
+  }
+});
+
+// ========== Google Search Console Integration ==========
+
+// Helper function to get Google OAuth access token
+async function getGoogleAccessToken() {
+  if (!GOOGLE_CLIENT_ID || !GOOGLE_CLIENT_SECRET || !GOOGLE_REFRESH_TOKEN) {
+    throw new Error('Google OAuth credentials not configured');
+  }
+
+  const response = await fetch('https://oauth2.googleapis.com/token', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      client_id: GOOGLE_CLIENT_ID,
+      client_secret: GOOGLE_CLIENT_SECRET,
+      refresh_token: GOOGLE_REFRESH_TOKEN,
+      grant_type: 'refresh_token'
+    })
+  });
+
+  if (!response.ok) {
+    throw new Error('Failed to refresh access token');
+  }
+
+  const data = await response.json();
+  return data.access_token;
+}
+
+// Get Search Console queries data
+app.get('/api/search-console/queries', authMiddleware, async (req, res) => {
+  try {
+    const accessToken = await getGoogleAccessToken();
+    const siteUrl = 'https://www.finaceverse.io';
+    
+    // Get last 28 days of data
+    const endDate = new Date();
+    const startDate = new Date();
+    startDate.setDate(startDate.getDate() - 28);
+    
+    const response = await fetch(
+      `https://www.googleapis.com/webmasters/v3/sites/${encodeURIComponent(siteUrl)}/searchAnalytics/query`,
+      {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${accessToken}`,
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          startDate: startDate.toISOString().split('T')[0],
+          endDate: endDate.toISOString().split('T')[0],
+          dimensions: ['query', 'page'],
+          rowLimit: 100
+        })
+      }
+    );
+
+    if (!response.ok) {
+      const error = await response.text();
+      console.error('Search Console API error:', error);
+      return res.status(response.status).json({ error: 'Failed to fetch Search Console data' });
+    }
+
+    const data = await response.json();
+    
+    res.json({
+      queries: data.rows || [],
+      totalClicks: data.rows?.reduce((sum, row) => sum + row.clicks, 0) || 0,
+      totalImpressions: data.rows?.reduce((sum, row) => sum + row.impressions, 0) || 0,
+      avgCTR: data.rows?.length ? 
+        (data.rows.reduce((sum, row) => sum + row.ctr, 0) / data.rows.length * 100).toFixed(2) : 0,
+      avgPosition: data.rows?.length ?
+        (data.rows.reduce((sum, row) => sum + row.position, 0) / data.rows.length).toFixed(1) : 0
+    });
+  } catch (error) {
+    console.error('Search Console error:', error);
+    res.status(500).json({ error: error.message || 'Failed to fetch Search Console data' });
+  }
+});
+
+// Get Search Console performance over time
+app.get('/api/search-console/performance', authMiddleware, async (req, res) => {
+  try {
+    const accessToken = await getGoogleAccessToken();
+    const siteUrl = 'https://www.finaceverse.io';
+    
+    // Get last 90 days of data
+    const endDate = new Date();
+    const startDate = new Date();
+    startDate.setDate(startDate.getDate() - 90);
+    
+    const response = await fetch(
+      `https://www.googleapis.com/webmasters/v3/sites/${encodeURIComponent(siteUrl)}/searchAnalytics/query`,
+      {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${accessToken}`,
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          startDate: startDate.toISOString().split('T')[0],
+          endDate: endDate.toISOString().split('T')[0],
+          dimensions: ['date'],
+          rowLimit: 90
+        })
+      }
+    );
+
+    if (!response.ok) {
+      const error = await response.text();
+      console.error('Search Console API error:', error);
+      return res.status(response.status).json({ error: 'Failed to fetch Search Console performance' });
+    }
+
+    const data = await response.json();
+    
+    res.json({
+      timeline: data.rows || []
+    });
+  } catch (error) {
+    console.error('Search Console performance error:', error);
+    res.status(500).json({ error: error.message || 'Failed to fetch Search Console performance' });
+  }
+});
+
 // Catch-all route - serve React app for any non-API routes
 app.get('*', (req, res) => {
   res.sendFile(path.join(__dirname, 'build', 'index.html'));
 });
 
-app.listen(PORT, () => {
+// Create HTTP server and attach Socket.IO
+const server = http.createServer(app);
+const io = new Server(server, {
+  cors: {
+    origin: process.env.NODE_ENV === 'production' 
+      ? 'https://www.finaceverse.io' 
+      : ['http://localhost:3000', 'http://localhost:5000'],
+    methods: ['GET', 'POST']
+  }
+});
+
+// WebSocket connection handling
+io.on('connection', (socket) => {
+  console.log('🔌 Client connected:', socket.id);
+  
+  // Send real-time analytics updates
+  socket.on('subscribe-analytics', async () => {
+    console.log('📊 Client subscribed to analytics updates');
+    
+    // Send initial data
+    try {
+      const summary = await cacheWrapper('analytics:summary', async () => {
+        const result = await pool.query(`
+          SELECT 
+            COUNT(DISTINCT visit_id) as total_visits,
+            COUNT(DISTINCT ip_address) as unique_visitors,
+            AVG(duration) as avg_duration
+          FROM visits
+          WHERE timestamp >= NOW() - INTERVAL '24 hours'
+        `);
+        return result.rows[0];
+      });
+      
+      socket.emit('analytics-update', { type: 'summary', data: summary });
+    } catch (error) {
+      console.error('Error sending initial analytics:', error);
+    }
+  });
+  
+  socket.on('disconnect', () => {
+    console.log('🔌 Client disconnected:', socket.id);
+  });
+});
+
+// Helper function to broadcast analytics updates
+global.broadcastAnalytics = (type, data) => {
+  io.emit('analytics-update', { type, data });
+};
+
+server.listen(PORT, () => {
   console.log(`🚀 Analytics API running on port ${PORT}`);
+  console.log(`🔌 WebSocket server ready`);
 });
