@@ -562,7 +562,6 @@ const CompliancePrivacy = (props) => {
               fill="#2874DE"
             ></path>
           </svg>
-          <img src="/logo.svg" alt="FinACEverse" style={{width: '20px', height: '20px', marginRight: '8px'}} />
           <span className="compliance-privacy-text42">Propel Past Paradigms</span>
         </div>
       </a>

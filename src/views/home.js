@@ -1035,7 +1035,6 @@ const Home = (props) => {
       <Footer></Footer>
       <a href="/">
         <div aria-label="FinACEverse" className="home-container6">
-          <img src="/logo.svg" alt="FinACEverse" style={{width: '24px', height: '24px', marginRight: '10px'}} />
           <span className="home-text28">Propel Past Paradigms</span>
         </div>
       </a>
