@@ -1055,7 +1055,7 @@ app.get('/api/search-console/performance', authMiddleware, async (req, res) => {
 });
 
 // Catch-all route - serve React app for any non-API routes
-app.get('*', (req, res) => {
+app.get('/*', (req, res) => {
   res.sendFile(path.join(__dirname, 'build', 'index.html'));
 });
 
