@@ -5,11 +5,21 @@ import Script from 'dangerous-html/react'
 import './navigation.css'
 
 const Navigation = (props) => {
+  const [mobileMenuOpen, setMobileMenuOpen] = React.useState(false);
+
   const toggleTheme = () => {
     const currentTheme = document.documentElement.getAttribute('data-theme');
     const newTheme = currentTheme === 'light' ? 'dark' : 'light';
     document.documentElement.setAttribute('data-theme', newTheme);
     localStorage.setItem('theme', newTheme);
+  };
+
+  const toggleMobileMenu = () => {
+    setMobileMenuOpen(!mobileMenuOpen);
+  };
+
+  const closeMobileMenu = () => {
+    setMobileMenuOpen(false);
   };
 
   React.useEffect(() => {
@@ -87,12 +97,93 @@ const Navigation = (props) => {
               </a>
             </div>
           </div>
-          <button
-            id="navToggle"
-            aria-label="Toggle Menu"
-            aria-expanded="false"
-            className="navigation-mobile-toggle"
-          >
+          <div className="navigation-mobile-actions">
+            <button 
+              onClick={toggleTheme}
+              className="theme-toggle-btn mobile-theme-toggle"
+              aria-label="Toggle theme"
+              title="Toggle light/dark mode"
+            >
+              <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24">
+                <path fill="currentColor" d="M12 17q-2.075 0-3.537-1.463T7 12t1.463-3.537T12 7t3.538 1.463T17 12t-1.463 3.538T12 17m-7-4H1v-2h4zm18 0h-4v-2h4zM11 5V1h2v4zm0 18v-4h2v4zM6.4 7.75L3.875 5.325L5.3 3.85l2.4 2.5zm12.3 12.4l-2.425-2.525L17.6 16.25l2.525 2.425zM16.25 6.4l2.425-2.525L20.15 5.3l-2.5 2.4zM3.85 18.7l2.525-2.425L7.75 17.6l-2.425 2.525z"/>
+              </svg>
+            </button>
+            <button
+              onClick={toggleMobileMenu}
+              id="navToggle"
+              aria-label="Toggle Menu"
+              aria-expanded={mobileMenuOpen}
+              className={`navigation-mobile-toggle mobile-menu-toggle ${mobileMenuOpen ? 'open' : ''}`}
+            >
+              <span></span>
+              <span></span>
+              <span></span>
+            </button>
+          </div>
+          <div className={`navigation-mobile-menu ${mobileMenuOpen ? 'mobile-open' : ''}`}>
+            <ul className="navigation-mobile-links nav-links">
+              <li className="navigation-item-mobile">
+                <a href="/" onClick={closeMobileMenu}>
+                  <div className="navigation-link">
+                    <span>Home</span>
+                  </div>
+                </a>
+              </li>
+              <li className="navigation-item-mobile">
+                <a href="/modules" onClick={closeMobileMenu}>
+                  <div className="navigation-link">
+                    <span>Modules</span>
+                  </div>
+                </a>
+              </li>
+              <li className="navigation-item-mobile">
+                <a href="/tailored-pilots" onClick={closeMobileMenu}>
+                  <div className="navigation-link">
+                    <span>Pilot Programs</span>
+                  </div>
+                </a>
+              </li>
+              <li className="navigation-item-mobile">
+                <a href="/expert-consultation" onClick={closeMobileMenu}>
+                  <div className="navigation-link">
+                    <span>Consultation</span>
+                  </div>
+                </a>
+              </li>
+              <li className="navigation-item-mobile">
+                <a href="/blog" onClick={closeMobileMenu}>
+                  <div className="navigation-link">
+                    <span>Blog</span>
+                  </div>
+                </a>
+              </li>
+              <li className="navigation-item-mobile">
+                <a href="/request-demo" onClick={closeMobileMenu}>
+                  <div className="btn btn-primary" style={{width: '100%', textAlign: 'center'}}>
+                    <span>Request Demo</span>
+                  </div>
+                </a>
+              </li>
+            </ul>
+          </div>
+        </div>
+      </nav>
+      <div data-thq="thq-mobile-menu" className="navigation-mobile-menu1">
+        <div className="navigation-nav">
+          <div className="navigation-container3">
+            <div className="navigation-image">
+              <img
+                alt={props.imageAlt}
+                src={props.imageSrc}
+                className="navigation-image1"
+              />
+            </div>
+            <button
+              id="navToggle"
+              aria-label="Toggle Menu"
+              aria-expanded="false"
+              className="navigation-mobile-toggle"
+            >
             <svg
               xmlns="http://www.w3.org/2000/svg"
               width="24"

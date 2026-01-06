@@ -7,7 +7,9 @@ import {
   Redirect,
 } from 'react-router-dom'
 
+import './polyfills'
 import './style.css'
+import './responsive.css'
 import Home from './views/home'
 import Modules from './views/modules'
 import CompliancePrivacy from './views/compliance-privacy'

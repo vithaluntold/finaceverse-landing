@@ -438,9 +438,11 @@ const CompliancePrivacy = (props) => {
                 <p className="section-content">
                   Access our latest SOC 2 Type II and ISO audit summaries.
                 </p>
-                <button className="btn btn-secondary btn-sm">
-                  Request Access
-                </button>
+                <a href="/request-demo">
+                  <button className="btn btn-secondary btn-sm">
+                    Request Access
+                  </button>
+                </a>
               </div>
             </div>
             <div className="compliance---privacy-bento-cell item-4">
@@ -464,9 +466,11 @@ const CompliancePrivacy = (props) => {
                   Direct line to our Data Protection Officer and Compliance
                   Team.
                 </p>
-                <button className="btn btn-sm btn-accent">
-                  Contact Compliance
-                </button>
+                <a href="/expert-consultation">
+                  <button className="btn btn-sm btn-accent">
+                    Contact Compliance
+                  </button>
+                </a>
               </div>
             </div>
           </div>
@@ -484,9 +488,9 @@ const CompliancePrivacy = (props) => {
           </div>
           <div className="compliance-cta-side">
             <div className="compliance-cta-actions">
-              <button className="btn btn-primary btn-xl">
+              <a href="/expert-consultation" className="btn btn-primary btn-xl">
                 Schedule Briefing
-              </button>
+              </a>
               <a href="/request-demo" className="btn btn-outline btn-xl">Request Demo</a>
             </div>
           </div>

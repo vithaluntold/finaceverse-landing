@@ -1,5 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useHistory } from 'react-router-dom';
+import { LineChart, Line, BarChart, Bar, PieChart, Pie, Cell, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
+import { format, subDays } from 'date-fns';
 import './analytics-dashboard.css';
 
 const AnalyticsDashboard = () => {
@@ -12,6 +14,23 @@ const AnalyticsDashboard = () => {
   const history = useHistory();
 
   const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:5000';
+
+  // Chart colors
+  const COLORS = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042', '#8884D8'];
+
+  // Generate mock trend data (replace with real data from API later)
+  const generateMockTrendData = () => {
+    const data = [];
+    for (let i = 6; i >= 0; i--) {
+      const date = subDays(new Date(), i);
+      data.push({
+        date: format(date, 'MMM dd'),
+        visits: Math.floor(Math.random() * 100) + 20,
+        pageViews: Math.floor(Math.random() * 300) + 50,
+      });
+    }
+    return data;
+  };
 
   useEffect(() => {
     const token = localStorage.getItem('analytics_token');
@@ -170,12 +189,62 @@ const AnalyticsDashboard = () => {
                 </strong>
               </div>
             </div>
+
+            {/* Visits Trend Line Chart */}
+            <div className="chart-container" style={{ marginTop: '30px' }}>
+              <h2>Visits Trend (7 Days)</h2>
+              <ResponsiveContainer width="100%" height={300}>
+                <LineChart data={generateMockTrendData()}>
+                  <CartesianGrid strokeDasharray="3 3" />
+                  <XAxis dataKey="date" />
+                  <YAxis />
+                  <Tooltip />
+                  <Legend />
+                  <Line 
+                    type="monotone" 
+                    dataKey="visits" 
+                    stroke={COLORS[0]} 
+                    strokeWidth={2}
+                    dot={{ fill: COLORS[0], r: 4 }}
+                  />
+                </LineChart>
+              </ResponsiveContainer>
+            </div>
           </div>
         )}
 
         {activeTab === 'geography' && (
           <div className="tab-panel">
             <h2>Geographic Distribution</h2>
+            
+            {/* Country Distribution Pie Chart */}
+            {geography?.byCountry && geography.byCountry.length > 0 && (
+              <div className="chart-section" style={{background: 'var(--color-surface-elevated)', padding: 'var(--spacing-2xl)', borderRadius: 'var(--border-radius-lg)', marginBottom: 'var(--spacing-xl)'}}>
+                <h3>Top 5 Countries by Traffic</h3>
+                <ResponsiveContainer width="100%" height={350}>
+                  <PieChart>
+                    <Pie
+                      data={geography.byCountry.slice(0, 5).map(item => ({
+                        name: item._id || 'Unknown',
+                        value: item.count
+                      }))}
+                      cx="50%"
+                      cy="50%"
+                      labelLine={false}
+                      label={({name, percent}) => `${name} ${(percent * 100).toFixed(0)}%`}
+                      outerRadius={100}
+                      fill="var(--color-primary)"
+                      dataKey="value"
+                    >
+                      {geography.byCountry.slice(0, 5).map((entry, index) => (
+                        <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                      ))}
+                    </Pie>
+                    <Tooltip contentStyle={{background: 'var(--color-surface-elevated)', border: '1px solid rgba(255,255,255,0.2)'}} />
+                  </PieChart>
+                </ResponsiveContainer>
+              </div>
+            )}
             
             <div className="geo-section">
               <h3>Top Countries</h3>
@@ -250,6 +319,38 @@ const AnalyticsDashboard = () => {
                 </div>
                 <div className="metric-target">Target: &lt;0.6s</div>
               </div>
+            </div>
+
+            {/* Performance Metrics Bar Chart */}
+            <div className="chart-container" style={{ marginTop: '30px', width: '100%' }}>
+              <h2>Performance Metrics Comparison</h2>
+              <ResponsiveContainer width="100%" height={300}>
+                <BarChart data={[
+                  {
+                    name: 'LCP',
+                    current: performance?.summary?.avgLCP ? (performance.summary.avgLCP / 1000) : 0,
+                    target: 2.5,
+                  },
+                  {
+                    name: 'FCP',
+                    current: performance?.summary?.avgFCP ? (performance.summary.avgFCP / 1000) : 0,
+                    target: 1.8,
+                  },
+                  {
+                    name: 'TTFB',
+                    current: performance?.summary?.avgTTFB ? (performance.summary.avgTTFB / 1000) : 0,
+                    target: 0.8,
+                  },
+                ]}>
+                  <CartesianGrid strokeDasharray="3 3" />
+                  <XAxis dataKey="name" />
+                  <YAxis label={{ value: 'Seconds', angle: -90, position: 'insideLeft' }} />
+                  <Tooltip />
+                  <Legend />
+                  <Bar dataKey="current" fill={COLORS[0]} name="Current" />
+                  <Bar dataKey="target" fill={COLORS[1]} name="Target" />
+                </BarChart>
+              </ResponsiveContainer>
             </div>
             
             <div className="performance-samples">

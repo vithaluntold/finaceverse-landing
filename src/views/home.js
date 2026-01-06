@@ -712,7 +712,9 @@ const Home = (props) => {
                     <span>Advisory Scaling Tools</span>
                   </li>
                 </ul>
-                <button className="btn btn-primary">View Solutions</button>
+                <a href="/modules">
+                  <button className="btn btn-primary">View Solutions</button>
+                </a>
               </div>
               <div className="service-bg">
                 <img
@@ -728,7 +730,9 @@ const Home = (props) => {
                   Ensure compliance causality with VAMN-powered tax preparation
                   and proactive future-shaping strategies.
                 </p>
-                <button className="btn btn-outline btn-sm">Learn More</button>
+                <a href="/modules">
+                  <button className="btn btn-outline btn-sm">Learn More</button>
+                </a>
               </div>
             </div>
             <div className="bento-cell-service cell-narrow-service">
@@ -738,7 +742,9 @@ const Home = (props) => {
                   In-house teams gain real-time visibility and control across
                   global enterprise operations with Accute.
                 </p>
-                <button className="btn btn-outline btn-sm">Learn More</button>
+                <a href="/expert-consultation">
+                  <button className="btn btn-outline btn-sm">Learn More</button>
+                </a>
               </div>
             </div>
             <div className="bento-cell-service cell-narrow-service">
@@ -749,7 +755,9 @@ const Home = (props) => {
                   Every transaction traces back to source documents with <strong>100% 
                   verification</strong> - reducing audit time by 60%.
                 </p>
-                <button className="btn btn-outline btn-sm">Learn More</button>
+                <a href="/compliance-privacy">
+                  <button className="btn btn-outline btn-sm">Learn More</button>
+                </a>
               </div>
             </div>
           </div>
