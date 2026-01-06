@@ -1181,9 +1181,10 @@
  
 .footer-social-icon:hover {
   transform: translateY(-5px) rotate(8deg);
-  background: var(--color-primary);
+  background: color-mix(in srgb, var(--color-primary) 20%, var(--color-surface-elevated));
   box-shadow: 0 10px 20px color-mix(in srgb, var(--color-primary) 30%, transparent);
-  border-color: var(--color-secondary);
+  border-color: var(--color-primary);
+  color: var(--color-primary);
 }
  
 .footer-column-title::after {

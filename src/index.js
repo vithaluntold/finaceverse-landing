@@ -13,6 +13,7 @@ import Modules from './views/modules'
 import CompliancePrivacy from './views/compliance-privacy'
 import TailoredPilots from './views/tailored-pilots'
 import ExpertConsultation from './views/expert-consultation'
+import RequestDemo from './views/request-demo'
 import Blog from './views/blog'
 import Unsubscribe from './views/unsubscribe'
 import NotFound from './views/not-found'
@@ -26,6 +27,7 @@ const App = () => {
         <Route component={CompliancePrivacy} exact path="/compliance-privacy" />
         <Route component={TailoredPilots} exact path="/tailored-pilots" />
         <Route component={ExpertConsultation} exact path="/expert-consultation" />
+        <Route component={RequestDemo} exact path="/request-demo" />
         <Route component={Blog} exact path="/blog" />
         <Route component={Unsubscribe} exact path="/unsubscribe" />
         <Route component={NotFound} path="**" />
