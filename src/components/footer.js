@@ -196,7 +196,7 @@ const Footer = (props) => {
             </div>
             <div className="footer-copyright">
               <span>
-                &amp;copy; 2026 FinACEverse. Shaping the future of financial
+                © 2026 FinACEverse. Shaping the future of financial
                 coherence.
               </span>
             </div>
