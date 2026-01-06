@@ -47,3 +47,4 @@ credentials.txt
 secrets.txt
 *.key
 *.pem
+client_secret_*.json
