@@ -32,9 +32,10 @@ const pool = new Pool({
   ssl: process.env.NODE_ENV === 'production' ? { rejectUnauthorized: false } : false,
 });
 
-// Test database connection and create tables
-pool.connect()
-  .then(async (client) => {
+// Initialize database tables before starting server
+async function initializeDatabase() {
+  try {
+    const client = await pool.connect();
     console.log('✓ Connected to PostgreSQL');
     
     // Create tables if they don't exist
@@ -150,11 +151,13 @@ pool.connect()
     
     client.release();
     console.log('✓ Database tables created/verified');
-    
-    // Start scheduled jobs after DB connection
-    startScheduledJobs();
-  })
-  .catch(err => console.error('PostgreSQL connection error:', err));
+    return true;
+  } catch (err) {
+    console.error('❌ Database initialization failed:', err);
+    console.error('Server will start but database operations may fail');
+    return false;
+  }
+}
 
 // Redis connection (optional, graceful fallback if not available)
 let redisClient;
@@ -1105,7 +1108,15 @@ global.broadcastAnalytics = (type, data) => {
   io.emit('analytics-update', { type, data });
 };
 
-server.listen(PORT, () => {
-  console.log(`🚀 Analytics API running on port ${PORT}`);
-  console.log(`🔌 WebSocket server ready`);
-});
+// Start server after database initialization
+async function startServer() {
+  await initializeDatabase();
+  startScheduledJobs();
+  
+  server.listen(PORT, () => {
+    console.log(`🚀 Analytics API running on port ${PORT}`);
+    console.log(`🔌 WebSocket server ready`);
+  });
+}
+
+startServer();
