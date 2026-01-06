@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useHistory } from 'react-router-dom';
 import './analytics-login.css';
 
 const AnalyticsLogin = () => {
@@ -7,7 +7,7 @@ const AnalyticsLogin = () => {
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
-  const navigate = useNavigate();
+  const history = useHistory();
 
   const handleLogin = async (e) => {
     e.preventDefault();
@@ -32,7 +32,7 @@ const AnalyticsLogin = () => {
       localStorage.setItem('analytics_user', data.username);
 
       // Redirect to dashboard
-      navigate('/analytics/dashboard');
+      history.push('/analytics/dashboard');
     } catch (err) {
       setError(err.message);
     } finally {

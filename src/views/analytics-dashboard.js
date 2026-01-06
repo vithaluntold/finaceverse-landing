@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useHistory } from 'react-router-dom';
 import './analytics-dashboard.css';
 
 const AnalyticsDashboard = () => {
@@ -9,21 +9,21 @@ const AnalyticsDashboard = () => {
   const [errors, setErrors] = useState(null);
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState('overview');
-  const navigate = useNavigate();
+  const history = useHistory();
 
   const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:5000';
 
   useEffect(() => {
     const token = localStorage.getItem('analytics_token');
     if (!token) {
-      navigate('/analytics/login');
+      history.push('/analytics/login');
       return;
     }
 
     fetchData();
     const interval = setInterval(fetchData, 60000); // Refresh every minute
     return () => clearInterval(interval);
-  }, [navigate]);
+  }, [history]);
 
   const fetchData = async () => {
     const token = localStorage.getItem('analytics_token');
@@ -50,7 +50,7 @@ const AnalyticsDashboard = () => {
       console.error('Fetch error:', err);
       if (err.message === 'Unauthorized') {
         localStorage.removeItem('analytics_token');
-        navigate('/analytics/login');
+        history.push('/analytics/login');
       }
     } finally {
       setLoading(false);
@@ -60,7 +60,7 @@ const AnalyticsDashboard = () => {
   const handleLogout = () => {
     localStorage.removeItem('analytics_token');
     localStorage.removeItem('analytics_user');
-    navigate('/analytics/login');
+    history.push('/analytics/login');
   };
 
   if (loading) {

@@ -1,4 +1,4 @@
-import { getCLS, getFID, getFCP, getLCP, getTTFB } from 'web-vitals';
+import { onCLS, onINP, onFCP, onLCP, onTTFB } from 'web-vitals';
 
 const API_ENDPOINT = process.env.REACT_APP_API_URL || 'http://localhost:5000/api';
 
@@ -24,12 +24,12 @@ export const initPerformanceTracking = () => {
     }).catch(err => console.error('Performance tracking failed:', err));
   };
 
-  // Track Web Vitals
-  getCLS(sendToAnalytics);
-  getFID(sendToAnalytics);
-  getFCP(sendToAnalytics);
-  getLCP(sendToAnalytics);
-  getTTFB(sendToAnalytics);
+  // Track Web Vitals (v5 API - INP replaced FID)
+  onCLS(sendToAnalytics);
+  onINP(sendToAnalytics); // Interaction to Next Paint (replaced FID)
+  onFCP(sendToAnalytics);
+  onLCP(sendToAnalytics);
+  onTTFB(sendToAnalytics);
 
   // Track custom metrics
   if (window.performance && window.performance.timing) {
