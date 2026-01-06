@@ -3,13 +3,13 @@ const express = require('express');
 const cors = require('cors');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
-const { MongoClient } = require('mongodb');
+const { Pool } = require('pg');
 const redis = require('redis');
 
 const app = express();
 const PORT = process.env.PORT || 5000;
 const JWT_SECRET = process.env.JWT_SECRET || 'your-secret-key-change-in-production';
-const MONGODB_URI = process.env.MONGODB_URI || 'mongodb://localhost:27017/finaceverse-analytics';
+const DATABASE_URL = process.env.DATABASE_URL || 'postgresql://localhost:5432/finaceverse_analytics';
 const REDIS_URL = process.env.REDIS_URL || 'redis://localhost:6379';
 const GOOGLE_API_KEY = process.env.GOOGLE_API_KEY || '';
 
@@ -17,14 +17,105 @@ const GOOGLE_API_KEY = process.env.GOOGLE_API_KEY || '';
 app.use(cors());
 app.use(express.json());
 
-// MongoDB connection
-let db;
-MongoClient.connect(MONGODB_URI, { useNewUrlParser: true, useUnifiedTopology: true })
-  .then(client => {
-    db = client.db();
-    console.log('✓ Connected to MongoDB');
+// PostgreSQL connection pool
+const pool = new Pool({
+  connectionString: DATABASE_URL,
+  ssl: process.env.NODE_ENV === 'production' ? { rejectUnauthorized: false } : false,
+});
+
+// Test database connection and create tables
+pool.connect()
+  .then(async (client) => {
+    console.log('✓ Connected to PostgreSQL');
+    
+    // Create tables if they don't exist
+    await client.query(\`
+      CREATE TABLE IF NOT EXISTS users (
+        id SERIAL PRIMARY KEY,
+        username VARCHAR(255) UNIQUE NOT NULL,
+        password VARCHAR(255) NOT NULL,
+        role VARCHAR(50) DEFAULT 'admin',
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+      );
+
+      CREATE TABLE IF NOT EXISTS performance_metrics (
+        id SERIAL PRIMARY KEY,
+        name VARCHAR(50),
+        delta NUMERIC,
+        value NUMERIC,
+        metric_id VARCHAR(255),
+        page VARCHAR(500),
+        user_agent TEXT,
+        connection JSONB,
+        ip VARCHAR(45),
+        received_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        timestamp TIMESTAMP
+      );
+
+      CREATE TABLE IF NOT EXISTS visits (
+        id SERIAL PRIMARY KEY,
+        page VARCHAR(500),
+        referrer TEXT,
+        user_agent TEXT,
+        screen_resolution VARCHAR(50),
+        viewport VARCHAR(50),
+        language VARCHAR(10),
+        ip VARCHAR(45),
+        country VARCHAR(100),
+        country_code VARCHAR(10),
+        region VARCHAR(100),
+        city VARCHAR(100),
+        timezone VARCHAR(100),
+        isp TEXT,
+        latitude NUMERIC,
+        longitude NUMERIC,
+        timestamp TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+      );
+
+      CREATE TABLE IF NOT EXISTS events (
+        id SERIAL PRIMARY KEY,
+        type VARCHAR(100),
+        depth INTEGER,
+        page VARCHAR(500),
+        timestamp TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+      );
+
+      CREATE TABLE IF NOT EXISTS errors (
+        id SERIAL PRIMARY KEY,
+        message TEXT,
+        source TEXT,
+        line INTEGER,
+        "column" INTEGER,
+        stack TEXT,
+        page VARCHAR(500),
+        user_agent TEXT,
+        type VARCHAR(50),
+        timestamp TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+      );
+
+      CREATE TABLE IF NOT EXISTS pagespeed_results (
+        id SERIAL PRIMARY KEY,
+        url VARCHAR(500),
+        strategy VARCHAR(20),
+        score NUMERIC,
+        metrics JSONB,
+        timestamp TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+      );
+
+      CREATE INDEX IF NOT EXISTS idx_performance_timestamp ON performance_metrics(timestamp);
+      CREATE INDEX IF NOT EXISTS idx_visits_timestamp ON visits(timestamp);
+      CREATE INDEX IF NOT EXISTS idx_events_timestamp ON events(timestamp);
+      CREATE INDEX IF NOT EXISTS idx_errors_timestamp ON errors(timestamp);
+      CREATE INDEX IF NOT EXISTS idx_pagespeed_timestamp ON pagespeed_results(timestamp);
+    \`);
+    
+    client.release();
+    console.log('✓ Database tables created/verified');
+    
+    // Start scheduled jobs after DB connection
+    startScheduledJobs();
   })
-  .catch(err => console.error('MongoDB connection error:', err));
+  .catch(err => console.error('PostgreSQL connection error:', err));
 
 // Redis connection (optional, graceful fallback if not available)
 let redisClient;
@@ -73,11 +164,11 @@ const runPageSpeedTest = async (url, strategy = 'mobile') => {
   }
   
   try {
-    const apiUrl = `https://www.googleapis.com/pagespeedonline/v5/runPagespeed?url=${encodeURIComponent(url)}&strategy=${strategy}&key=${GOOGLE_API_KEY}`;
+    const apiUrl = \`https://www.googleapis.com/pagespeedonline/v5/runPagespeed?url=\${encodeURIComponent(url)}&strategy=\${strategy}&key=\${GOOGLE_API_KEY}\`;
     const response = await fetch(apiUrl);
     
     if (!response.ok) {
-      throw new Error(`PageSpeed API error: ${response.statusText}`);
+      throw new Error(\`PageSpeed API error: \${response.statusText}\`);
     }
     
     const data = await response.json();
@@ -106,46 +197,50 @@ const runPageSpeedTest = async (url, strategy = 'mobile') => {
 const startScheduledJobs = () => {
   // Run PageSpeed test immediately on startup
   setTimeout(async () => {
-    if (!db) return;
-    
     console.log('🔍 Running PageSpeed test...');
     const mobileResult = await runPageSpeedTest('https://finaceverse.io', 'mobile');
     const desktopResult = await runPageSpeedTest('https://finaceverse.io', 'desktop');
     
+    if (mobileResult) {
+      await pool.query(
+        'INSERT INTO pagespeed_results (url, strategy, score, metrics, timestamp) VALUES (\$1, \$2, \$3, \$4, \$5)',
+        [mobileResult.url, mobileResult.strategy, mobileResult.score, JSON.stringify(mobileResult.metrics), mobileResult.timestamp]
+      );
+    }
+    if (desktopResult) {
+      await pool.query(
+        'INSERT INTO pagespeed_results (url, strategy, score, metrics, timestamp) VALUES (\$1, \$2, \$3, \$4, \$5)',
+        [desktopResult.url, desktopResult.strategy, desktopResult.score, JSON.stringify(desktopResult.metrics), desktopResult.timestamp]
+      );
+    }
     if (mobileResult || desktopResult) {
-      const pageSpeedCollection = db.collection('pagespeed_results');
-      if (mobileResult) await pageSpeedCollection.insertOne(mobileResult);
-      if (desktopResult) await pageSpeedCollection.insertOne(desktopResult);
       console.log('✓ PageSpeed test completed');
     }
   }, 5000); // Wait 5 seconds after startup
   
   // Schedule every 6 hours
   setInterval(async () => {
-    if (!db) return;
-    
     console.log('🔍 Running scheduled PageSpeed test...');
     const mobileResult = await runPageSpeedTest('https://finaceverse.io', 'mobile');
     const desktopResult = await runPageSpeedTest('https://finaceverse.io', 'desktop');
     
+    if (mobileResult) {
+      await pool.query(
+        'INSERT INTO pagespeed_results (url, strategy, score, metrics, timestamp) VALUES (\$1, \$2, \$3, \$4, \$5)',
+        [mobileResult.url, mobileResult.strategy, mobileResult.score, JSON.stringify(mobileResult.metrics), mobileResult.timestamp]
+      );
+    }
+    if (desktopResult) {
+      await pool.query(
+        'INSERT INTO pagespeed_results (url, strategy, score, metrics, timestamp) VALUES (\$1, \$2, \$3, \$4, \$5)',
+        [desktopResult.url, desktopResult.strategy, desktopResult.score, JSON.stringify(desktopResult.metrics), desktopResult.timestamp]
+      );
+    }
     if (mobileResult || desktopResult) {
-      const pageSpeedCollection = db.collection('pagespeed_results');
-      if (mobileResult) await pageSpeedCollection.insertOne(mobileResult);
-      if (desktopResult) await pageSpeedCollection.insertOne(desktopResult);
       console.log('✓ Scheduled PageSpeed test completed');
     }
   }, 6 * 60 * 60 * 1000); // Every 6 hours
 };
-
-// MongoDB connection
-let db;
-MongoClient.connect(MONGODB_URI, { useNewUrlParser: true, useUnifiedTopology: true })
-  .then(client => {
-    db = client.db();
-    console.log('✓ Connected to MongoDB');
-    startScheduledJobs();
-  })
-  .catch(err => console.error('MongoDB connection error:', err));
 
 // Authentication middleware
 const authMiddleware = (req, res, next) => {
@@ -171,13 +266,13 @@ app.post('/api/auth/login', async (req, res) => {
   try {
     const { username, password } = req.body;
     
-    // Find user (in production, use database)
-    const users = db.collection('users');
-    const user = await users.findOne({ username });
+    const result = await pool.query('SELECT * FROM users WHERE username = \$1', [username]);
     
-    if (!user) {
+    if (result.rows.length === 0) {
       return res.status(401).json({ error: 'Invalid credentials' });
     }
+    
+    const user = result.rows[0];
     
     // Verify password
     const validPassword = await bcrypt.compare(password, user.password);
@@ -186,7 +281,7 @@ app.post('/api/auth/login', async (req, res) => {
     }
     
     // Generate JWT
-    const token = jwt.sign({ userId: user._id, username: user.username }, JWT_SECRET, {
+    const token = jwt.sign({ userId: user.id, username: user.username }, JWT_SECRET, {
       expiresIn: '24h',
     });
     
@@ -207,20 +302,17 @@ app.post('/api/auth/create-admin', async (req, res) => {
       return res.status(403).json({ error: 'Invalid secret key' });
     }
     
-    const users = db.collection('users');
-    const existingUser = await users.findOne({ username });
+    const existingUser = await pool.query('SELECT id FROM users WHERE username = \$1', [username]);
     
-    if (existingUser) {
+    if (existingUser.rows.length > 0) {
       return res.status(400).json({ error: 'User already exists' });
     }
     
     const hashedPassword = await bcrypt.hash(password, 10);
-    await users.insertOne({
-      username,
-      password: hashedPassword,
-      role: 'admin',
-      createdAt: new Date(),
-    });
+    await pool.query(
+      'INSERT INTO users (username, password, role) VALUES (\$1, \$2, \$3)',
+      [username, hashedPassword, 'admin']
+    );
     
     res.json({ message: 'Admin user created successfully' });
   } catch (err) {
@@ -234,12 +326,13 @@ app.post('/api/auth/create-admin', async (req, res) => {
 // Track performance metrics
 app.post('/api/track-performance', async (req, res) => {
   try {
-    const metrics = db.collection('performance_metrics');
-    await metrics.insertOne({
-      ...req.body,
-      ip: req.ip,
-      receivedAt: new Date(),
-    });
+    const { name, delta, value, id, page, timestamp, userAgent, connection } = req.body;
+    
+    await pool.query(
+      'INSERT INTO performance_metrics (name, delta, value, metric_id, page, user_agent, connection, ip, timestamp) VALUES (\$1, \$2, \$3, \$4, \$5, \$6, \$7, \$8, \$9)',
+      [name, delta, value, id, page, userAgent, JSON.stringify(connection), req.ip, timestamp]
+    );
+    
     res.json({ success: true });
   } catch (err) {
     console.error('Track performance error:', err);
@@ -255,7 +348,7 @@ app.post('/api/track-visit', async (req, res) => {
     // Get geo data from IP (using ipapi.co)
     let geoData = {};
     try {
-      const geoResponse = await fetch(`https://ipapi.co/${ip}/json/`);
+      const geoResponse = await fetch(\`https://ipapi.co/\${ip}/json/\`);
       if (geoResponse.ok) {
         geoData = await geoResponse.json();
       }
@@ -263,20 +356,20 @@ app.post('/api/track-visit', async (req, res) => {
       console.error('Geo lookup failed:', err);
     }
     
-    const visits = db.collection('visits');
-    await visits.insertOne({
-      ...req.body,
-      ip: ip.replace(/:\d+$/, ''), // Anonymize (remove port)
-      country: geoData.country_name,
-      countryCode: geoData.country_code,
-      region: geoData.region,
-      city: geoData.city,
-      timezone: geoData.timezone,
-      isp: geoData.org,
-      latitude: geoData.latitude,
-      longitude: geoData.longitude,
-      timestamp: new Date(),
-    });
+    const { page, referrer, userAgent, screenResolution, viewport, language } = req.body;
+    
+    await pool.query(
+      \`INSERT INTO visits (page, referrer, user_agent, screen_resolution, viewport, language, ip, 
+       country, country_code, region, city, timezone, isp, latitude, longitude) 
+       VALUES (\$1, \$2, \$3, \$4, \$5, \$6, \$7, \$8, \$9, \$10, \$11, \$12, \$13, \$14, \$15)\`,
+      [
+        page, referrer, userAgent, screenResolution, viewport, language,
+        ip.replace(/:\d+\$/, ''), // Anonymize (remove port)
+        geoData.country_name, geoData.country_code, geoData.region,
+        geoData.city, geoData.timezone, geoData.org,
+        geoData.latitude, geoData.longitude
+      ]
+    );
     
     res.json({ success: true });
   } catch (err) {
@@ -288,11 +381,13 @@ app.post('/api/track-visit', async (req, res) => {
 // Track events
 app.post('/api/track-event', async (req, res) => {
   try {
-    const events = db.collection('events');
-    await events.insertOne({
-      ...req.body,
-      timestamp: new Date(),
-    });
+    const { type, depth, page, timestamp } = req.body;
+    
+    await pool.query(
+      'INSERT INTO events (type, depth, page, timestamp) VALUES (\$1, \$2, \$3, \$4)',
+      [type, depth, page, timestamp]
+    );
+    
     res.json({ success: true });
   } catch (err) {
     console.error('Track event error:', err);
@@ -303,11 +398,13 @@ app.post('/api/track-event', async (req, res) => {
 // Track errors
 app.post('/api/track-error', async (req, res) => {
   try {
-    const errors = db.collection('errors');
-    await errors.insertOne({
-      ...req.body,
-      timestamp: new Date(),
-    });
+    const { message, source, line, column, stack, page, userAgent, type, timestamp } = req.body;
+    
+    await pool.query(
+      'INSERT INTO errors (message, source, line, "column", stack, page, user_agent, type, timestamp) VALUES (\$1, \$2, \$3, \$4, \$5, \$6, \$7, \$8, \$9)',
+      [message, source, line, column, stack, page, userAgent, type, timestamp]
+    );
+    
     res.json({ success: true });
   } catch (err) {
     console.error('Track error error:', err);
@@ -321,26 +418,32 @@ app.post('/api/track-error', async (req, res) => {
 app.get('/api/analytics/performance', authMiddleware, async (req, res) => {
   try {
     const { startDate, endDate, page } = req.query;
-    const metrics = db.collection('performance_metrics');
     
-    const query = {};
+    let query = 'SELECT * FROM performance_metrics WHERE 1=1';
+    const params = [];
+    let paramCount = 1;
+    
     if (startDate && endDate) {
-      query.timestamp = {
-        $gte: new Date(startDate),
-        $lte: new Date(endDate),
-      };
+      query += \` AND timestamp >= \$\${paramCount} AND timestamp <= \$\${paramCount + 1}\`;
+      params.push(new Date(startDate), new Date(endDate));
+      paramCount += 2;
     }
     if (page) {
-      query.page = page;
+      query += \` AND page = \$\${paramCount}\`;
+      params.push(page);
+      paramCount++;
     }
     
-    const data = await metrics.find(query).sort({ timestamp: -1 }).limit(1000).toArray();
+    query += ' ORDER BY timestamp DESC LIMIT 1000';
+    
+    const result = await pool.query(query, params);
+    const data = result.rows;
     
     // Calculate averages
-    const lcpValues = data.filter(m => m.name === 'LCP').map(m => m.value);
-    const fcpValues = data.filter(m => m.name === 'FCP').map(m => m.value);
-    const clsValues = data.filter(m => m.name === 'CLS').map(m => m.value);
-    const ttfbValues = data.filter(m => m.name === 'TTFB').map(m => m.value);
+    const lcpValues = data.filter(m => m.name === 'LCP').map(m => parseFloat(m.value));
+    const fcpValues = data.filter(m => m.name === 'FCP').map(m => parseFloat(m.value));
+    const clsValues = data.filter(m => m.name === 'CLS').map(m => parseFloat(m.value));
+    const ttfbValues = data.filter(m => m.name === 'TTFB').map(m => parseFloat(m.value));
     
     const avg = arr => arr.length > 0 ? arr.reduce((a, b) => a + b, 0) / arr.length : 0;
     
@@ -363,33 +466,41 @@ app.get('/api/analytics/performance', authMiddleware, async (req, res) => {
 // Get geographic data
 app.get('/api/analytics/geography', authMiddleware, async (req, res) => {
   try {
-    const visits = db.collection('visits');
-    
     // Aggregate by country
-    const byCountry = await visits.aggregate([
-      { $group: { _id: '$country', count: { $sum: 1 } } },
-      { $sort: { count: -1 } },
-      { $limit: 50 },
-    ]).toArray();
+    const byCountryResult = await pool.query(\`
+      SELECT country as name, COUNT(*) as count 
+      FROM visits 
+      WHERE country IS NOT NULL 
+      GROUP BY country 
+      ORDER BY count DESC 
+      LIMIT 50
+    \`);
     
     // Aggregate by city
-    const byCity = await visits.aggregate([
-      { $group: { _id: { city: '$city', country: '$country' }, count: { $sum: 1 } } },
-      { $sort: { count: -1 } },
-      { $limit: 20 },
-    ]).toArray();
+    const byCityResult = await pool.query(\`
+      SELECT city, country, COUNT(*) as count 
+      FROM visits 
+      WHERE city IS NOT NULL 
+      GROUP BY city, country 
+      ORDER BY count DESC 
+      LIMIT 20
+    \`);
     
     // Get recent visits with coordinates
-    const recentVisits = await visits.find({
-      latitude: { $exists: true },
-      longitude: { $exists: true },
-    }).sort({ timestamp: -1 }).limit(100).toArray();
+    const recentVisitsResult = await pool.query(\`
+      SELECT * FROM visits 
+      WHERE latitude IS NOT NULL AND longitude IS NOT NULL 
+      ORDER BY timestamp DESC 
+      LIMIT 100
+    \`);
+    
+    const totalVisitsResult = await pool.query('SELECT COUNT(*) as total FROM visits');
     
     res.json({
-      byCountry,
-      byCity,
-      recentVisits,
-      totalVisits: await visits.countDocuments(),
+      byCountry: byCountryResult.rows,
+      byCity: byCityResult.rows,
+      recentVisits: recentVisitsResult.rows,
+      totalVisits: parseInt(totalVisitsResult.rows[0].total),
     });
   } catch (err) {
     console.error('Get geography error:', err);
@@ -401,20 +512,27 @@ app.get('/api/analytics/geography', authMiddleware, async (req, res) => {
 app.get('/api/analytics/events', authMiddleware, async (req, res) => {
   try {
     const { type, startDate, endDate } = req.query;
-    const events = db.collection('events');
     
-    const query = {};
-    if (type) query.type = type;
+    let query = 'SELECT * FROM events WHERE 1=1';
+    const params = [];
+    let paramCount = 1;
+    
+    if (type) {
+      query += \` AND type = \$\${paramCount}\`;
+      params.push(type);
+      paramCount++;
+    }
     if (startDate && endDate) {
-      query.timestamp = {
-        $gte: new Date(startDate),
-        $lte: new Date(endDate),
-      };
+      query += \` AND timestamp >= \$\${paramCount} AND timestamp <= \$\${paramCount + 1}\`;
+      params.push(new Date(startDate), new Date(endDate));
+      paramCount += 2;
     }
     
-    const data = await events.find(query).sort({ timestamp: -1 }).limit(500).toArray();
+    query += ' ORDER BY timestamp DESC LIMIT 500';
     
-    res.json({ data, count: data.length });
+    const result = await pool.query(query, params);
+    
+    res.json({ data: result.rows, count: result.rows.length });
   } catch (err) {
     console.error('Get events error:', err);
     res.status(500).json({ error: 'Failed to get events' });
@@ -424,10 +542,9 @@ app.get('/api/analytics/events', authMiddleware, async (req, res) => {
 // Get errors
 app.get('/api/analytics/errors', authMiddleware, async (req, res) => {
   try {
-    const errors = db.collection('errors');
-    const data = await errors.find({}).sort({ timestamp: -1 }).limit(100).toArray();
+    const result = await pool.query('SELECT * FROM errors ORDER BY timestamp DESC LIMIT 100');
     
-    res.json({ data, count: data.length });
+    res.json({ data: result.rows, count: result.rows.length });
   } catch (err) {
     console.error('Get errors error:', err);
     res.status(500).json({ error: 'Failed to get errors' });
@@ -437,11 +554,6 @@ app.get('/api/analytics/errors', authMiddleware, async (req, res) => {
 // Get dashboard summary
 app.get('/api/analytics/summary', authMiddleware, async (req, res) => {
   try {
-    const visits = db.collection('visits');
-    const metrics = db.collection('performance_metrics');
-    const events = db.collection('events');
-    const errors = db.collection('errors');
-    
     const now = new Date();
     const last24h = new Date(now - 24 * 60 * 60 * 1000);
     const last7d = new Date(now - 7 * 24 * 60 * 60 * 1000);
@@ -454,21 +566,21 @@ app.get('/api/analytics/summary', authMiddleware, async (req, res) => {
       totalErrors,
       countries,
     ] = await Promise.all([
-      visits.countDocuments(),
-      visits.countDocuments({ timestamp: { $gte: last24h } }),
-      visits.countDocuments({ timestamp: { $gte: last7d } }),
-      events.countDocuments(),
-      errors.countDocuments({ timestamp: { $gte: last7d } }),
-      visits.distinct('country'),
+      pool.query('SELECT COUNT(*) as total FROM visits'),
+      pool.query('SELECT COUNT(*) as total FROM visits WHERE timestamp >= \$1', [last24h]),
+      pool.query('SELECT COUNT(*) as total FROM visits WHERE timestamp >= \$1', [last7d]),
+      pool.query('SELECT COUNT(*) as total FROM events'),
+      pool.query('SELECT COUNT(*) as total FROM errors WHERE timestamp >= \$1', [last7d]),
+      pool.query('SELECT COUNT(DISTINCT country) as total FROM visits WHERE country IS NOT NULL'),
     ]);
     
     res.json({
-      totalVisits,
-      visits24h,
-      visits7d,
-      totalEvents,
-      totalErrors,
-      uniqueCountries: countries.length,
+      totalVisits: parseInt(totalVisits.rows[0].total),
+      visits24h: parseInt(visits24h.rows[0].total),
+      visits7d: parseInt(visits7d.rows[0].total),
+      totalEvents: parseInt(totalEvents.rows[0].total),
+      totalErrors: parseInt(totalErrors.rows[0].total),
+      uniqueCountries: parseInt(countries.rows[0].total),
     });
   } catch (err) {
     console.error('Get summary error:', err);
@@ -479,31 +591,30 @@ app.get('/api/analytics/summary', authMiddleware, async (req, res) => {
 // Get PageSpeed Insights results
 app.get('/api/analytics/pagespeed', authMiddleware, async (req, res) => {
   try {
-    const pageSpeedCollection = db.collection('pagespeed_results');
-    
     // Get latest results for mobile and desktop
-    const latestMobile = await pageSpeedCollection.findOne(
-      { strategy: 'mobile' },
-      { sort: { timestamp: -1 } }
+    const latestMobile = await pool.query(
+      'SELECT * FROM pagespeed_results WHERE strategy = \$1 ORDER BY timestamp DESC LIMIT 1',
+      ['mobile']
     );
     
-    const latestDesktop = await pageSpeedCollection.findOne(
-      { strategy: 'desktop' },
-      { sort: { timestamp: -1 } }
+    const latestDesktop = await pool.query(
+      'SELECT * FROM pagespeed_results WHERE strategy = \$1 ORDER BY timestamp DESC LIMIT 1',
+      ['desktop']
     );
     
     // Get historical trend (last 7 days)
     const sevenDaysAgo = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000);
-    const history = await pageSpeedCollection.find({
-      timestamp: { $gte: sevenDaysAgo }
-    }).sort({ timestamp: 1 }).toArray();
+    const history = await pool.query(
+      'SELECT * FROM pagespeed_results WHERE timestamp >= \$1 ORDER BY timestamp ASC',
+      [sevenDaysAgo]
+    );
     
     res.json({
       latest: {
-        mobile: latestMobile,
-        desktop: latestDesktop,
+        mobile: latestMobile.rows[0] || null,
+        desktop: latestDesktop.rows[0] || null,
       },
-      history,
+      history: history.rows,
     });
   } catch (err) {
     console.error('Get PageSpeed error:', err);
@@ -514,7 +625,7 @@ app.get('/api/analytics/pagespeed', authMiddleware, async (req, res) => {
 // AI-powered route prediction (simple implementation)
 app.post('/api/predict-route', async (req, res) => {
   try {
-    const { currentPath, history } = req.body;
+    const { currentPath } = req.body;
     
     // Simple rule-based prediction (can be replaced with ML model)
     const predictions = {
@@ -544,5 +655,5 @@ app.get('/health', (req, res) => {
 });
 
 app.listen(PORT, () => {
-  console.log(`🚀 Analytics API running on port ${PORT}`);
+  console.log(\`🚀 Analytics API running on port \${PORT}\`);
 });
