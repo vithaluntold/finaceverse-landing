@@ -184,31 +184,31 @@ const Home = (props) => {
           </div>
         </div>
       </section>
-      <section className="who-its-for\" style={{background: 'var(--color-surface)', padding: 'var(--spacing-4xl) 0'}}>
-        <div className=\"container-wrapper\">
-          <div className=\"section-header centered\">
-            <h2 className=\"section-title\">
+      <section className="who-its-for" style={{background: 'var(--color-surface)', padding: 'var(--spacing-4xl) 0'}}>
+        <div className="container-wrapper">
+          <div className="section-header centered">
+            <h2 className="section-title">
               <span>Who </span>
-              <span className=\"home-thq-text-gradient-elm2\">It's Built For</span>
+              <span className="home-thq-text-gradient-elm2">It's Built For</span>
             </h2>
-            <p className=\"section-subtitle\">
+            <p className="section-subtitle">
               Whether you're a solo practitioner or a global enterprise, FinACEverse scales to your needs
             </p>
           </div>
-          <div className=\"bento-grid\" style={{gap: 'var(--spacing-xl)', marginTop: 'var(--spacing-2xl)'}}>
-            <div className=\"bento-cell cell-wide\" style={{background: 'var(--color-surface-elevated)', padding: 'var(--spacing-2xl)', borderRadius: 'var(--border-radius-lg)'}}>
-              <div className=\"persona-header\" style={{display: 'flex', alignItems: 'center', gap: 'var(--spacing-md)', marginBottom: 'var(--spacing-lg)'}}>
+          <div className="bento-grid" style={{gap: 'var(--spacing-xl)', marginTop: 'var(--spacing-2xl)'}}>
+            <div className="bento-cell cell-wide" style={{background: 'var(--color-surface-elevated)', padding: 'var(--spacing-2xl)', borderRadius: 'var(--border-radius-lg)'}}>
+              <div className="persona-header" style={{display: 'flex', alignItems: 'center', gap: 'var(--spacing-md)', marginBottom: 'var(--spacing-lg)'}}>
                 <div style={{fontSize: '2.5rem'}}>👔</div>
                 <div>
-                  <h3 className=\"cell-title\">Accounting Firms (5-200+ People)</h3>
+                  <h3 className="cell-title">Accounting Firms (5-200+ People)</h3>
                   <p style={{opacity: 0.7, fontSize: 'var(--font-size-sm)'}}>Managing dozens to hundreds of client engagements</p>
                 </div>
               </div>
-              <p className=\"section-content\">
+              <p className="section-content">
                 <strong>Your Pain Point:</strong> Tax season chaos. Partners buried in data entry instead of advisory. 
-                Staff overwhelmed with manual reconciliations. Clients demanding real-time insights you can't deliver.
+                Staff overwhelmed with manual reconciliations. Clients demanding real-time insights you can&apos;t deliver.
               </p>
-              <p className=\"section-content\" style={{marginTop: 'var(--spacing-md)'}}>
+              <p className="section-content" style={{marginTop: 'var(--spacing-md)'}}>
                 <strong>Your Solution:</strong> Foundation (VAMN + Accute) + Cyloid + Finaid Hub handles 90% of routine work. 
                 Partners shift from data entry to high-value advisory. Add Sumbuddy for white-label client portals.
               </p>
@@ -217,39 +217,51 @@ const Home = (props) => {
               </div>
             </div>
             
-            <div className=\"bento-cell cell-narrow\" style={{background: 'var(--color-surface-elevated)', padding: 'var(--spacing-xl)', borderRadius: 'var(--border-radius-lg)'}}>
-              <div className=\"persona-header\" style={{marginBottom: 'var(--spacing-md)'}}>
+            <div className="bento-cell cell-narrow" style={{background: 'var(--color-surface-elevated)', padding: 'var(--spacing-xl)', borderRadius: 'var(--border-radius-lg)'}}>
+              <div className="persona-header" style={{marginBottom: 'var(--spacing-md)'}}>
                 <div style={{fontSize: '2rem', marginBottom: 'var(--spacing-sm)'}}>⚖️</div>
-                <h3 className=\"cell-title\" style={{fontSize: 'var(--font-size-xl)'}}>Tax Practitioners (Solo to Small Teams)</h3>
+                <h3 className="cell-title" style={{fontSize: 'var(--font-size-xl)'}}>Tax Practitioners (Solo to Small Teams)</h3>
               </div>
-              <p className=\"section-content\">\n                <strong>Pain:</strong> Turning away clients during tax season. Manual prep taking 10-15 hours per return. No time for proactive planning.\n              </p>\n              <p className=\"section-content\" style={{marginTop: 'var(--spacing-md)'}}>
+              <p className="section-content">
+                <strong>Pain:</strong> Turning away clients during tax season. Manual prep taking 10-15 hours per return. No time for proactive planning.
+              </p>
+              <p className="section-content" style={{marginTop: 'var(--spacing-md)'}}>
                 <strong>Solution:</strong> Luca + EPI-Q gives you AI-powered tax research and predictive planning. Scale to 3x clients with proactive strategies.
-              </p>\n            </div>
+              </p>
+            </div>
             
-            <div className=\"bento-cell cell-narrow\" style={{background: 'var(--color-surface-elevated)', padding: 'var(--spacing-xl)', borderRadius: 'var(--border-radius-lg)'}}>
-              <div className=\"persona-header\" style={{marginBottom: 'var(--spacing-md)'}}>
+            <div className="bento-cell cell-narrow" style={{background: 'var(--color-surface-elevated)', padding: 'var(--spacing-xl)', borderRadius: 'var(--border-radius-lg)'}}>
+              <div className="persona-header" style={{marginBottom: 'var(--spacing-md)'}}>
                 <div style={{fontSize: '2rem', marginBottom: 'var(--spacing-sm)'}}>🏢</div>
-                <h3 className=\"cell-title\" style={{fontSize: 'var(--font-size-xl)'}}>Corporate Finance Teams</h3>
+                <h3 className="cell-title" style={{fontSize: 'var(--font-size-xl)'}}>Corporate Finance Teams</h3>
               </div>
-              <p className=\"section-content\">\n                <strong>Pain:</strong> Multi-entity chaos. Delayed month-end close (2+ weeks). Fragmented systems across subsidiaries.\n              </p>\n              <p className=\"section-content\" style={{marginTop: 'var(--spacing-md)'}}>
+              <p className="section-content">
+                <strong>Pain:</strong> Multi-entity chaos. Delayed month-end close (2+ weeks). Fragmented systems across subsidiaries.
+              </p>
+              <p className="section-content" style={{marginTop: 'var(--spacing-md)'}}>
                 <strong>Solution:</strong> Accute orchestrates global ops. Finory delivers real-time consolidated dashboards. Close in 2 hours, not 2 weeks.
-              </p>\n            </div>
+              </p>
+            </div>
             
-            <div className=\"bento-cell cell-narrow\" style={{background: 'var(--color-surface-elevated)', padding: 'var(--spacing-xl)', borderRadius: 'var(--border-radius-lg)'}}>
-              <div className=\"persona-header\" style={{marginBottom: 'var(--spacing-md)'}}>
+            <div className="bento-cell cell-narrow" style={{background: 'var(--color-surface-elevated)', padding: 'var(--spacing-xl)', borderRadius: 'var(--border-radius-lg)'}}>
+              <div className="persona-header" style={{marginBottom: 'var(--spacing-md)'}}>
                 <div style={{fontSize: '2rem', marginBottom: 'var(--spacing-sm)'}}>🔍</div>
-                <h3 className=\"cell-title\" style={{fontSize: 'var(--font-size-xl)'}}>Auditors & Compliance</h3>
+                <h3 className="cell-title" style={{fontSize: 'var(--font-size-xl)'}}>Auditors & Compliance</h3>
               </div>
-              <p className=\"section-content\">\n                <strong>Pain:</strong> Chasing source documents. Incomplete audit trails. Manual verification taking weeks.\n              </p>\n              <p className=\"section-content\" style={{marginTop: 'var(--spacing-md)'}}>
-                <strong>Solution:</strong> Cyloid's compliance causality gives you complete audit trails. Every number traces to source. 60% faster audits.
-              </p>\n            </div>
+              <p className="section-content">
+                <strong>Pain:</strong> Chasing source documents. Incomplete audit trails. Manual verification taking weeks.
+              </p>
+              <p className="section-content" style={{marginTop: 'var(--spacing-md)'}}>
+                <strong>Solution:</strong> Cyloid&apos;s compliance causality gives you complete audit trails. Every number traces to source. 60% faster audits.
+              </p>
+            </div>
           </div>
         </div>
       </section>
-      <section className=\"process-timeline\">
-        <div className=\"container-wrapper\">
-          <div className=\"section-header centered\">
-            <h2 className=\"section-title\">
+      <section className="process-timeline">
+        <div className="container-wrapper">
+          <div className="section-header centered">
+            <h2 className="section-title">
               <span>
                 {' '}
                 Cognitive OS
@@ -259,9 +271,9 @@ const Home = (props) => {
                   }}
                 />
               </span>
-              <span className=\"home-thq-text-gradient-elm2\">Architecture</span>
+              <span className="home-thq-text-gradient-elm2">Architecture</span>
             </h2>
-            <p className=\"section-subtitle\">
+            <p className="section-subtitle">
               How FinACEverse transforms documents into indisputable financial
               facts.
             </p>
