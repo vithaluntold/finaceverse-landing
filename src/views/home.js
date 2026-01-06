@@ -278,70 +278,99 @@ const Home = (props) => {
           </div>
           <div className="masonry-grid">
             <div className="masonry-item item-lg">
-              <div className="module-card">
-                <div className="module-header">
-                  <span className="module-name">Accute</span>
-                  <div className="module-tag">
-                    <span>Orchestrator</span>
+              <a href="https://accute.io" target="_blank" rel="noopener noreferrer" style={{textDecoration: 'none', color: 'inherit'}}>
+                <div className="module-card" style={{cursor: 'pointer'}}>
+                  <div className="module-header">
+                    <span className="module-name">Accute</span>
+                    <div className="module-tag">
+                      <span>Orchestrator</span>
+                    </div>
                   </div>
+                  <h3 className="module-benefit">Operational Orchestration</h3>
+                  <p className="section-content">
+                    Orchestrates every financial cycle with unified compliance logic,
+                    coordinating VAMN's cognitive intelligence across workflows.
+                  </p>
+                  <img
+                    src="/images/Accute Transparent symbol.png"
+                    alt="Accute module"
+                    style={{maxWidth: '80px', margin: '20px auto', display: 'block', opacity: 0.9}}
+                  />
                 </div>
-                <h3 className="module-benefit">Operational Orchestration</h3>
-                <p className="section-content">
-                  Orchestrates every financial cycle with unified compliance logic,
-                  coordinating VAMN's cognitive intelligence across workflows.
-                </p>
-                <img
-                  src="https://images.pexels.com/photos/30547598/pexels-photo-30547598.jpeg?auto=compress&amp;cs=tinysrgb&amp;w=1500"
-                  alt="Accute module visualization"
-                />
+              </a>
               </div>
             </div>
             <div className="masonry-item item-sm">
-              <div className="module-card secondary">
-                <span className="module-name">VAMN</span>
-                <div className="module-tag">
-                  <span>Core</span>
+              <a href="https://vamn.io" target="_blank" rel="noopener noreferrer" style={{textDecoration: 'none', color: 'inherit'}}>
+                <div className="module-card secondary" style={{cursor: 'pointer'}}>
+                  <span className="module-name">VAMN</span>
+                  <div className="module-tag">
+                    <span>Core</span>
+                  </div>
+                  <h3 className="module-benefit">Cognitive Brain</h3>
+                  <p className="section-content">
+                    The central brain of FinACEverse - multi-stream network for
+                    rigorous financial intelligence and calculation accuracy.
+                  </p>
+                  <img
+                    src="/images/VAMN-7B Transparent logo.png"
+                    alt="VAMN"
+                    style={{maxWidth: '70px', margin: '15px auto', display: 'block', opacity: 0.9}}
+                  />
                 </div>
-                <h3 className="module-benefit">Cognitive Brain</h3>
-                <p className="section-content">
-                  The central brain of FinACEverse - multi-stream network for
-                  rigorous financial intelligence and calculation accuracy.
-                </p>
-              </div>
+              </a>
             </div>
             <div className="masonry-item item-md">
-              <div className="module-card accent">
-                <span className="module-name">Cyloid</span>
-                <h3 className="module-benefit">Verification Eyes</h3>
-                <p className="section-content">
-                  The eyes of FinACEverse - turns every incoming document into an
-                  indisputable fact through mathematical verification.
-                </p>
-                <img
-                  src="https://images.pexels.com/photos/30547616/pexels-photo-30547616.jpeg?auto=compress&amp;cs=tinysrgb&amp;w=1500"
-                  alt="Cyloid verification"
-                />
+              <a href="https://cyloid.io" target="_blank" rel="noopener noreferrer" style={{textDecoration: 'none', color: 'inherit'}}>
+                <div className="module-card accent" style={{cursor: 'pointer'}}>
+                  <span className="module-name">Cyloid</span>
+                  <h3 className="module-benefit">Verification Eyes</h3>
+                  <p className="section-content">
+                    The eyes of FinACEverse - turns every incoming document into an
+                    indisputable fact through mathematical verification.
+                  </p>
+                  <img
+                    src="/images/Cyloid.png"
+                    alt="Cyloid"
+                    style={{maxWidth: '75px', margin: '20px auto', display: 'block', opacity: 0.9}}
+                  />
+                </div>
+              </a>
               </div>
             </div>
             <div className="masonry-item item-sm">
-              <div className="module-card">
-                <span className="module-name">Luca</span>
-                <h3 className="module-benefit">Domain Intelligence</h3>
-                <p className="section-content">
-                  AI-powered expertise for complex accounting and tax decision
-                  support.
-                </p>
-              </div>
+              <a href="https://askluca.io" target="_blank" rel="noopener noreferrer" style={{textDecoration: 'none', color: 'inherit'}}>
+                <div className="module-card" style={{cursor: 'pointer'}}>
+                  <span className="module-name">Luca</span>
+                  <h3 className="module-benefit">Domain Intelligence</h3>
+                  <p className="section-content">
+                    AI-powered expertise for complex accounting and tax decision
+                    support.
+                  </p>
+                  <img
+                    src="/images/Luca Transparent symbol (2).png"
+                    alt="Luca"
+                    style={{maxWidth: '60px', margin: '15px auto', display: 'block', opacity: 0.9}}
+                  />
+                </div>
+              </a>
             </div>
             <div className="masonry-item item-sm">
-              <div className="module-card">
-                <span className="module-name">Finaid Hub</span>
-                <h3 className="module-benefit">Execution at Scale</h3>
-                <p className="section-content">
-                  Scale your firm&apos;s capacity without increasing your
-                  headcount.
-                </p>
-              </div>
+              <a href="https://finaidhub.io" target="_blank" rel="noopener noreferrer" style={{textDecoration: 'none', color: 'inherit'}}>
+                <div className="module-card" style={{cursor: 'pointer'}}>
+                  <span className="module-name">Finaid Hub</span>
+                  <h3 className="module-benefit">Execution at Scale</h3>
+                  <p className="section-content">
+                    Scale your firm&apos;s capacity without increasing your
+                    headcount.
+                  </p>
+                  <img
+                    src="/images/Fin(Ai)d Studio Transparent symbol.png"
+                    alt="Finaid Hub"
+                    style={{maxWidth: '60px', margin: '15px auto', display: 'block', opacity: 0.9}}
+                  />
+                </div>
+              </a>
             </div>
             <div className="masonry-item item-md">
               <div className="module-card elevated">
@@ -351,20 +380,39 @@ const Home = (props) => {
                   Real-time reporting and predictive intelligence for proactive
                   taxation strategy.
                 </p>
-                <img
-                  src="https://images.pexels.com/photos/17485707/pexels-photo-17485707.png?auto=compress&amp;cs=tinysrgb&amp;w=1500"
-                  alt="Finory intelligence"
-                />
+                <div style={{display: 'flex', gap: '20px', justifyContent: 'center', margin: '20px 0'}}>
+                  <a href="https://finory.io" target="_blank" rel="noopener noreferrer" style={{cursor: 'pointer'}}>
+                    <img
+                      src="/images/Finory Transparent symbol.png"
+                      alt="Finory"
+                      style={{maxWidth: '55px', opacity: 0.9}}
+                    />
+                  </a>
+                  <a href="https://epi-q.io" target="_blank" rel="noopener noreferrer" style={{cursor: 'pointer'}}>
+                    <img
+                      src="/images/EPI-Q Transparent symbol.png"
+                      alt="EPI-Q"
+                      style={{maxWidth: '55px', opacity: 0.9}}
+                    />
+                  </a>
+                </div>
               </div>
             </div>
             <div className="masonry-item item-sm">
-              <div className="module-card">
-                <span className="module-name">Sumbuddy</span>
-                <h3 className="module-benefit">Smart Collaboration</h3>
-                <p className="section-content">
-                  Unified communication layer for clients and internal teams.
-                </p>
-              </div>
+              <a href="https://sumbuddy.io" target="_blank" rel="noopener noreferrer" style={{textDecoration: 'none', color: 'inherit'}}>
+                <div className="module-card" style={{cursor: 'pointer'}}>
+                  <span className="module-name">Sumbuddy</span>
+                  <h3 className="module-benefit">Smart Collaboration</h3>
+                  <p className="section-content">
+                    Unified communication layer for clients and internal teams.
+                  </p>
+                  <img
+                    src="/images/SumBuddy Transparent symbol.png"
+                    alt="Sumbuddy"
+                    style={{maxWidth: '60px', margin: '15px auto', display: 'block', opacity: 0.9}}
+                  />
+                </div>
+              </a>
             </div>
           </div>
         </div>

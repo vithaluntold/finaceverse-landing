@@ -52,9 +52,10 @@ const Modules = (props) => {
                 </a>
               </div>
             </div>
-            <div className="modules-hero-card modules-hero-accute">
-              <div className="modules-hero-card-icon">
-                <svg
+            <a href="https://accute.io" target="_blank" rel="noopener noreferrer" style={{textDecoration: 'none', color: 'inherit'}}>
+              <div className="modules-hero-card modules-hero-accute" style={{cursor: 'pointer'}}>
+                <div className="modules-hero-card-icon">
+                  <svg
                   xmlns="http://www.w3.org/2000/svg"
                   width="24"
                   height="24"
@@ -78,8 +79,10 @@ const Modules = (props) => {
                 Operational orchestrator coordinating VAMN's cognitive streams across complex financial workflows.
               </p>
             </div>
-            <div className="modules-hero-card modules-hero-vamn">
-              <div className="modules-hero-card-icon">
+            </a>
+            <a href="https://vamn.io" target="_blank" rel="noopener noreferrer" style={{textDecoration: 'none', color: 'inherit'}}>
+              <div className="modules-hero-card modules-hero-vamn" style={{cursor: 'pointer'}}>
+                <div className="modules-hero-card-icon">
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
                   width="24"
@@ -104,8 +107,10 @@ const Modules = (props) => {
                 Verifiable Arithmetic Multi-Stream Network for intelligence.
               </p>
             </div>
-            <div className="modules-hero-card modules-hero-cyloid">
-              <div className="modules-hero-card-icon">
+            </a>
+            <a href="https://cyloid.io" target="_blank" rel="noopener noreferrer" style={{textDecoration: 'none', color: 'inherit'}}>
+              <div className="modules-hero-card modules-hero-cyloid" style={{cursor: 'pointer'}}>
+                <div className="modules-hero-card-icon">
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
                   width="24"
@@ -127,6 +132,7 @@ const Modules = (props) => {
                 Transforming documents into indisputable mathematical facts.
               </p>
             </div>
+            </a>
           </div>
         </div>
       </section>
