@@ -157,17 +157,17 @@ const Footer = (props) => {
           </div>
           <div className="footer-bottom-bar">
             <div className="footer-legal-links">
-              <a href="#">
+              <a href="/compliance-privacy">
                 <div className="footer-legal-link">
                   <span>Privacy Protocol</span>
                 </div>
               </a>
-              <a href="#">
+              <a href="/compliance-privacy">
                 <div className="footer-legal-link">
                   <span>Terms of Operation</span>
                 </div>
               </a>
-              <a href="#">
+              <a href="/compliance-privacy">
                 <div className="footer-legal-link">
                   <span>Security Standards</span>
                 </div>
