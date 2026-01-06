@@ -164,14 +164,18 @@ const ExpertConsultation = (props) => {
             architects. Select your preferred time.
           </p>
           
-          <div className="google-calendar-container">
-            <iframe 
-              src="https://calendar.app.google/eoV5uKtAo37xJtee7" 
-              style={{border: 0, width: '100%', height: '600px'}}
-              frameBorder="0"
-              scrolling="no"
-              title="Google Calendar Appointment Scheduling"
-            ></iframe>
+          <div className="booking-cta-container">
+            <a 
+              href="https://calendar.app.google/eoV5uKtAo37xJtee7" 
+              target="_blank"
+              rel="noopener noreferrer"
+              className="btn btn-primary btn-lg"
+            >
+              Open Calendar & Book Appointment
+            </a>
+            <p className="booking-alternative section-content">
+              Or email us at <a href="mailto:vithal@finacegroup.com?subject=Consultation Request&body=I'd like to schedule a 45-minute consultation.%0D%0A%0D%0AName:%0D%0ACompany:%0D%0ARole:%0D%0APreferred Date/Time:%0D%0ATopics to Discuss:" style={{color: 'var(--color-primary)'}}>vithal@finacegroup.com</a> with your preferred date and time.
+            </p>
           </div>
           
           <div className="booking-note">

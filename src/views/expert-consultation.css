@@ -199,12 +199,19 @@ select.form-input {
   padding-right: 2.5rem;
 }
 
-.google-calendar-container {
-  max-width: 800px;
-  margin: 0 auto;
-  border-radius: var(--border-radius-lg);
-  overflow: hidden;
-  box-shadow: var(--shadow-level-2);
+.booking-cta-container {
+  display: flex;
+  margin: var(--spacing-2xl) auto;
+  max-width: 600px;
+  align-items: center;
+  flex-direction: column;
+  gap: var(--spacing-lg);
+  text-align: center;
+}
+
+.booking-alternative {
+  color: var(--color-on-surface-secondary);
+  font-size: var(--font-size-base);
 }
 
 .booking-note {
@@ -221,9 +228,5 @@ select.form-input {
 
   .value-grid {
     grid-template-columns: 1fr;
-  }
-  
-  .google-calendar-container {
-    margin: 0 var(--spacing-md);
   }
 }
