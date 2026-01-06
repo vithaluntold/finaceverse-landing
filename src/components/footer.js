@@ -102,6 +102,11 @@ const Footer = (props) => {
                     <span>Expert Consultation</span>
                   </div>
                 </a>
+                <a href="/blog">
+                  <div className="footer-nav-link">
+                    <span>Blog</span>
+                  </div>
+                </a>
               </nav>
             </div>
             <div className="footer-bento-cell footer-action-cell">
@@ -112,27 +117,43 @@ const Footer = (props) => {
                 Subscribe to our Cognitive Insights newsletter.
               </p>
               <form
-                action="/subscribe"
-                method="POST"
-                data-form-id="9a6831b2-b560-4e7b-b51e-be491c8b0777"
+                onSubmit={async (e) => {
+                  e.preventDefault();
+                  const email = e.target.elements.email.value;
+                  
+                  try {
+                    const response = await fetch('/api/mailgun', {
+                      method: 'POST',
+                      headers: { 'Content-Type': 'application/json' },
+                      body: JSON.stringify({ action: 'subscribe', email })
+                    });
+                    
+                    const result = await response.json();
+                    
+                    if (result.success) {
+                      alert('Successfully subscribed to our newsletter!');
+                      e.target.reset();
+                    } else {
+                      alert(result.message || 'Subscription failed. Please try again.');
+                    }
+                  } catch (error) {
+                    console.error('Subscription error:', error);
+                    alert('An error occurred. Please try again later.');
+                  }
+                }}
                 className="footer-newsletter-form"
               >
                 <div className="footer-input-group">
                   <input
                     type="email"
                     placeholder="Professional Email"
-                    required="true"
-                    id="thq_textinput_Qrui"
-                    name="textinput"
-                    data-form-field-id="thq_textinput_Qrui"
+                    required={true}
+                    name="email"
                     className="footer-email-input"
                   />
                   <button
                     type="submit"
                     aria-label="Subscribe"
-                    id="thq_button_ncH0"
-                    name="button"
-                    data-form-field-id="thq_button_ncH0"
                     className="footer-submit-btn"
                   >
                     <svg

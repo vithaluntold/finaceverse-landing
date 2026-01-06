@@ -599,7 +599,7 @@ const Home = (props) => {
                   </button>
                 </form>
                 <p className="form-disclaimer">
-                  Join 500+ firms already pioneering the new category.
+                  Be among the early adopters pioneering the new category.
                 </p>
               </div>
             </div>
