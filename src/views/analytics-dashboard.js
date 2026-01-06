@@ -9,11 +9,12 @@ const AnalyticsDashboard = () => {
   const [geography, setGeography] = useState(null);
   const [performance, setPerformance] = useState(null);
   const [errors, setErrors] = useState(null);
+  const [pageSpeed, setPageSpeed] = useState(null);
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState('overview');
   const history = useHistory();
 
-  const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:5000';
+  const API_URL = process.env.REACT_APP_API_URL || 'https://www.finaceverse.io';
 
   // Chart colors
   const COLORS = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042', '#8884D8'];
@@ -52,11 +53,12 @@ const AnalyticsDashboard = () => {
     };
 
     try {
-      const [summaryRes, geoRes, perfRes, errorsRes] = await Promise.all([
+      const [summaryRes, geoRes, perfRes, errorsRes, pageSpeedRes] = await Promise.all([
         fetch(`${API_URL}/api/analytics/summary`, { headers }),
         fetch(`${API_URL}/api/analytics/geography`, { headers }),
         fetch(`${API_URL}/api/analytics/performance`, { headers }),
         fetch(`${API_URL}/api/analytics/errors`, { headers }),
+        fetch(`${API_URL}/api/analytics/pagespeed`, { headers }),
       ]);
 
       if (!summaryRes.ok) throw new Error('Unauthorized');
@@ -65,6 +67,7 @@ const AnalyticsDashboard = () => {
       setGeography(await geoRes.json());
       setPerformance(await perfRes.json());
       setErrors(await errorsRes.json());
+      setPageSpeed(await pageSpeedRes.json());
     } catch (err) {
       console.error('Fetch error:', err);
       if (err.message === 'Unauthorized') {
@@ -124,6 +127,12 @@ const AnalyticsDashboard = () => {
           onClick={() => setActiveTab('performance')}
         >
           Performance
+        </button>
+        <button
+          className={activeTab === 'pagespeed' ? 'tab-active' : ''}
+          onClick={() => setActiveTab('pagespeed')}
+        >
+          PageSpeed
         </button>
         <button
           className={activeTab === 'errors' ? 'tab-active' : ''}
@@ -225,7 +234,7 @@ const AnalyticsDashboard = () => {
                   <PieChart>
                     <Pie
                       data={geography.byCountry.slice(0, 5).map(item => ({
-                        name: item._id || 'Unknown',
+                        name: item.name || 'Unknown',
                         value: item.count
                       }))}
                       cx="50%"
@@ -252,7 +261,7 @@ const AnalyticsDashboard = () => {
                 {geography?.byCountry?.slice(0, 10).map((item, idx) => (
                   <div key={idx} className="geo-row">
                     <span className="geo-rank">{idx + 1}</span>
-                    <span className="geo-name">{item._id || 'Unknown'}</span>
+                    <span className="geo-name">{item.name || 'Unknown'}</span>
                     <span className="geo-count">{item.count} visits</span>
                   </div>
                 ))}
@@ -266,13 +275,114 @@ const AnalyticsDashboard = () => {
                   <div key={idx} className="geo-row">
                     <span className="geo-rank">{idx + 1}</span>
                     <span className="geo-name">
-                      {item._id.city}, {item._id.country}
+                      {item.city}, {item.country}
                     </span>
                     <span className="geo-count">{item.count} visits</span>
                   </div>
                 ))}
               </div>
             </div>
+          </div>
+        )}
+
+        {activeTab === 'pagespeed' && (
+          <div className="tab-panel">
+            <h2>Google PageSpeed Insights</h2>
+            
+            {pageSpeed?.latest && (
+              <div className="pagespeed-section">
+                <div className="pagespeed-grid">
+                  <div className="pagespeed-card">
+                    <h3>📱 Mobile</h3>
+                    {pageSpeed.latest.mobile ? (
+                      <>
+                        <div className="pagespeed-score" style={{color: pageSpeed.latest.mobile.score >= 90 ? '#0CCE6B' : pageSpeed.latest.mobile.score >= 50 ? '#FFA400' : '#FF4E42'}}>
+                          {Math.round(pageSpeed.latest.mobile.score)}
+                        </div>
+                        <div className="pagespeed-metrics">
+                          <div className="pagespeed-metric">
+                            <span>FCP:</span>
+                            <strong>{pageSpeed.latest.mobile.metrics?.fcp ? (pageSpeed.latest.mobile.metrics.fcp / 1000).toFixed(2) + 's' : 'N/A'}</strong>
+                          </div>
+                          <div className="pagespeed-metric">
+                            <span>LCP:</span>
+                            <strong>{pageSpeed.latest.mobile.metrics?.lcp ? (pageSpeed.latest.mobile.metrics.lcp / 1000).toFixed(2) + 's' : 'N/A'}</strong>
+                          </div>
+                          <div className="pagespeed-metric">
+                            <span>CLS:</span>
+                            <strong>{pageSpeed.latest.mobile.metrics?.cls?.toFixed(3) || 'N/A'}</strong>
+                          </div>
+                          <div className="pagespeed-metric">
+                            <span>SI:</span>
+                            <strong>{pageSpeed.latest.mobile.metrics?.si ? (pageSpeed.latest.mobile.metrics.si / 1000).toFixed(2) + 's' : 'N/A'}</strong>
+                          </div>
+                        </div>
+                        <div className="pagespeed-time">
+                          Last tested: {new Date(pageSpeed.latest.mobile.timestamp).toLocaleString()}
+                        </div>
+                      </>
+                    ) : (
+                      <div className="no-data">No mobile data yet</div>
+                    )}
+                  </div>
+
+                  <div className="pagespeed-card">
+                    <h3>🖥️ Desktop</h3>
+                    {pageSpeed.latest.desktop ? (
+                      <>
+                        <div className="pagespeed-score" style={{color: pageSpeed.latest.desktop.score >= 90 ? '#0CCE6B' : pageSpeed.latest.desktop.score >= 50 ? '#FFA400' : '#FF4E42'}}>
+                          {Math.round(pageSpeed.latest.desktop.score)}
+                        </div>
+                        <div className="pagespeed-metrics">
+                          <div className="pagespeed-metric">
+                            <span>FCP:</span>
+                            <strong>{pageSpeed.latest.desktop.metrics?.fcp ? (pageSpeed.latest.desktop.metrics.fcp / 1000).toFixed(2) + 's' : 'N/A'}</strong>
+                          </div>
+                          <div className="pagespeed-metric">
+                            <span>LCP:</span>
+                            <strong>{pageSpeed.latest.desktop.metrics?.lcp ? (pageSpeed.latest.desktop.metrics.lcp / 1000).toFixed(2) + 's' : 'N/A'}</strong>
+                          </div>
+                          <div className="pagespeed-metric">
+                            <span>CLS:</span>
+                            <strong>{pageSpeed.latest.desktop.metrics?.cls?.toFixed(3) || 'N/A'}</strong>
+                          </div>
+                          <div className="pagespeed-metric">
+                            <span>SI:</span>
+                            <strong>{pageSpeed.latest.desktop.metrics?.si ? (pageSpeed.latest.desktop.metrics.si / 1000).toFixed(2) + 's' : 'N/A'}</strong>
+                          </div>
+                        </div>
+                        <div className="pagespeed-time">
+                          Last tested: {new Date(pageSpeed.latest.desktop.timestamp).toLocaleString()}
+                        </div>
+                      </>
+                    ) : (
+                      <div className="no-data">No desktop data yet</div>
+                    )}
+                  </div>
+                </div>
+
+                {pageSpeed.history && pageSpeed.history.length > 0 && (
+                  <div className="chart-container" style={{ marginTop: '30px' }}>
+                    <h3>Performance Score History (7 Days)</h3>
+                    <ResponsiveContainer width="100%" height={300}>
+                      <LineChart data={pageSpeed.history.map(item => ({
+                        date: format(new Date(item.timestamp), 'MMM dd'),
+                        mobile: item.strategy === 'mobile' ? item.score : null,
+                        desktop: item.strategy === 'desktop' ? item.score : null,
+                      }))}>
+                        <CartesianGrid strokeDasharray="3 3" />
+                        <XAxis dataKey="date" />
+                        <YAxis domain={[0, 100]} />
+                        <Tooltip />
+                        <Legend />
+                        <Line type="monotone" dataKey="mobile" stroke={COLORS[0]} name="Mobile" />
+                        <Line type="monotone" dataKey="desktop" stroke={COLORS[1]} name="Desktop" />
+                      </LineChart>
+                    </ResponsiveContainer>
+                  </div>
+                )}
+              </div>
+            )}
           </div>
         )}
 
