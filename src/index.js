@@ -21,17 +21,30 @@ import AnalyticsDashboard from './views/analytics-dashboard'
 import NotFound from './views/not-found'
 import { initGA, trackPageView } from './utils/analytics'
 import { initPerformanceTracking, trackVisit } from './utils/performanceTracker'
+import { prefetchLikelyRoutes, trackNavigation, shouldPrefetch, initSmartImageLoading } from './utils/aiPrefetch'
 
 // Initialize analytics on app load
 initGA();
 initPerformanceTracking();
 trackVisit();
 
+// Initialize AI-powered features if conditions are met
+if (shouldPrefetch()) {
+  initSmartImageLoading();
+}
+
 const App = () => {
-  // Track page views on route change
+  // Track page views and prefetch on route change
   React.useEffect(() => {
     const handleRouteChange = () => {
-      trackPageView(window.location.pathname);
+      const currentPath = window.location.pathname;
+      trackPageView(currentPath);
+      trackNavigation(currentPath);
+      
+      // Prefetch likely next routes (only on good connections)
+      if (shouldPrefetch()) {
+        setTimeout(() => prefetchLikelyRoutes(currentPath), 2000);
+      }
     };
     handleRouteChange(); // Track initial page
     window.addEventListener('popstate', handleRouteChange);

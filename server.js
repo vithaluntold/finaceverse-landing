@@ -4,11 +4,14 @@ const cors = require('cors');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const { MongoClient } = require('mongodb');
+const redis = require('redis');
 
 const app = express();
 const PORT = process.env.PORT || 5000;
 const JWT_SECRET = process.env.JWT_SECRET || 'your-secret-key-change-in-production';
 const MONGODB_URI = process.env.MONGODB_URI || 'mongodb://localhost:27017/finaceverse-analytics';
+const REDIS_URL = process.env.REDIS_URL || 'redis://localhost:6379';
+const GOOGLE_API_KEY = process.env.GOOGLE_API_KEY || '';
 
 // Middleware
 app.use(cors());
@@ -20,6 +23,127 @@ MongoClient.connect(MONGODB_URI, { useNewUrlParser: true, useUnifiedTopology: tr
   .then(client => {
     db = client.db();
     console.log('✓ Connected to MongoDB');
+  })
+  .catch(err => console.error('MongoDB connection error:', err));
+
+// Redis connection (optional, graceful fallback if not available)
+let redisClient;
+try {
+  redisClient = redis.createClient({ url: REDIS_URL });
+  redisClient.connect()
+    .then(() => console.log('✓ Connected to Redis'))
+    .catch(err => {
+      console.warn('Redis not available, running without cache:', err.message);
+      redisClient = null;
+    });
+} catch (err) {
+  console.warn('Redis disabled');
+  redisClient = null;
+}
+
+// Helper: Get from cache or execute function
+const cacheWrapper = async (key, ttl, fn) => {
+  if (redisClient) {
+    try {
+      const cached = await redisClient.get(key);
+      if (cached) return JSON.parse(cached);
+    } catch (err) {
+      console.warn('Redis get failed:', err.message);
+    }
+  }
+  
+  const result = await fn();
+  
+  if (redisClient) {
+    try {
+      await redisClient.setEx(key, ttl, JSON.stringify(result));
+    } catch (err) {
+      console.warn('Redis set failed:', err.message);
+    }
+  }
+  
+  return result;
+};
+
+// Google PageSpeed Insights integration
+const runPageSpeedTest = async (url, strategy = 'mobile') => {
+  if (!GOOGLE_API_KEY) {
+    console.warn('Google API key not configured, skipping PageSpeed test');
+    return null;
+  }
+  
+  try {
+    const apiUrl = `https://www.googleapis.com/pagespeedonline/v5/runPagespeed?url=${encodeURIComponent(url)}&strategy=${strategy}&key=${GOOGLE_API_KEY}`;
+    const response = await fetch(apiUrl);
+    
+    if (!response.ok) {
+      throw new Error(`PageSpeed API error: ${response.statusText}`);
+    }
+    
+    const data = await response.json();
+    
+    return {
+      url,
+      strategy,
+      score: data.lighthouseResult.categories.performance.score * 100,
+      metrics: {
+        fcp: data.lighthouseResult.audits['first-contentful-paint']?.numericValue,
+        lcp: data.lighthouseResult.audits['largest-contentful-paint']?.numericValue,
+        cls: data.lighthouseResult.audits['cumulative-layout-shift']?.numericValue,
+        tbt: data.lighthouseResult.audits['total-blocking-time']?.numericValue,
+        si: data.lighthouseResult.audits['speed-index']?.numericValue,
+        tti: data.lighthouseResult.audits['interactive']?.numericValue,
+      },
+      timestamp: new Date(),
+    };
+  } catch (err) {
+    console.error('PageSpeed test failed:', err);
+    return null;
+  }
+};
+
+// Scheduled jobs (run every 6 hours)
+const startScheduledJobs = () => {
+  // Run PageSpeed test immediately on startup
+  setTimeout(async () => {
+    if (!db) return;
+    
+    console.log('🔍 Running PageSpeed test...');
+    const mobileResult = await runPageSpeedTest('https://finaceverse.io', 'mobile');
+    const desktopResult = await runPageSpeedTest('https://finaceverse.io', 'desktop');
+    
+    if (mobileResult || desktopResult) {
+      const pageSpeedCollection = db.collection('pagespeed_results');
+      if (mobileResult) await pageSpeedCollection.insertOne(mobileResult);
+      if (desktopResult) await pageSpeedCollection.insertOne(desktopResult);
+      console.log('✓ PageSpeed test completed');
+    }
+  }, 5000); // Wait 5 seconds after startup
+  
+  // Schedule every 6 hours
+  setInterval(async () => {
+    if (!db) return;
+    
+    console.log('🔍 Running scheduled PageSpeed test...');
+    const mobileResult = await runPageSpeedTest('https://finaceverse.io', 'mobile');
+    const desktopResult = await runPageSpeedTest('https://finaceverse.io', 'desktop');
+    
+    if (mobileResult || desktopResult) {
+      const pageSpeedCollection = db.collection('pagespeed_results');
+      if (mobileResult) await pageSpeedCollection.insertOne(mobileResult);
+      if (desktopResult) await pageSpeedCollection.insertOne(desktopResult);
+      console.log('✓ Scheduled PageSpeed test completed');
+    }
+  }, 6 * 60 * 60 * 1000); // Every 6 hours
+};
+
+// MongoDB connection
+let db;
+MongoClient.connect(MONGODB_URI, { useNewUrlParser: true, useUnifiedTopology: true })
+  .then(client => {
+    db = client.db();
+    console.log('✓ Connected to MongoDB');
+    startScheduledJobs();
   })
   .catch(err => console.error('MongoDB connection error:', err));
 
@@ -349,6 +473,68 @@ app.get('/api/analytics/summary', authMiddleware, async (req, res) => {
   } catch (err) {
     console.error('Get summary error:', err);
     res.status(500).json({ error: 'Failed to get summary' });
+  }
+});
+
+// Get PageSpeed Insights results
+app.get('/api/analytics/pagespeed', authMiddleware, async (req, res) => {
+  try {
+    const pageSpeedCollection = db.collection('pagespeed_results');
+    
+    // Get latest results for mobile and desktop
+    const latestMobile = await pageSpeedCollection.findOne(
+      { strategy: 'mobile' },
+      { sort: { timestamp: -1 } }
+    );
+    
+    const latestDesktop = await pageSpeedCollection.findOne(
+      { strategy: 'desktop' },
+      { sort: { timestamp: -1 } }
+    );
+    
+    // Get historical trend (last 7 days)
+    const sevenDaysAgo = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000);
+    const history = await pageSpeedCollection.find({
+      timestamp: { $gte: sevenDaysAgo }
+    }).sort({ timestamp: 1 }).toArray();
+    
+    res.json({
+      latest: {
+        mobile: latestMobile,
+        desktop: latestDesktop,
+      },
+      history,
+    });
+  } catch (err) {
+    console.error('Get PageSpeed error:', err);
+    res.status(500).json({ error: 'Failed to get PageSpeed data' });
+  }
+});
+
+// AI-powered route prediction (simple implementation)
+app.post('/api/predict-route', async (req, res) => {
+  try {
+    const { currentPath, history } = req.body;
+    
+    // Simple rule-based prediction (can be replaced with ML model)
+    const predictions = {
+      '/': ['/modules', '/request-demo', '/tailored-pilots'],
+      '/modules': ['/request-demo', '/tailored-pilots', '/expert-consultation'],
+      '/tailored-pilots': ['/request-demo', '/expert-consultation', '/modules'],
+      '/blog': ['/modules', '/expert-consultation', '/'],
+    };
+    
+    const predictedRoutes = predictions[currentPath] || ['/modules', '/request-demo'];
+    
+    res.json({
+      predictions: predictedRoutes.map((route, index) => ({
+        route,
+        confidence: (0.9 - index * 0.2).toFixed(2), // Decreasing confidence
+      })),
+    });
+  } catch (err) {
+    console.error('Route prediction error:', err);
+    res.status(500).json({ error: 'Prediction failed' });
   }
 });
 
