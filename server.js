@@ -9,6 +9,10 @@ const { Pool } = require('pg');
 const redis = require('redis');
 const { Server } = require('socket.io');
 
+// SEO AI Services
+const KeywordOptimizer = require('./src/seo-ai/keyword-optimizer');
+const LocalSEOManager = require('./src/seo-ai/local-seo-manager');
+
 const app = express();
 const PORT = process.env.PORT || 5000;
 const JWT_SECRET = process.env.JWT_SECRET || 'your-secret-key-change-in-production';
@@ -31,6 +35,18 @@ const pool = new Pool({
   connectionString: DATABASE_URL,
   ssl: process.env.NODE_ENV === 'production' ? { rejectUnauthorized: false } : false,
 });
+
+// Initialize SEO AI services
+let keywordOptimizer;
+let localSEOManager;
+
+try {
+  keywordOptimizer = new KeywordOptimizer(pool);
+  localSEOManager = new LocalSEOManager(pool);
+  console.log('✓ SEO AI services initialized');
+} catch (error) {
+  console.warn('⚠️  SEO AI services not available:', error.message);
+}
 
 // Initialize database tables before starting server
 async function initializeDatabase() {
@@ -1060,6 +1076,274 @@ app.get('/api/search-console/performance', authMiddleware, async (req, res) => {
   } catch (error) {
     console.error('Search Console performance error:', error);
     res.status(500).json({ error: error.message || 'Failed to fetch Search Console performance' });
+  }
+});
+
+// =====================================================================
+// SEO AI INFRASTRUCTURE ENDPOINTS
+// =====================================================================
+
+// Get all target keywords
+app.get('/api/seo/keywords', authMiddleware, async (req, res) => {
+  try {
+    const result = await pool.query(`
+      SELECT * FROM target_keywords 
+      ORDER BY 
+        CASE keyword_type
+          WHEN 'primary' THEN 1
+          WHEN 'long-tail' THEN 2
+          WHEN 'semantic' THEN 3
+          ELSE 4
+        END,
+        priority DESC
+    `);
+    
+    res.json({
+      keywords: result.rows,
+      total: result.rows.length
+    });
+  } catch (error) {
+    console.error('Keywords fetch error:', error);
+    res.status(500).json({ error: 'Failed to fetch keywords' });
+  }
+});
+
+// Scan a specific page for keyword optimization
+app.get('/api/seo/scan/:page', authMiddleware, async (req, res) => {
+  try {
+    if (!keywordOptimizer) {
+      return res.status(503).json({ error: 'SEO optimizer not available' });
+    }
+    
+    const { page } = req.params;
+    const pageUrl = page === 'home' ? 
+      'https://www.finaceverse.io/' : 
+      `https://www.finaceverse.io/${page}`;
+    
+    console.log(`📊 Scanning page: ${pageUrl}`);
+    const analysis = await keywordOptimizer.scanPageOptimization(pageUrl);
+    
+    res.json(analysis);
+  } catch (error) {
+    console.error('Page scan error:', error);
+    res.status(500).json({ error: error.message || 'Failed to scan page' });
+  }
+});
+
+// Scan all pages
+app.post('/api/seo/scan-all', authMiddleware, async (req, res) => {
+  try {
+    if (!keywordOptimizer) {
+      return res.status(503).json({ error: 'SEO optimizer not available' });
+    }
+    
+    console.log('📊 Starting full site scan...');
+    const results = await keywordOptimizer.scanAllPages();
+    
+    res.json({
+      success: true,
+      message: 'Full site scan completed',
+      results
+    });
+  } catch (error) {
+    console.error('Full scan error:', error);
+    res.status(500).json({ error: error.message || 'Failed to scan all pages' });
+  }
+});
+
+// Generate SEO report
+app.get('/api/seo/report', authMiddleware, async (req, res) => {
+  try {
+    if (!keywordOptimizer) {
+      return res.status(503).json({ error: 'SEO optimizer not available' });
+    }
+    
+    const report = await keywordOptimizer.generateReport();
+    res.json(report);
+  } catch (error) {
+    console.error('Report generation error:', error);
+    res.status(500).json({ error: error.message || 'Failed to generate report' });
+  }
+});
+
+// Get content analysis history for a page
+app.get('/api/seo/history/:page', authMiddleware, async (req, res) => {
+  try {
+    const { page } = req.params;
+    const pageUrl = page === 'home' ? 
+      'https://www.finaceverse.io/' : 
+      `https://www.finaceverse.io/${page}`;
+    
+    const result = await pool.query(`
+      SELECT 
+        page_url,
+        seo_score,
+        word_count,
+        keyword_density,
+        readability_score,
+        meta_title,
+        meta_description,
+        scanned_at,
+        heading_structure
+      FROM content_analysis
+      WHERE page_url = $1
+      ORDER BY scanned_at DESC
+      LIMIT 30
+    `, [pageUrl]);
+    
+    res.json({
+      page: pageUrl,
+      history: result.rows,
+      count: result.rows.length
+    });
+  } catch (error) {
+    console.error('History fetch error:', error);
+    res.status(500).json({ error: 'Failed to fetch history' });
+  }
+});
+
+// Get SEO issues
+app.get('/api/seo/issues', authMiddleware, async (req, res) => {
+  try {
+    const { severity, page, autoFixable } = req.query;
+    
+    let query = 'SELECT * FROM seo_issues WHERE status = $1';
+    const params = ['open'];
+    
+    if (severity) {
+      query += ' AND severity = $2';
+      params.push(severity);
+    }
+    
+    if (page) {
+      const pageUrl = page === 'home' ? 
+        'https://www.finaceverse.io/' : 
+        `https://www.finaceverse.io/${page}`;
+      query += ` AND page_url = $${params.length + 1}`;
+      params.push(pageUrl);
+    }
+    
+    if (autoFixable === 'true') {
+      query += ` AND auto_fixable = true`;
+    }
+    
+    query += ' ORDER BY CASE severity WHEN \'critical\' THEN 1 WHEN \'high\' THEN 2 WHEN \'medium\' THEN 3 ELSE 4 END, detected_at DESC';
+    
+    const result = await pool.query(query, params);
+    
+    res.json({
+      issues: result.rows,
+      total: result.rows.length,
+      critical: result.rows.filter(i => i.severity === 'critical').length,
+      high: result.rows.filter(i => i.severity === 'high').length,
+      autoFixable: result.rows.filter(i => i.auto_fixable).length
+    });
+  } catch (error) {
+    console.error('Issues fetch error:', error);
+    res.status(500).json({ error: 'Failed to fetch issues' });
+  }
+});
+
+// =====================================================================
+// LOCAL SEO - 9 COUNTRIES
+// =====================================================================
+
+// Get local SEO status for all countries
+app.get('/api/local-seo/status', authMiddleware, async (req, res) => {
+  try {
+    if (!localSEOManager) {
+      return res.status(503).json({ error: 'Local SEO manager not available' });
+    }
+    
+    const status = await localSEOManager.generateLocalSEOReport();
+    res.json({
+      countries: status,
+      total: status.length
+    });
+  } catch (error) {
+    console.error('Local SEO status error:', error);
+    res.status(500).json({ error: 'Failed to fetch local SEO status' });
+  }
+});
+
+// Setup local SEO for a specific country
+app.post('/api/local-seo/setup/:countryCode', authMiddleware, async (req, res) => {
+  try {
+    if (!localSEOManager) {
+      return res.status(503).json({ error: 'Local SEO manager not available' });
+    }
+    
+    const { countryCode } = req.params;
+    console.log(`🌍 Setting up local SEO for ${countryCode}...`);
+    
+    const result = await localSEOManager.setupLocalPresence(countryCode.toUpperCase());
+    res.json(result);
+  } catch (error) {
+    console.error('Local SEO setup error:', error);
+    res.status(500).json({ error: error.message || 'Failed to setup local SEO' });
+  }
+});
+
+// Setup all countries at once
+app.post('/api/local-seo/setup-all', authMiddleware, async (req, res) => {
+  try {
+    if (!localSEOManager) {
+      return res.status(503).json({ error: 'Local SEO manager not available' });
+    }
+    
+    console.log('🌍 Setting up local SEO for all 9 countries...');
+    const results = await localSEOManager.setupAllCountries();
+    
+    const successful = results.filter(r => r.success).length;
+    const failed = results.filter(r => !r.success).length;
+    
+    res.json({
+      success: true,
+      message: `Setup completed: ${successful} successful, ${failed} failed`,
+      results,
+      successful,
+      failed
+    });
+  } catch (error) {
+    console.error('Local SEO setup all error:', error);
+    res.status(500).json({ error: error.message || 'Failed to setup all countries' });
+  }
+});
+
+// Get country priorities
+app.get('/api/local-seo/priorities', authMiddleware, async (req, res) => {
+  try {
+    if (!localSEOManager) {
+      return res.status(503).json({ error: 'Local SEO manager not available' });
+    }
+    
+    const priorities = localSEOManager.getCountryPriorities();
+    res.json({ priorities });
+  } catch (error) {
+    console.error('Priorities fetch error:', error);
+    res.status(500).json({ error: 'Failed to fetch priorities' });
+  }
+});
+
+// Get city pages for a country
+app.get('/api/local-seo/cities/:countryCode', authMiddleware, async (req, res) => {
+  try {
+    const { countryCode } = req.params;
+    
+    const result = await pool.query(`
+      SELECT * FROM city_pages
+      WHERE country_code = $1
+      ORDER BY status DESC, city_name
+    `, [countryCode.toUpperCase()]);
+    
+    res.json({
+      countryCode: countryCode.toUpperCase(),
+      cities: result.rows,
+      total: result.rows.length
+    });
+  } catch (error) {
+    console.error('Cities fetch error:', error);
+    res.status(500).json({ error: 'Failed to fetch cities' });
   }
 });
 
