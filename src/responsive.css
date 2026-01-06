@@ -15,6 +15,7 @@ html {
   -webkit-text-size-adjust: 100%;
   -moz-text-size-adjust: 100%;
   -ms-text-size-adjust: 100%;
+  text-size-adjust: 100%;
 }
 
 /* Better font rendering across browsers */
@@ -374,7 +375,9 @@ body {
   input,
   textarea {
     -webkit-appearance: none;
+    appearance: none;
     -webkit-border-radius: 0;
+    border-radius: 0;
   }
 }
 
