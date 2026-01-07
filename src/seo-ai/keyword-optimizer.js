@@ -4,12 +4,14 @@
 
 const { Pool } = require('pg');
 const cheerio = require('cheerio');
+const puppeteer = require('puppeteer');
 
 class KeywordOptimizer {
   constructor(pool, options = {}) {
     this.pool = pool;
     this.ssrfProtection = options.ssrfProtection || null;
     this.xssSanitizer = options.xssSanitizer || null;
+    this.usePuppeteer = options.usePuppeteer !== false; // Default true for React SPAs
     this.targetKeywords = [
       'AI-powered accounting software',
       'automated financial operations platform',
@@ -17,8 +19,51 @@ class KeywordOptimizer {
     ];
   }
 
+  // SECURED: Fetch page content using Puppeteer for React SPA
+  async fetchPageContentWithBrowser(pageUrl) {
+    let browser;
+    try {
+      browser = await puppeteer.launch({
+        headless: 'new',
+        args: ['--no-sandbox', '--disable-setuid-sandbox', '--disable-dev-shm-usage']
+      });
+      
+      const page = await browser.newPage();
+      
+      // Set realistic headers
+      await page.setUserAgent('Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36');
+      
+      // Navigate with timeout
+      await page.goto(pageUrl, {
+        waitUntil: 'networkidle2',
+        timeout: 30000
+      });
+      
+      // Wait for React to render
+      await page.waitForTimeout(2000);
+      
+      // Get rendered HTML
+      const html = await page.content();
+      
+      return html;
+    } catch (error) {
+      console.error(`Puppeteer error for ${pageUrl}:`, error.message);
+      return null;
+    } finally {
+      if (browser) {
+        await browser.close();
+      }
+    }
+  }
+
   // SECURED: Fetch and parse page content with SSRF protection
   async fetchPageContent(pageUrl) {
+    // Use Puppeteer for React SPAs (finaceverse.io)
+    if (this.usePuppeteer && pageUrl.includes('finaceverse.io')) {
+      return await this.fetchPageContentWithBrowser(pageUrl);
+    }
+    
+    // Fallback to regular fetch for static pages
     try {
       let response;
       
