@@ -369,15 +369,15 @@ const Home = (props) => {
                   <div className="module-header">
                     <span className="module-name">Accute</span>
                     <div className="module-tag">
-                      <span>AI Orchestrator</span>
+                      <span>Workflow Orchestrator</span>
                     </div>
                   </div>
-                  <h3 className="module-benefit">Intelligent Orchestration</h3>
+                  <h3 className="module-benefit">Workflow Orchestration</h3>
                   <p className="section-content">
-                    The AI conductor of your financial symphony. Accute orchestrates every 
-                    financial cycle with unified compliance logic - automatically handling 
-                    tax filing, financial reporting, and audits in one system. Result: 
-                    <strong>20+ hours saved per week</strong> on coordination and reconciliation.
+                    The master conductor of your financial workflows. Accute connects 
+                    every process, automates handoffs, and ensures nothing falls through 
+                    the cracks. Result: <strong>20+ hours saved per week</strong> on 
+                    coordination and reconciliation.
                   </p>
                   <img
                     src="/images/Accute Transparent symbol.png"
@@ -392,14 +392,14 @@ const Home = (props) => {
                 <div className="module-card secondary" style={{cursor: 'pointer'}}>
                   <span className="module-name">VAMN</span>
                   <div className="module-tag">
-                    <span>AI Core</span>
+                    <span>Financial LLM</span>
                   </div>
-                  <h3 className="module-benefit">The Cognitive Brain</h3>
+                  <h3 className="module-benefit">The Numbers Whisperer</h3>
                   <p className="section-content">
-                    The neural network at FinACEverse's core. VAMN delivers rigorous 
-                    financial intelligence through multiple AI models that catch errors, 
-                    flag compliance issues, and suggest optimizations in real-time. 
-                    <strong>Reduces audit findings by 90%</strong> with mathematical precision.
+                    An LLM with a cool mind of its own - built specifically for numbers. 
+                    Unlike generic AI, VAMN thinks in financial logic, catches what others 
+                    miss, and delivers <strong>90% fewer audit findings</strong> with 
+                    mathematical precision that makes CPAs jealous.
                   </p>
                   <img
                     src="/images/VAMN-7B Transparent logo.png"
@@ -470,11 +470,11 @@ const Home = (props) => {
               <a href="https://finory.io" target="_blank" rel="noopener noreferrer" style={{textDecoration: 'none', color: 'inherit'}}>
                 <div className="module-card" style={{cursor: 'pointer'}}>
                   <span className="module-name">Finory</span>
-                  <h3 className="module-benefit">Real-Time Reporting</h3>
+                  <h3 className="module-benefit">Self-Building ERP</h3>
                   <p className="section-content">
-                    Live financial dashboards that update automatically. See your 
-                    entire financial picture in real-time - from cash flow to P&L - 
-                    <strong>updated every 15 minutes</strong> without manual data entry.
+                    The ERP that builds itself. Finory adapts to your business processes 
+                    automatically - no consultants, no 18-month implementations. 
+                    <strong>Go live in weeks, not years</strong> with an ERP that evolves with you.
                   </p>
                   <img
                     src="/images/Finory Transparent symbol.png"
@@ -592,10 +592,10 @@ const Home = (props) => {
                   <img src="/images/Finory Transparent symbol.png" alt="Finory" style={{height: '35px', opacity: 0.9}} />
                   <img src="/images/EPI-Q Transparent symbol.png" alt="EPI-Q" style={{height: '35px', opacity: 0.9}} />
                 </div>
-                <h3 className="cell-title">Insights Layer: Finory + EPI-Q</h3>
+                <h3 className="cell-title">Systems Layer: Finory + EPI-Q</h3>
                 <p className="section-content">
-                  Finory provides real-time dashboards. EPI-Q maps your processes and 
-                  identifies automation opportunities through task mining.
+                  Finory is the self-building ERP that adapts to you. EPI-Q maps your 
+                  processes and identifies automation opportunities through task mining.
                 </p>
               </div>
             </div>
