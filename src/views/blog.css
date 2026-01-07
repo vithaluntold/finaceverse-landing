@@ -522,3 +522,57 @@
   border-color: #70a9e0;
   color: #ffffff;
 }
+
+/* Light mode fixes for blog article page - keep header dark */
+[data-theme="light"] .article-header {
+  background: linear-gradient(135deg, rgba(16, 20, 31, 0.98), rgba(26, 32, 51, 0.95)) !important;
+}
+
+[data-theme="light"] .article-title {
+  color: #ffffff !important;
+}
+
+[data-theme="light"] .article-excerpt {
+  color: rgba(255, 255, 255, 0.85) !important;
+}
+
+[data-theme="light"] .article-date,
+[data-theme="light"] .article-read-time {
+  color: rgba(255, 255, 255, 0.7) !important;
+}
+
+[data-theme="light"] .author-name {
+  color: #ffffff !important;
+}
+
+[data-theme="light"] .author-role {
+  color: rgba(255, 255, 255, 0.7) !important;
+}
+
+[data-theme="light"] .article-content {
+  background: #ffffff;
+  color: #1f2328;
+}
+
+[data-theme="light"] .article-content h2,
+[data-theme="light"] .article-content h3,
+[data-theme="light"] .article-content h4 {
+  color: #1f2328;
+}
+
+[data-theme="light"] .article-content p {
+  color: #57606a;
+}
+
+[data-theme="light"] .article-cta {
+  background: #f6f8fa;
+  border-color: #d0d7de;
+}
+
+[data-theme="light"] .article-cta h3 {
+  color: #1f2328;
+}
+
+[data-theme="light"] .article-cta p {
+  color: #57606a;
+}

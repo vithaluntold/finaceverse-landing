@@ -13,7 +13,7 @@ const blogArticles = {
     excerpt: 'Traditional accounting software was built for record-keeping. The future demands intelligent systems that think, learn, and act.',
     category: 'Industry Insights',
     date: 'January 5, 2026',
-    author: 'Vithal Deshmukh',
+    author: 'Vithal Valluri',
     authorRole: 'Founder & CEO, FinACEverse',
     image: 'https://images.pexels.com/photos/30547577/pexels-photo-30547577.jpeg?auto=compress&cs=tinysrgb&w=1500',
     readTime: '8 min read',
@@ -93,7 +93,7 @@ The future of finance is cognitive. The question is: are you ready?
 
 ---
 
-*Vithal Deshmukh is the Founder and CEO of FinACEverse, the cognitive operating system for financial services. He previously led digital transformation initiatives at major accounting firms and financial institutions.*
+*Vithal Valluri is the Founder and CEO of FinACEverse, the cognitive operating system for financial services. He previously led digital transformation initiatives at major accounting firms and financial institutions.*
     `
   },
   'ai-workforce-multiplier-explained': {

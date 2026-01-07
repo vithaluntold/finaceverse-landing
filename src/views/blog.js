@@ -15,7 +15,7 @@ const Blog = () => {
       excerpt: 'Traditional accounting software was built for record-keeping. The future demands intelligent systems that think, learn, and act.',
       category: 'Industry Insights',
       date: 'January 5, 2026',
-      author: 'Vithal Deshmukh',
+      author: 'Vithal Valluri',
       image: 'https://images.pexels.com/photos/30547577/pexels-photo-30547577.jpeg?auto=compress&cs=tinysrgb&w=1500',
       slug: 'why-cognitive-operating-systems-are-future'
     },
