@@ -7,37 +7,47 @@ import './blog.css'
 const Blog = () => {
   const [selectedCategory, setSelectedCategory] = useState('all')
   
-  // Sample blog posts - replace with actual CMS or API data
+  // Blog posts with actual content
   const blogPosts = [
     {
       id: 1,
-      title: 'Introducing VAMN: The Cognitive Brain of Financial Operations',
-      excerpt: 'Discover how our Verifiable Arithmetic Multi-Stream Network is revolutionizing financial intelligence and calculation accuracy.',
-      category: 'Technology',
-      date: 'January 3, 2026',
-      author: 'FinACEverse Team',
+      title: 'Why Cognitive Operating Systems Are the Future of Finance',
+      excerpt: 'Traditional accounting software was built for record-keeping. The future demands intelligent systems that think, learn, and act.',
+      category: 'Industry Insights',
+      date: 'January 5, 2026',
+      author: 'Vithal Deshmukh',
       image: 'https://images.pexels.com/photos/30547577/pexels-photo-30547577.jpeg?auto=compress&cs=tinysrgb&w=1500',
-      slug: 'introducing-vamn-cognitive-brain'
+      slug: 'why-cognitive-operating-systems-are-future'
     },
     {
       id: 2,
-      title: 'Why Traditional Accounting Software is Becoming Obsolete',
-      excerpt: 'The shift from record-keeping tools to cognitive operating systems is transforming the finance profession.',
-      category: 'Industry Insights',
-      date: 'December 28, 2025',
-      author: 'FinACEverse Research',
+      title: 'The AI Workforce Multiplier: What It Is and Why It Matters',
+      excerpt: 'Understanding how AI can make one accountant as productive as ten—without replacing a single human.',
+      category: 'Technology',
+      date: 'January 3, 2026',
+      author: 'FinACEverse Team',
       image: 'https://images.pexels.com/photos/30547598/pexels-photo-30547598.jpeg?auto=compress&cs=tinysrgb&w=1500',
-      slug: 'traditional-accounting-software-obsolete'
+      slug: 'ai-workforce-multiplier-explained'
     },
     {
       id: 3,
       title: 'Pilot Program Results: 2.5x Capacity Uplift Without New Hires',
-      excerpt: 'Early adopters share how FinACEverse enabled them to expand their client base while maintaining quality.',
+      excerpt: 'Early adopters share their experience implementing FinACEverse and the results they\'ve achieved.',
       category: 'Case Studies',
-      date: 'December 20, 2025',
-      author: 'Vithal Deshmukh',
+      date: 'December 28, 2025',
+      author: 'FinACEverse Research',
       image: 'https://images.pexels.com/photos/30547606/pexels-photo-30547606.jpeg?auto=compress&cs=tinysrgb&w=1500',
-      slug: 'pilot-program-results-capacity-uplift'
+      slug: 'pilot-program-results-2-5x-capacity'
+    },
+    {
+      id: 4,
+      title: 'Process Mining for Accounting Firms: Finding Hidden Inefficiencies',
+      excerpt: 'How EPI-Q reveals the actual workflows in your firm—and why they\'re probably different from what you think.',
+      category: 'Technology',
+      date: 'December 20, 2025',
+      author: 'FinACEverse Team',
+      image: 'https://images.pexels.com/photos/30547577/pexels-photo-30547577.jpeg?auto=compress&cs=tinysrgb&w=1500',
+      slug: 'process-mining-accounting-firms'
     }
   ]
   

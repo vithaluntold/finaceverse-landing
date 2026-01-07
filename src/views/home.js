@@ -432,11 +432,11 @@ const Home = (props) => {
               <a href="https://finaidhub.io" target="_blank" rel="noopener noreferrer" style={{textDecoration: 'none', color: 'inherit'}}>
                 <div className="module-card" style={{cursor: 'pointer'}}>
                   <span className="module-name">Finaid Hub</span>
-                  <h3 className="module-benefit">AI Workforce Multiplier</h3>
+                  <h3 className="module-benefit">AI Workforce Multiplier for Accounting</h3>
                   <p className="section-content">
-                    Your AI-powered execution engine that handles routine tasks at machine speed. 
-                    Automates data entry, reconciliation, and report generation - enabling your 
-                    team to <strong>handle 10x more clients without new hires</strong>. Average 
+                    Your AI-powered accounting workforce. Handles bookkeeping, reconciliation, 
+                    and financial reporting at machine speed - enabling your team to 
+                    <strong>handle 10x more clients without new hires</strong>. Average 
                     ROI: 400% in year one.
                   </p>
                   <img
@@ -516,10 +516,10 @@ const Home = (props) => {
                   <div className="module-card" style={{position: 'relative'}}>
                     <div style={{position: 'absolute', top: '10px', right: '10px', background: 'var(--color-accent)', color: 'white', padding: '4px 8px', borderRadius: '4px', fontSize: '10px', fontWeight: 'bold'}}>COMING SOON</div>
                     <span className="module-name">TaxBlitz</span>
-                    <h3 className="module-benefit">AI Tax Automation</h3>
+                    <h3 className="module-benefit">AI Workforce Multiplier for Tax</h3>
                     <p className="section-content">
-                      Finaid Hub specialized for Tax. Automates tax preparation, filing, 
-                      and compliance at scale. <strong>Process 100+ returns per day</strong> with 
+                      Your AI-powered tax workforce. Handles tax preparation, filing, 
+                      and compliance at machine speed. <strong>Process 100+ returns per day</strong> with 
                       AI-powered accuracy and complete audit trails.
                     </p>
                     <img
@@ -533,10 +533,10 @@ const Home = (props) => {
                   <div className="module-card" style={{position: 'relative'}}>
                     <div style={{position: 'absolute', top: '10px', right: '10px', background: 'var(--color-accent)', color: 'white', padding: '4px 8px', borderRadius: '4px', fontSize: '10px', fontWeight: 'bold'}}>COMING SOON</div>
                     <span className="module-name">Audric</span>
-                    <h3 className="module-benefit">AI Audit Automation</h3>
+                    <h3 className="module-benefit">AI Workforce Multiplier for Audit</h3>
                     <p className="section-content">
-                      Finaid Hub specialized for Audit. Automates audit procedures, evidence 
-                      gathering, and workpaper generation. <strong>Cut audit time by 60%</strong> while 
+                      Your AI-powered audit workforce. Handles audit procedures, evidence 
+                      gathering, and workpaper generation at machine speed. <strong>Cut audit time by 60%</strong> while 
                       improving quality and consistency.
                     </p>
                     <img
