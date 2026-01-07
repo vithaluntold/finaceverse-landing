@@ -506,9 +506,12 @@ const Home = (props) => {
               <a href="https://sumbuddy.io" target="_blank" rel="noopener noreferrer" style={{textDecoration: 'none', color: 'inherit'}}>
                 <div className="module-card" style={{cursor: 'pointer'}}>
                   <span className="module-name">Sumbuddy</span>
-                  <h3 className="module-benefit">Smart Collaboration</h3>
+                  <h3 className="module-benefit">Client Acquisition Marketplace</h3>
                   <p className="section-content">
-                    Unified communication layer for clients and internal teams.
+                    Your gateway to new business. Sumbuddy is the marketplace where 
+                    accounting and finance firms find qualified clients actively seeking 
+                    professional services. <strong>Get matched with clients</strong> looking 
+                    for your exact expertise - no cold calling, no marketing spend.
                   </p>
                   <img
                     src="/images/SumBuddy Transparent symbol.png"
@@ -599,10 +602,10 @@ const Home = (props) => {
             <div className="bento-cell cell-narrow" style={{background: 'var(--color-surface-elevated)', padding: 'var(--spacing-xl)', borderRadius: 'var(--border-radius-lg)'}}>
               <div className="cell-content">
                 <img src="/images/SumBuddy Transparent symbol.png" alt="Sumbuddy" style={{height: '35px', marginBottom: 'var(--spacing-sm)', opacity: 0.9}} />
-                <h3 className="cell-title">Communication Layer: Sumbuddy</h3>
+                <h3 className="cell-title">Growth Layer: Sumbuddy</h3>
                 <p className="section-content">
-                  Client portal and team collaboration. Shares insights from all modules. 
-                  Optional but recommended for client-facing firms.
+                  Client acquisition marketplace. Get matched with qualified clients 
+                  seeking your exact services. Zero marketing spend required.
                 </p>
               </div>
             </div>
