@@ -172,7 +172,7 @@ const apiLimiter = rateLimit({
   message: 'API rate limit exceeded, please slow down',
   standardHeaders: true,
   legacyHeaders: false,
-  validate: { trustProxy: false, xForwardedForHeader: false },
+  validate: { trustProxy: false, xForwardedForHeader: false, keyGenerator: false },
   keyGenerator: (req) => {
     // Use userId if authenticated, otherwise IP
     return req.userId ? `user:${req.userId}` : `ip:${req.ip}`;
@@ -206,7 +206,7 @@ const seoLimiter = rateLimit({
   message: 'SEO operations rate limit exceeded - these are resource-intensive',
   standardHeaders: true,
   legacyHeaders: false,
-  validate: { trustProxy: false, xForwardedForHeader: false },
+  validate: { trustProxy: false, xForwardedForHeader: false, keyGenerator: false },
   keyGenerator: (req) => {
     // Per tenant, not per IP (allows multiple admins)
     return `tenant:${req.tenantId || 'platform'}`;
