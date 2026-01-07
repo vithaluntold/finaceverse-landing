@@ -536,6 +536,10 @@ const Home = (props) => {
           <div className="bento-grid" style={{gap: 'var(--spacing-xl)'}}>
             <div className="bento-cell cell-wide" style={{background: 'color-mix(in srgb, var(--color-primary) 10%, var(--color-surface))', padding: 'var(--spacing-2xl)', borderRadius: 'var(--border-radius-lg)'}}>
               <div className="cell-content">
+                <div style={{display: 'flex', gap: '15px', marginBottom: 'var(--spacing-md)'}}>
+                  <img src="/images/VAMN-7B Transparent logo.png" alt="VAMN" style={{height: '40px', opacity: 0.9}} />
+                  <img src="/images/Accute Transparent symbol.png" alt="Accute" style={{height: '40px', opacity: 0.9}} />
+                </div>
                 <h3 className="cell-title" style={{color: 'var(--color-primary)'}}>The Foundation: VAMN + Accute</h3>
                 <p className="section-content">
                   <strong>Start here.</strong> VAMN provides the AI brain (data processing, verification, intelligence), 
@@ -547,6 +551,7 @@ const Home = (props) => {
             
             <div className="bento-cell cell-narrow" style={{background: 'var(--color-surface-elevated)', padding: 'var(--spacing-xl)', borderRadius: 'var(--border-radius-lg)'}}>
               <div className="cell-content">
+                <img src="/images/Cyloid.png" alt="Cyloid" style={{height: '35px', marginBottom: 'var(--spacing-sm)', opacity: 0.9}} />
                 <h3 className="cell-title">Input Layer: Cyloid</h3>
                 <p className="section-content">
                   Handles all incoming documents. Can work standalone for document processing, 
@@ -557,6 +562,7 @@ const Home = (props) => {
             
             <div className="bento-cell cell-narrow" style={{background: 'var(--color-surface-elevated)', padding: 'var(--spacing-xl)', borderRadius: 'var(--border-radius-lg)'}}>
               <div className="cell-content">
+                <img src="/images/Luca Transparent symbol (2).png" alt="Luca" style={{height: '35px', marginBottom: 'var(--spacing-sm)', opacity: 0.9}} />
                 <h3 className="cell-title">Intelligence Layer: Luca</h3>
                 <p className="section-content">
                   Provides expert guidance on complex scenarios. Uses VAMN's data to give 
@@ -567,6 +573,7 @@ const Home = (props) => {
             
             <div className="bento-cell cell-narrow" style={{background: 'var(--color-surface-elevated)', padding: 'var(--spacing-xl)', borderRadius: 'var(--border-radius-lg)'}}>
               <div className="cell-content">
+                <img src="/images/Fin(Ai)d Studio Transparent symbol.png" alt="Finaid Hub" style={{height: '35px', marginBottom: 'var(--spacing-sm)', opacity: 0.9}} />
                 <h3 className="cell-title">Execution Layer: Finaid Hub</h3>
                 <p className="section-content">
                   Automates routine tasks using VAMN's intelligence. Essential for firms 
@@ -577,6 +584,10 @@ const Home = (props) => {
             
             <div className="bento-cell cell-narrow" style={{background: 'var(--color-surface-elevated)', padding: 'var(--spacing-xl)', borderRadius: 'var(--border-radius-lg)'}}>
               <div className="cell-content">
+                <div style={{display: 'flex', gap: '10px', marginBottom: 'var(--spacing-sm)'}}>
+                  <img src="/images/Finory Transparent symbol.png" alt="Finory" style={{height: '35px', opacity: 0.9}} />
+                  <img src="/images/EPI-Q Transparent symbol.png" alt="EPI-Q" style={{height: '35px', opacity: 0.9}} />
+                </div>
                 <h3 className="cell-title">Insights Layer: Finory + EPI-Q</h3>
                 <p className="section-content">
                   Finory provides real-time dashboards. EPI-Q predicts future tax scenarios. 
@@ -587,6 +598,7 @@ const Home = (props) => {
             
             <div className="bento-cell cell-narrow" style={{background: 'var(--color-surface-elevated)', padding: 'var(--spacing-xl)', borderRadius: 'var(--border-radius-lg)'}}>
               <div className="cell-content">
+                <img src="/images/SumBuddy Transparent symbol.png" alt="Sumbuddy" style={{height: '35px', marginBottom: 'var(--spacing-sm)', opacity: 0.9}} />
                 <h3 className="cell-title">Communication Layer: Sumbuddy</h3>
                 <p className="section-content">
                   Client portal and team collaboration. Shares insights from all modules. 
