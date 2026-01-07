@@ -1,6 +1,6 @@
 import React from 'react'
 import { Helmet } from 'react-helmet'
-import { useParams, Navigate } from 'react-router-dom'
+import { useParams, Redirect } from 'react-router-dom'
 import Navigation from '../components/navigation'
 import Footer from '../components/footer'
 import './blog.css'
@@ -490,7 +490,7 @@ const BlogArticle = () => {
   const article = blogArticles[slug]
   
   if (!article) {
-    return <Navigate to="/blog" replace />
+    return <Redirect to="/blog" />
   }
   
   return (

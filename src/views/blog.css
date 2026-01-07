@@ -460,3 +460,65 @@
     padding: 32px 24px;
   }
 }
+
+/* Light mode fixes for blog - keep hero dark */
+[data-theme="light"] .blog-hero {
+  background: linear-gradient(135deg, rgba(16, 20, 31, 0.95), rgba(26, 32, 51, 0.98)),
+              url('https://images.pexels.com/photos/30547577/pexels-photo-30547577.jpeg?auto=compress&cs=tinysrgb&w=1500') !important;
+  background-size: cover !important;
+  background-position: center !important;
+}
+
+[data-theme="light"] .blog-hero .hero-title {
+  color: #ffffff !important;
+}
+
+[data-theme="light"] .blog-hero .hero-subtitle {
+  color: rgba(255, 255, 255, 0.85) !important;
+}
+
+[data-theme="light"] .blog-hero .text-gradient {
+  background: linear-gradient(135deg, #70a9e0, #9b6fd8) !important;
+  -webkit-background-clip: text !important;
+  -webkit-text-fill-color: transparent !important;
+  background-clip: text !important;
+}
+
+[data-theme="light"] .blog-main {
+  background: #f6f8fa;
+}
+
+[data-theme="light"] .blog-card {
+  background: #ffffff;
+  border-color: #d0d7de;
+}
+
+[data-theme="light"] .blog-card-title {
+  color: #1f2328;
+}
+
+[data-theme="light"] .blog-card-excerpt {
+  color: #57606a;
+}
+
+[data-theme="light"] .blog-card-date,
+[data-theme="light"] .blog-card-author {
+  color: #57606a;
+}
+
+[data-theme="light"] .filter-btn {
+  background: #ffffff;
+  border-color: #d0d7de;
+  color: #57606a;
+}
+
+[data-theme="light"] .filter-btn:hover {
+  color: #1f2328;
+  border-color: #70a9e0;
+}
+
+[data-theme="light"] .filter-btn.active {
+  background: #70a9e0;
+  border-color: #70a9e0;
+  color: #ffffff;
+}
