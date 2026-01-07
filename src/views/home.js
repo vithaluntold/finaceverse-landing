@@ -488,11 +488,12 @@ const Home = (props) => {
               <a href="https://epi-q.io" target="_blank" rel="noopener noreferrer" style={{textDecoration: 'none', color: 'inherit'}}>
                 <div className="module-card" style={{cursor: 'pointer'}}>
                   <span className="module-name">EPI-Q</span>
-                  <h3 className="module-benefit">Predictive Tax Intelligence</h3>
+                  <h3 className="module-benefit">Process & Task Mining</h3>
                   <p className="section-content">
-                    AI that forecasts tax liabilities 6 months ahead. Identifies optimization 
-                    opportunities and recommends proactive strategies - <strong>average tax 
-                    savings of 15-20%</strong> through early planning.
+                    AI-powered process discovery that maps your actual workflows. EPI-Q analyzes 
+                    how work really happens, identifies bottlenecks, and uncovers automation 
+                    opportunities - <strong>reduce process inefficiencies by 40%</strong> with 
+                    data-driven insights.
                   </p>
                   <img
                     src="/images/EPI-Q Transparent symbol.png"
@@ -593,8 +594,8 @@ const Home = (props) => {
                 </div>
                 <h3 className="cell-title">Insights Layer: Finory + EPI-Q</h3>
                 <p className="section-content">
-                  Finory provides real-time dashboards. EPI-Q predicts future tax scenarios. 
-                  Both read from VAMN's verified data for accurate forecasting.
+                  Finory provides real-time dashboards. EPI-Q maps your processes and 
+                  identifies automation opportunities through task mining.
                 </p>
               </div>
             </div>
