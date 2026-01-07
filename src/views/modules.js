@@ -149,6 +149,10 @@ const Modules = (props) => {
           <div className="capabilities-cell cell-large">
             <div className="cell-content">
               <span className="cell-tag">Foundation</span>
+              <div style={{display: 'flex', gap: '12px', marginBottom: '8px'}}>
+                <img src="/images/VAMN-7B Transparent logo.png" alt="VAMN" style={{height: '32px', opacity: 0.9}} />
+                <img src="/images/Accute Transparent symbol.png" alt="Accute" style={{height: '32px', opacity: 0.9}} />
+              </div>
               <h3 className="section-subtitle">VAMN &amp; Accute</h3>
               <p className="section-content">
                 The cognitive brain of FinACEverse. VAMN provides the core
@@ -176,6 +180,7 @@ const Modules = (props) => {
           <div className="capabilities-cell cell-medium">
             <div className="cell-content">
               <span className="cell-tag">Intelligence</span>
+              <img src="/images/Luca Transparent symbol (2).png" alt="Luca" style={{height: '32px', opacity: 0.9, marginBottom: '8px'}} />
               <h3 className="section-subtitle">Luca</h3>
               <p className="section-content">
                 Domain intelligence that understands the nuances of accounting
@@ -186,6 +191,7 @@ const Modules = (props) => {
           <div className="capabilities-cell cell-small">
             <div className="cell-content">
               <span className="cell-tag">Scale</span>
+              <img src="/images/Fin(Ai)d Studio Transparent symbol.png" alt="Finaid Hub" style={{height: '32px', opacity: 0.9, marginBottom: '8px'}} />
               <h3 className="section-subtitle">Finaid Hub</h3>
               <p className="section-content">
                 Execution at scale without increasing headcount.
@@ -195,6 +201,7 @@ const Modules = (props) => {
           <div className="capabilities-cell cell-medium">
             <div className="cell-content">
               <span className="cell-tag">Verification</span>
+              <img src="/images/Cyloid.png" alt="Cyloid" style={{height: '32px', opacity: 0.9, marginBottom: '8px'}} />
               <h3 className="section-subtitle">Cyloid</h3>
               <p className="section-content">
                 Ensuring mathematical verification for every entry into the
@@ -205,6 +212,7 @@ const Modules = (props) => {
           <div className="capabilities-cell cell-small">
             <div className="cell-content">
               <span className="cell-tag">Communication</span>
+              <img src="/images/SumBuddy Transparent symbol.png" alt="Sumbuddy" style={{height: '32px', opacity: 0.9, marginBottom: '8px'}} />
               <h3 className="section-subtitle">Sumbuddy</h3>
               <p className="section-content">
                 Smart collaboration and unified communication layer.
@@ -214,6 +222,10 @@ const Modules = (props) => {
           <div className="capabilities-cell cell-medium">
             <div className="cell-content">
               <span className="cell-tag">Insights</span>
+              <div style={{display: 'flex', gap: '12px', marginBottom: '8px'}}>
+                <img src="/images/Finory Transparent symbol.png" alt="Finory" style={{height: '32px', opacity: 0.9}} />
+                <img src="/images/EPI-Q Transparent symbol.png" alt="EPI-Q" style={{height: '32px', opacity: 0.9}} />
+              </div>
               <h3 className="section-subtitle">Finory &amp; EPI-Q</h3>
               <p className="section-content">
                 Advanced reporting and predictive analytics for modern
@@ -514,29 +526,9 @@ const Modules = (props) => {
         </div>
       </div>
       <Footer></Footer>
-      <a href="https://play.teleporthq.io/signup">
-        <div aria-label="Sign up to TeleportHQ" className="modules-container4">
-          <svg
-            width="24"
-            height="24"
-            viewBox="0 0 19 21"
-            fill="none"
-            xmlns="http://www.w3.org/2000/svg"
-            className="modules-icon36"
-          >
-            <path
-              d="M9.1017 4.64355H2.17867C0.711684 4.64355 -0.477539 5.79975 -0.477539 7.22599V13.9567C-0.477539 15.3829 0.711684 16.5391 2.17867 16.5391H9.1017C10.5687 16.5391 11.7579 15.3829 11.7579 13.9567V7.22599C11.7579 5.79975 10.5687 4.64355 9.1017 4.64355Z"
-              fill="#B23ADE"
-            ></path>
-            <path
-              d="M10.9733 12.7878C14.4208 12.7878 17.2156 10.0706 17.2156 6.71886C17.2156 3.3671 14.4208 0.649963 10.9733 0.649963C7.52573 0.649963 4.73096 3.3671 4.73096 6.71886C4.73096 10.0706 7.52573 12.7878 10.9733 12.7878Z"
-              fill="#FF5C5C"
-            ></path>
-            <path
-              d="M17.7373 13.3654C19.1497 14.1588 19.1497 15.4634 17.7373 16.2493L10.0865 20.5387C8.67402 21.332 7.51855 20.6836 7.51855 19.0968V10.5141C7.51855 8.92916 8.67402 8.2807 10.0865 9.07221L17.7373 13.3654Z"
-              fill="#2874DE"
-            ></path>
-          </svg>
+      <a href="/request-demo">
+        <div aria-label="Request Demo" className="modules-container4">
+          <img src="/logo.svg" alt="FinACEverse" style={{width: '24px', height: '24px'}} />
           <span className="modules-text29">Propel Past Paradigms</span>
         </div>
       </a>
