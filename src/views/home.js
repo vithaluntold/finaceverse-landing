@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useState } from 'react'
 
 import Script from 'dangerous-html/react'
 import { Helmet } from 'react-helmet'
@@ -8,6 +8,9 @@ import Footer from '../components/footer'
 import './home.css'
 
 const Home = (props) => {
+  // Phase toggle - Phase 1 products are live, Phase 2 coming soon
+  const [showPhase2] = useState(false); // Set to true via SuperAdmin to show Phase 2
+  
   return (
     <div className="home-container1">
       <Helmet>
@@ -57,12 +60,11 @@ const Home = (props) => {
               <span className="home-thq-text-gradient-elm1">Multiverse</span>
             </h1>
             <p className="hero-subtitle">
-              FinACEverse is a <strong>Cognitive Operating System</strong> - AI software that thinks, 
-              learns, and orchestrates your entire financial ecosystem. Unlike traditional tools that 
-              just store data, our system actively integrates accounting, finance, and taxation into 
-              a single intelligent platform. Powered by <strong>VAMN AI</strong> (our multi-stream 
-              verification engine) and <strong>Accute</strong> (the orchestration layer), we eliminate 
-              fragmentation and restore coherence across all financial operations.
+              FinACEverse is a <strong>Cognitive Operating System</strong> for finance - AI software that thinks, 
+              learns, and orchestrates your entire financial ecosystem. <strong>Accute</strong> orchestrates workflows, 
+              <strong>VAMN</strong> is the brain (an LLM with a cool mind of its own for numbers), and specialized 
+              modules handle everything from document verification to process mining. We eliminate fragmentation 
+              and restore coherence across all financial operations.
             </p>
             <div className="hero-actions">
               <a href="/request-demo" className="btn btn-primary btn-lg">Request Demo</a>
@@ -359,10 +361,11 @@ const Home = (props) => {
               <span className="home-thq-text-accent-elm2">Modules</span>
             </h2>
             <p className="section-subtitle">
-              Seven specialized engines working in harmony under one roof.
+              {showPhase2 ? 'Nine specialized engines working in harmony under one roof.' : 'Phase 1: Five powerful modules launching now.'}
             </p>
           </div>
           <div className="masonry-grid">
+            {/* PHASE 1 - Launching Now */}
             <div className="masonry-item item-lg">
               <a href="https://accute.io" target="_blank" rel="noopener noreferrer" style={{textDecoration: 'none', color: 'inherit'}}>
                 <div className="module-card" style={{cursor: 'pointer'}}>
@@ -383,28 +386,6 @@ const Home = (props) => {
                     src="/images/Accute Transparent symbol.png"
                     alt="Accute module"
                     style={{maxWidth: '80px', margin: '20px auto', display: 'block', opacity: 0.9}}
-                  />
-                </div>
-              </a>
-            </div>
-            <div className="masonry-item item-sm">
-              <a href="https://vamn.io" target="_blank" rel="noopener noreferrer" style={{textDecoration: 'none', color: 'inherit'}}>
-                <div className="module-card secondary" style={{cursor: 'pointer'}}>
-                  <span className="module-name">VAMN</span>
-                  <div className="module-tag">
-                    <span>Financial LLM</span>
-                  </div>
-                  <h3 className="module-benefit">The Numbers Whisperer</h3>
-                  <p className="section-content">
-                    An LLM with a cool mind of its own - built specifically for numbers. 
-                    Unlike generic AI, VAMN thinks in financial logic, catches what others 
-                    miss, and delivers <strong>90% fewer audit findings</strong> with 
-                    mathematical precision that makes CPAs jealous.
-                  </p>
-                  <img
-                    src="/images/VAMN-7B Transparent logo.png"
-                    alt="VAMN"
-                    style={{maxWidth: '70px', margin: '15px auto', display: 'block', opacity: 0.9}}
                   />
                 </div>
               </a>
@@ -467,30 +448,12 @@ const Home = (props) => {
               </a>
             </div>
             <div className="masonry-item item-sm">
-              <a href="https://finory.io" target="_blank" rel="noopener noreferrer" style={{textDecoration: 'none', color: 'inherit'}}>
-                <div className="module-card" style={{cursor: 'pointer'}}>
-                  <span className="module-name">Finory</span>
-                  <h3 className="module-benefit">Self-Building ERP</h3>
-                  <p className="section-content">
-                    The ERP that builds itself. Finory adapts to your business processes 
-                    automatically - no consultants, no 18-month implementations. 
-                    <strong>Go live in weeks, not years</strong> with an ERP that evolves with you.
-                  </p>
-                  <img
-                    src="/images/Finory Transparent symbol.png"
-                    alt="Finory"
-                    style={{maxWidth: '60px', margin: '15px auto', display: 'block', opacity: 0.9}}
-                  />
-                </div>
-              </a>
-            </div>
-            <div className="masonry-item item-sm">
               <a href="https://epi-q.io" target="_blank" rel="noopener noreferrer" style={{textDecoration: 'none', color: 'inherit'}}>
                 <div className="module-card" style={{cursor: 'pointer'}}>
                   <span className="module-name">EPI-Q</span>
-                  <h3 className="module-benefit">Process & Task Mining</h3>
+                  <h3 className="module-benefit">Enterprise Process Mining</h3>
                   <p className="section-content">
-                    AI-powered process discovery that maps your actual workflows. EPI-Q analyzes 
+                    Enterprise process, task, and communication mining module. EPI-Q analyzes 
                     how work really happens, identifies bottlenecks, and uncovers automation 
                     opportunities - <strong>reduce process inefficiencies by 40%</strong> with 
                     data-driven insights.
@@ -503,25 +466,108 @@ const Home = (props) => {
                 </div>
               </a>
             </div>
-            <div className="masonry-item item-sm">
-              <a href="https://sumbuddy.io" target="_blank" rel="noopener noreferrer" style={{textDecoration: 'none', color: 'inherit'}}>
-                <div className="module-card" style={{cursor: 'pointer'}}>
-                  <span className="module-name">Sumbuddy</span>
-                  <h3 className="module-benefit">Client Acquisition Marketplace</h3>
-                  <p className="section-content">
-                    Your gateway to new business. Sumbuddy is the marketplace where 
-                    accounting and finance firms find qualified clients actively seeking 
-                    professional services. <strong>Get matched with clients</strong> looking 
-                    for your exact expertise - no cold calling, no marketing spend.
-                  </p>
-                  <img
-                    src="/images/SumBuddy Transparent symbol.png"
-                    alt="Sumbuddy"
-                    style={{maxWidth: '60px', margin: '15px auto', display: 'block', opacity: 0.9}}
-                  />
+            
+            {/* PHASE 2 - Coming Soon (conditionally rendered) */}
+            {showPhase2 && (
+              <>
+                <div className="masonry-item item-sm">
+                  <a href="https://vamn.io" target="_blank" rel="noopener noreferrer" style={{textDecoration: 'none', color: 'inherit'}}>
+                    <div className="module-card secondary" style={{cursor: 'pointer', position: 'relative'}}>
+                      <div style={{position: 'absolute', top: '10px', right: '10px', background: 'var(--color-accent)', color: 'white', padding: '4px 8px', borderRadius: '4px', fontSize: '10px', fontWeight: 'bold'}}>COMING SOON</div>
+                      <span className="module-name">VAMN</span>
+                      <div className="module-tag">
+                        <span>The Brain</span>
+                      </div>
+                      <h3 className="module-benefit">Financial LLM</h3>
+                      <p className="section-content">
+                        An LLM with a cool mind of its own - built specifically for numbers. 
+                        Unlike generic AI, VAMN thinks in financial logic, catches what others 
+                        miss, and delivers <strong>90% fewer audit findings</strong> with 
+                        mathematical precision that makes CPAs jealous.
+                      </p>
+                      <img
+                        src="/images/VAMN-7B Transparent logo.png"
+                        alt="VAMN"
+                        style={{maxWidth: '70px', margin: '15px auto', display: 'block', opacity: 0.9}}
+                      />
+                    </div>
+                  </a>
                 </div>
-              </a>
-            </div>
+                <div className="masonry-item item-sm">
+                  <a href="https://finory.io" target="_blank" rel="noopener noreferrer" style={{textDecoration: 'none', color: 'inherit'}}>
+                    <div className="module-card" style={{cursor: 'pointer', position: 'relative'}}>
+                      <div style={{position: 'absolute', top: '10px', right: '10px', background: 'var(--color-accent)', color: 'white', padding: '4px 8px', borderRadius: '4px', fontSize: '10px', fontWeight: 'bold'}}>COMING SOON</div>
+                      <span className="module-name">Finory</span>
+                      <h3 className="module-benefit">Self-Constructing ERP</h3>
+                      <p className="section-content">
+                        The AI-native ERP that builds itself. Finory adapts to your business processes 
+                        automatically - no consultants, no 18-month implementations. 
+                        <strong>Go live in weeks, not years</strong> with an ERP that evolves with you.
+                      </p>
+                      <img
+                        src="/images/Finory Transparent symbol.png"
+                        alt="Finory"
+                        style={{maxWidth: '60px', margin: '15px auto', display: 'block', opacity: 0.9}}
+                      />
+                    </div>
+                  </a>
+                </div>
+                <div className="masonry-item item-sm">
+                  <div className="module-card" style={{position: 'relative'}}>
+                    <div style={{position: 'absolute', top: '10px', right: '10px', background: 'var(--color-accent)', color: 'white', padding: '4px 8px', borderRadius: '4px', fontSize: '10px', fontWeight: 'bold'}}>COMING SOON</div>
+                    <span className="module-name">TaxBlitz</span>
+                    <h3 className="module-benefit">AI Tax Automation</h3>
+                    <p className="section-content">
+                      Finaid Hub specialized for Tax. Automates tax preparation, filing, 
+                      and compliance at scale. <strong>Process 100+ returns per day</strong> with 
+                      AI-powered accuracy and complete audit trails.
+                    </p>
+                    <img
+                      src="/images/Fin(Ai)d Studio Transparent symbol.png"
+                      alt="TaxBlitz"
+                      style={{maxWidth: '60px', margin: '15px auto', display: 'block', opacity: 0.7}}
+                    />
+                  </div>
+                </div>
+                <div className="masonry-item item-sm">
+                  <div className="module-card" style={{position: 'relative'}}>
+                    <div style={{position: 'absolute', top: '10px', right: '10px', background: 'var(--color-accent)', color: 'white', padding: '4px 8px', borderRadius: '4px', fontSize: '10px', fontWeight: 'bold'}}>COMING SOON</div>
+                    <span className="module-name">Audric</span>
+                    <h3 className="module-benefit">AI Audit Automation</h3>
+                    <p className="section-content">
+                      Finaid Hub specialized for Audit. Automates audit procedures, evidence 
+                      gathering, and workpaper generation. <strong>Cut audit time by 60%</strong> while 
+                      improving quality and consistency.
+                    </p>
+                    <img
+                      src="/images/Fin(Ai)d Studio Transparent symbol.png"
+                      alt="Audric"
+                      style={{maxWidth: '60px', margin: '15px auto', display: 'block', opacity: 0.7}}
+                    />
+                  </div>
+                </div>
+                <div className="masonry-item item-sm">
+                  <a href="https://sumbuddy.io" target="_blank" rel="noopener noreferrer" style={{textDecoration: 'none', color: 'inherit'}}>
+                    <div className="module-card" style={{cursor: 'pointer', position: 'relative'}}>
+                      <div style={{position: 'absolute', top: '10px', right: '10px', background: 'var(--color-accent)', color: 'white', padding: '4px 8px', borderRadius: '4px', fontSize: '10px', fontWeight: 'bold'}}>COMING SOON</div>
+                      <span className="module-name">Sumbuddy</span>
+                      <h3 className="module-benefit">Client Marketplace</h3>
+                      <p className="section-content">
+                        Your gateway to new business. Sumbuddy is the marketplace where 
+                        accounting and finance firms find qualified clients actively seeking 
+                        professional services. <strong>Get matched with clients</strong> looking 
+                        for your exact expertise.
+                      </p>
+                      <img
+                        src="/images/SumBuddy Transparent symbol.png"
+                        alt="Sumbuddy"
+                        style={{maxWidth: '60px', margin: '15px auto', display: 'block', opacity: 0.9}}
+                      />
+                    </div>
+                  </a>
+                </div>
+              </>
+            )}
           </div>
         </div>
       </section>
@@ -529,26 +575,23 @@ const Home = (props) => {
         <div className="container-wrapper">
           <div style={{textAlign: 'center', maxWidth: '900px', margin: '0 auto var(--spacing-3xl)', width: '100%'}}>
             <h2 className="section-title" style={{textAlign: 'center', marginBottom: 'var(--spacing-md)'}}>
-              <span>How the </span>
-              <span className="home-thq-text-gradient-elm2">7 Modules Work Together</span>
+              <span>The </span>
+              <span className="home-thq-text-gradient-elm2">Cognitive OS Architecture</span>
             </h2>
             <p style={{opacity: 0.85, fontSize: 'var(--font-size-lg)', maxWidth: '700px', margin: '0 auto', textAlign: 'center', lineHeight: 1.6}}>
-              Each module solves a specific problem. Together, they create an intelligent ecosystem where the whole is greater than the sum of its parts.
+              FinACEverse is a Cognitive Operating System. Each module serves a distinct purpose in the ecosystem.
             </p>
           </div>
           
           <div className="bento-grid" style={{gap: 'var(--spacing-xl)'}}>
             <div className="bento-cell cell-wide" style={{background: 'color-mix(in srgb, var(--color-primary) 10%, var(--color-surface))', padding: 'var(--spacing-2xl)', borderRadius: 'var(--border-radius-lg)'}}>
               <div className="cell-content">
-                <div style={{display: 'flex', gap: '15px', marginBottom: 'var(--spacing-md)'}}>
-                  <img src="/images/VAMN-7B Transparent logo.png" alt="VAMN" style={{height: '40px', opacity: 0.9}} />
-                  <img src="/images/Accute Transparent symbol.png" alt="Accute" style={{height: '40px', opacity: 0.9}} />
-                </div>
-                <h3 className="cell-title" style={{color: 'var(--color-primary)'}}>The Foundation: VAMN + Accute</h3>
+                <img src="/images/Accute Transparent symbol.png" alt="Accute" style={{height: '40px', marginBottom: 'var(--spacing-md)', opacity: 0.9}} />
+                <h3 className="cell-title" style={{color: 'var(--color-primary)'}}>The Orchestrator: Accute</h3>
                 <p className="section-content">
-                  <strong>Start here.</strong> VAMN provides the AI brain (data processing, verification, intelligence), 
-                  while Accute orchestrates workflows. These two form the core operating system. Without them, 
-                  the other modules can't function. Think: Windows or macOS for finance.
+                  <strong>Start here.</strong> Accute is the workflow orchestrator that connects every process. 
+                  It's the conductor ensuring all modules work in harmony - routing data, triggering automations, 
+                  and maintaining the flow of your financial operations.
                 </p>
               </div>
             </div>
@@ -558,8 +601,8 @@ const Home = (props) => {
                 <img src="/images/Cyloid.png" alt="Cyloid" style={{height: '35px', marginBottom: 'var(--spacing-sm)', opacity: 0.9}} />
                 <h3 className="cell-title">Input Layer: Cyloid</h3>
                 <p className="section-content">
-                  Handles all incoming documents. Can work standalone for document processing, 
-                  but reaches full power when feeding verified data into VAMN.
+                  AI verification engine for document processing. Reads, extracts, and 
+                  verifies every document with mathematical precision.
                 </p>
               </div>
             </div>
@@ -567,10 +610,10 @@ const Home = (props) => {
             <div className="bento-cell cell-narrow" style={{background: 'var(--color-surface-elevated)', padding: 'var(--spacing-xl)', borderRadius: 'var(--border-radius-lg)'}}>
               <div className="cell-content">
                 <img src="/images/Luca Transparent symbol (2).png" alt="Luca" style={{height: '35px', marginBottom: 'var(--spacing-sm)', opacity: 0.9}} />
-                <h3 className="cell-title">Intelligence Layer: Luca</h3>
+                <h3 className="cell-title">Expert Layer: Luca</h3>
                 <p className="section-content">
-                  Provides expert guidance on complex scenarios. Uses VAMN's data to give 
-                  contextual recommendations. Optional but highly valuable for tax optimization.
+                  AI domain expert with CPA-level knowledge. Answers complex tax and 
+                  accounting questions instantly with contextual recommendations.
                 </p>
               </div>
             </div>
@@ -580,47 +623,70 @@ const Home = (props) => {
                 <img src="/images/Fin(Ai)d Studio Transparent symbol.png" alt="Finaid Hub" style={{height: '35px', marginBottom: 'var(--spacing-sm)', opacity: 0.9}} />
                 <h3 className="cell-title">Execution Layer: Finaid Hub</h3>
                 <p className="section-content">
-                  Automates routine tasks using VAMN's intelligence. Essential for firms 
-                  wanting to scale without hiring. Works best with full system integration.
+                  AI workforce multiplier. Handles routine tasks at machine speed, 
+                  enabling your team to handle 10x more clients.
                 </p>
               </div>
             </div>
             
             <div className="bento-cell cell-narrow" style={{background: 'var(--color-surface-elevated)', padding: 'var(--spacing-xl)', borderRadius: 'var(--border-radius-lg)'}}>
               <div className="cell-content">
-                <div style={{display: 'flex', gap: '10px', marginBottom: 'var(--spacing-sm)'}}>
-                  <img src="/images/Finory Transparent symbol.png" alt="Finory" style={{height: '35px', opacity: 0.9}} />
-                  <img src="/images/EPI-Q Transparent symbol.png" alt="EPI-Q" style={{height: '35px', opacity: 0.9}} />
+                <img src="/images/EPI-Q Transparent symbol.png" alt="EPI-Q" style={{height: '35px', marginBottom: 'var(--spacing-sm)', opacity: 0.9}} />
+                <h3 className="cell-title">Discovery Layer: EPI-Q</h3>
+                <p className="section-content">
+                  Enterprise process, task, and communication mining. Maps your actual 
+                  workflows and identifies automation opportunities.
+                </p>
+              </div>
+            </div>
+            
+            {showPhase2 && (
+              <>
+                <div className="bento-cell cell-narrow" style={{background: 'var(--color-surface-elevated)', padding: 'var(--spacing-xl)', borderRadius: 'var(--border-radius-lg)', position: 'relative'}}>
+                  <div style={{position: 'absolute', top: '10px', right: '10px', background: 'var(--color-accent)', color: 'white', padding: '4px 8px', borderRadius: '4px', fontSize: '10px', fontWeight: 'bold'}}>PHASE 2</div>
+                  <div className="cell-content">
+                    <img src="/images/VAMN-7B Transparent logo.png" alt="VAMN" style={{height: '35px', marginBottom: 'var(--spacing-sm)', opacity: 0.9}} />
+                    <h3 className="cell-title">The Brain: VAMN</h3>
+                    <p className="section-content">
+                      Financial LLM with a cool mind of its own. Unlike generic AI, 
+                      VAMN thinks in financial logic with mathematical precision.
+                    </p>
+                  </div>
                 </div>
-                <h3 className="cell-title">Systems Layer: Finory + EPI-Q</h3>
-                <p className="section-content">
-                  Finory is the self-building ERP that adapts to you. EPI-Q maps your 
-                  processes and identifies automation opportunities through task mining.
-                </p>
-              </div>
-            </div>
-            
-            <div className="bento-cell cell-narrow" style={{background: 'var(--color-surface-elevated)', padding: 'var(--spacing-xl)', borderRadius: 'var(--border-radius-lg)'}}>
-              <div className="cell-content">
-                <img src="/images/SumBuddy Transparent symbol.png" alt="Sumbuddy" style={{height: '35px', marginBottom: 'var(--spacing-sm)', opacity: 0.9}} />
-                <h3 className="cell-title">Growth Layer: Sumbuddy</h3>
-                <p className="section-content">
-                  Client acquisition marketplace. Get matched with qualified clients 
-                  seeking your exact services. Zero marketing spend required.
-                </p>
-              </div>
-            </div>
+                <div className="bento-cell cell-narrow" style={{background: 'var(--color-surface-elevated)', padding: 'var(--spacing-xl)', borderRadius: 'var(--border-radius-lg)', position: 'relative'}}>
+                  <div style={{position: 'absolute', top: '10px', right: '10px', background: 'var(--color-accent)', color: 'white', padding: '4px 8px', borderRadius: '4px', fontSize: '10px', fontWeight: 'bold'}}>PHASE 2</div>
+                  <div className="cell-content">
+                    <img src="/images/Finory Transparent symbol.png" alt="Finory" style={{height: '35px', marginBottom: 'var(--spacing-sm)', opacity: 0.9}} />
+                    <h3 className="cell-title">Systems Layer: Finory</h3>
+                    <p className="section-content">
+                      Self-constructing AI-native ERP. Adapts to your business 
+                      automatically - go live in weeks, not years.
+                    </p>
+                  </div>
+                </div>
+                <div className="bento-cell cell-narrow" style={{background: 'var(--color-surface-elevated)', padding: 'var(--spacing-xl)', borderRadius: 'var(--border-radius-lg)', position: 'relative'}}>
+                  <div style={{position: 'absolute', top: '10px', right: '10px', background: 'var(--color-accent)', color: 'white', padding: '4px 8px', borderRadius: '4px', fontSize: '10px', fontWeight: 'bold'}}>PHASE 2</div>
+                  <div className="cell-content">
+                    <img src="/images/SumBuddy Transparent symbol.png" alt="Sumbuddy" style={{height: '35px', marginBottom: 'var(--spacing-sm)', opacity: 0.9}} />
+                    <h3 className="cell-title">Growth Layer: Sumbuddy</h3>
+                    <p className="section-content">
+                      Client acquisition marketplace. Get matched with qualified 
+                      clients seeking your exact services.
+                    </p>
+                  </div>
+                </div>
+              </>
+            )}
           </div>
           
           <div style={{marginTop: 'var(--spacing-3xl)', textAlign: 'center', padding: 'var(--spacing-2xl)', background: 'color-mix(in srgb, var(--color-accent) 15%, var(--color-surface))', borderRadius: 'var(--border-radius-lg)'}}>
             <h3 className="section-subtitle" style={{marginBottom: 'var(--spacing-md)', color: 'var(--color-accent)'}}>
-              💡 Can You Use Just One Module?
+              🚀 Phase 1 Launching Now
             </h3>
             <p className="section-content" style={{maxWidth: '700px', margin: '0 auto', fontSize: 'var(--font-size-lg)'}}>
-              <strong>Short answer: No.</strong> You need the Foundation (VAMN + Accute) at minimum. 
-              From there, add modules based on your needs: Cyloid for document chaos, Luca for complex 
-              tax scenarios, Finaid Hub for scaling, Finory/EPI-Q for insights, Sumbuddy for clients. 
-              Most firms start with Foundation + Cyloid + Finaid Hub = <strong>70% time savings</strong>.
+              <strong>Available today:</strong> Accute (orchestration) + Cyloid (document AI) + Luca (domain expert) 
+              + Finaid Hub (workforce multiplier) + EPI-Q (process mining). 
+              Start with this powerful stack and achieve <strong>70% time savings</strong> immediately.
             </p>
           </div>
         </div>
