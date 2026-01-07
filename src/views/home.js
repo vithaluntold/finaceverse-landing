@@ -199,7 +199,12 @@ const Home = (props) => {
           <div className="bento-grid" style={{gap: 'var(--spacing-xl)', marginTop: 'var(--spacing-2xl)'}}>
             <div className="bento-cell cell-wide" style={{background: 'var(--color-surface-elevated)', padding: 'var(--spacing-2xl)', borderRadius: 'var(--border-radius-lg)'}}>
               <div className="persona-header" style={{display: 'flex', alignItems: 'center', gap: 'var(--spacing-md)', marginBottom: 'var(--spacing-lg)'}}>
-                <div style={{fontSize: '2.5rem'}}>👔</div>
+                <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="var(--color-primary)" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2" />
+                  <circle cx="9" cy="7" r="4" />
+                  <path d="M22 21v-2a4 4 0 0 0-3-3.87" />
+                  <path d="M16 3.13a4 4 0 0 1 0 7.75" />
+                </svg>
                 <div>
                   <h3 className="cell-title">Accounting Firms (5-200+ People)</h3>
                   <p style={{opacity: 0.7, fontSize: 'var(--font-size-sm)'}}>Managing dozens to hundreds of client engagements</p>
@@ -210,7 +215,7 @@ const Home = (props) => {
                 Staff overwhelmed with manual reconciliations. Clients demanding real-time insights you can&apos;t deliver.
               </p>
               <p className="section-content" style={{marginTop: 'var(--spacing-md)'}}>
-                <strong>Your Solution:</strong> Foundation (VAMN + Accute) + Cyloid + Finaid Hub handles 90% of routine work. 
+                <strong>Your Solution:</strong> Foundation (VAMN + Accute) + Finaid Hub handles 90% of routine work. 
                 Partners shift from data entry to high-value advisory. Add Sumbuddy for white-label client portals.
               </p>
               <div style={{marginTop: 'var(--spacing-lg)', padding: 'var(--spacing-lg)', background: 'color-mix(in srgb, var(--color-primary) 10%, transparent)', borderRadius: 'var(--border-radius-md)'}}>
@@ -220,7 +225,13 @@ const Home = (props) => {
             
             <div className="bento-cell cell-narrow" style={{background: 'var(--color-surface-elevated)', padding: 'var(--spacing-xl)', borderRadius: 'var(--border-radius-lg)'}}>
               <div className="persona-header" style={{marginBottom: 'var(--spacing-md)'}}>
-                <div style={{fontSize: '2rem', marginBottom: 'var(--spacing-sm)'}}>⚖️</div>
+                <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="var(--color-primary)" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" style={{marginBottom: 'var(--spacing-sm)'}}>
+                  <path d="M4 7V4h16v3" />
+                  <path d="M9 20h6" />
+                  <path d="M12 4v16" />
+                  <path d="m8 8-4 4 4 4" />
+                  <path d="m16 8 4 4-4 4" />
+                </svg>
                 <h3 className="cell-title" style={{fontSize: 'var(--font-size-xl)'}}>Tax Practitioners (Solo to Small Teams)</h3>
               </div>
               <p className="section-content">
@@ -233,7 +244,13 @@ const Home = (props) => {
             
             <div className="bento-cell cell-narrow" style={{background: 'var(--color-surface-elevated)', padding: 'var(--spacing-xl)', borderRadius: 'var(--border-radius-lg)'}}>
               <div className="persona-header" style={{marginBottom: 'var(--spacing-md)'}}>
-                <div style={{fontSize: '2rem', marginBottom: 'var(--spacing-sm)'}}>🏢</div>
+                <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="var(--color-primary)" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" style={{marginBottom: 'var(--spacing-sm)'}}>
+                  <rect x="3" y="3" width="18" height="18" rx="2" />
+                  <path d="M3 9h18" />
+                  <path d="M3 15h18" />
+                  <path d="M9 3v18" />
+                  <path d="M15 3v18" />
+                </svg>
                 <h3 className="cell-title" style={{fontSize: 'var(--font-size-xl)'}}>Corporate Finance Teams</h3>
               </div>
               <p className="section-content">
@@ -246,14 +263,21 @@ const Home = (props) => {
             
             <div className="bento-cell cell-narrow" style={{background: 'var(--color-surface-elevated)', padding: 'var(--spacing-xl)', borderRadius: 'var(--border-radius-lg)'}}>
               <div className="persona-header" style={{marginBottom: 'var(--spacing-md)'}}>
-                <div style={{fontSize: '2rem', marginBottom: 'var(--spacing-sm)'}}>🔍</div>
+                <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="var(--color-primary)" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" style={{marginBottom: 'var(--spacing-sm)'}}>
+                  <path d="M9 11a3 3 0 1 0 6 0a3 3 0 0 0-6 0" />
+                  <path d="M12.02 2C6.21 2 2.2 6.2 2.2 12c0 5.8 4.82 10 9.82 10 5.01 0 9.78-4.2 9.78-10S17.02 2 12.02 2" />
+                  <path d="M12 2v4" />
+                  <path d="M12 18v4" />
+                  <path d="M4.93 4.93l2.83 2.83" />
+                  <path d="M16.24 16.24l2.83 2.83" />
+                </svg>
                 <h3 className="cell-title" style={{fontSize: 'var(--font-size-xl)'}}>Auditors & Compliance</h3>
               </div>
               <p className="section-content">
                 <strong>Pain:</strong> Chasing source documents. Incomplete audit trails. Manual verification taking weeks.
               </p>
               <p className="section-content" style={{marginTop: 'var(--spacing-md)'}}>
-                <strong>Solution:</strong> Cyloid&apos;s compliance causality gives you complete audit trails. Every number traces to source. 60% faster audits.
+                <strong>Solution:</strong> Luca + EPI-Q gives you complete audit trails with AI-powered document verification. Every number traces to source. 60% faster audits.
               </p>
             </div>
           </div>
@@ -318,13 +342,12 @@ const Home = (props) => {
                 <div className="step-number">
                   <span>03</span>
                 </div>
-                <h3 className="step-title">Cyloid AI Verification</h3>
+                <h3 className="step-title">EPI-Q Process Discovery</h3>
                 <p className="section-content">
-                  <strong>Cyloid</strong> is the eyes of the system - an AI that mathematically 
-                  verifies every document entering your ecosystem. It transforms messy, unstructured 
-                  data (PDFs, emails, scans) into verified, structured facts with complete 
-                  <strong>compliance causality</strong> - meaning every number traces back to its 
-                  original source document, creating an unbreakable audit trail that regulators love.
+                  <strong>EPI-Q</strong> maps how work actually happens in your organization. 
+                  Enterprise process, task, and communication mining reveals bottlenecks, 
+                  identifies automation opportunities, and creates a <strong>digital twin 
+                  of your workflows</strong> - the foundation for intelligent transformation.
                 </p>
               </div>
             </div>
@@ -386,25 +409,6 @@ const Home = (props) => {
                     src="/images/Accute Transparent symbol.png"
                     alt="Accute module"
                     style={{maxWidth: '80px', margin: '20px auto', display: 'block', opacity: 0.9}}
-                  />
-                </div>
-              </a>
-            </div>
-            <div className="masonry-item item-md">
-              <a href="https://cyloid.io" target="_blank" rel="noopener noreferrer" style={{textDecoration: 'none', color: 'inherit'}}>
-                <div className="module-card accent" style={{cursor: 'pointer'}}>
-                  <span className="module-name">Cyloid</span>
-                  <h3 className="module-benefit">AI Verification Engine</h3>
-                  <p className="section-content">
-                    The intelligent scanner that never blinks. Cyloid AI reads, extracts, 
-                    and verifies every document with mathematical precision - processing 
-                    <strong>500+ invoices per hour</strong> while maintaining complete audit 
-                    trails. Turns 3 days of manual data entry into 30 minutes.
-                  </p>
-                  <img
-                    src="/images/Cyloid.png"
-                    alt="Cyloid"
-                    style={{maxWidth: '75px', margin: '20px auto', display: 'block', opacity: 0.9}}
                   />
                 </div>
               </a>
@@ -598,17 +602,6 @@ const Home = (props) => {
             
             <div className="bento-cell cell-narrow" style={{background: 'var(--color-surface-elevated)', padding: 'var(--spacing-xl)', borderRadius: 'var(--border-radius-lg)'}}>
               <div className="cell-content">
-                <img src="/images/Cyloid.png" alt="Cyloid" style={{height: '35px', marginBottom: 'var(--spacing-sm)', opacity: 0.9}} />
-                <h3 className="cell-title">Input Layer: Cyloid</h3>
-                <p className="section-content">
-                  AI verification engine for document processing. Reads, extracts, and 
-                  verifies every document with mathematical precision.
-                </p>
-              </div>
-            </div>
-            
-            <div className="bento-cell cell-narrow" style={{background: 'var(--color-surface-elevated)', padding: 'var(--spacing-xl)', borderRadius: 'var(--border-radius-lg)'}}>
-              <div className="cell-content">
                 <img src="/images/Luca Transparent symbol (2).png" alt="Luca" style={{height: '35px', marginBottom: 'var(--spacing-sm)', opacity: 0.9}} />
                 <h3 className="cell-title">Expert Layer: Luca</h3>
                 <p className="section-content">
@@ -642,6 +635,17 @@ const Home = (props) => {
             
             {showPhase2 && (
               <>
+                <div className="bento-cell cell-narrow" style={{background: 'var(--color-surface-elevated)', padding: 'var(--spacing-xl)', borderRadius: 'var(--border-radius-lg)', position: 'relative'}}>
+                  <div style={{position: 'absolute', top: '10px', right: '10px', background: 'var(--color-accent)', color: 'white', padding: '4px 8px', borderRadius: '4px', fontSize: '10px', fontWeight: 'bold'}}>PHASE 2</div>
+                  <div className="cell-content">
+                    <img src="/images/Cyloid.png" alt="Cyloid" style={{height: '35px', marginBottom: 'var(--spacing-sm)', opacity: 0.9}} />
+                    <h3 className="cell-title">Input Layer: Cyloid</h3>
+                    <p className="section-content">
+                      AI verification engine for document processing. Reads, extracts, and 
+                      verifies every document with mathematical precision.
+                    </p>
+                  </div>
+                </div>
                 <div className="bento-cell cell-narrow" style={{background: 'var(--color-surface-elevated)', padding: 'var(--spacing-xl)', borderRadius: 'var(--border-radius-lg)', position: 'relative'}}>
                   <div style={{position: 'absolute', top: '10px', right: '10px', background: 'var(--color-accent)', color: 'white', padding: '4px 8px', borderRadius: '4px', fontSize: '10px', fontWeight: 'bold'}}>PHASE 2</div>
                   <div className="cell-content">
@@ -684,7 +688,7 @@ const Home = (props) => {
               🚀 Phase 1 Launching Now
             </h3>
             <p className="section-content" style={{maxWidth: '700px', margin: '0 auto', fontSize: 'var(--font-size-lg)'}}>
-              <strong>Available today:</strong> Accute (orchestration) + Cyloid (document AI) + Luca (domain expert) 
+              <strong>Available today:</strong> Accute (orchestration) + Luca (domain expert) 
               + Finaid Hub (workforce multiplier) + EPI-Q (process mining). 
               Start with this powerful stack and achieve <strong>70% time savings</strong> immediately.
             </p>
@@ -865,7 +869,7 @@ const Home = (props) => {
                   Partners spending 30+ hours/week on data entry instead of advisory services.
                 </p>
                 <p className="section-content" style={{marginTop: 'var(--spacing-md)'}}>
-                  <strong>Solution:</strong> Deployed Foundation (VAMN + Accute) + Cyloid + Finaid Hub
+                  <strong>Solution:</strong> Deployed Accute + Luca + Finaid Hub + EPI-Q
                 </p>
                 <div className="metrics-grid" style={{display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(150px, 1fr))', gap: 'var(--spacing-lg)', marginTop: 'var(--spacing-xl)', padding: 'var(--spacing-xl)', background: 'color-mix(in srgb, var(--color-primary) 5%, transparent)', borderRadius: 'var(--border-radius-md)'}}>
                   <div className="metric">
@@ -910,7 +914,7 @@ const Home = (props) => {
                 <strong>Challenge:</strong> Manufacturing company with 12 subsidiaries across 8 countries - fragmented systems, delayed reporting, compliance nightmares.
               </p>
               <p className="section-content" style={{marginTop: 'var(--spacing-md)'}}>
-                <strong>Result:</strong> Accute orchestrating all entities, Finory delivering real-time consolidated dashboards, Cyloid ensuring compliance causality across jurisdictions.
+                <strong>Result:</strong> Accute orchestrating all entities, Finory delivering real-time consolidated dashboards, EPI-Q identifying process inefficiencies across jurisdictions.
               </p>
               <div style={{marginTop: 'var(--spacing-lg)', padding: 'var(--spacing-md)', background: 'color-mix(in srgb, var(--color-secondary) 10%, transparent)', borderRadius: 'var(--border-radius-sm)'}}>
                 <div className="metric-value" style={{fontSize: 'var(--font-size-2xl)', fontWeight: '700', color: 'var(--color-secondary)'}}>2 weeks → 2 hours</div>

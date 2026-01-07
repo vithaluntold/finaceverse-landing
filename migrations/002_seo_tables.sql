@@ -39,7 +39,7 @@ CREATE TABLE IF NOT EXISTS content_analysis (
   meta_title TEXT,
   meta_description TEXT,
   seo_score INTEGER, -- 0-100
-  analyzed_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+  scanned_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
 -- Backlink monitoring
