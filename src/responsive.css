@@ -27,7 +27,15 @@ body {
 
 /* Flexbox fixes for older browsers */
 .container-wrapper,
-.section-header,
+.section-header {
+  display: -webkit-box;
+  display: -moz-box;
+  display: -ms-flexbox;
+  display: -webkit-flex;
+  display: flex;
+  flex-direction: column;
+}
+
 .btn,
 .nav-links {
   display: -webkit-box;
