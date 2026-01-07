@@ -8,6 +8,28 @@ const jwt = require('jsonwebtoken');
 const { Pool } = require('pg');
 const redis = require('redis');
 const { Server } = require('socket.io');
+const helmet = require('helmet');
+const rateLimit = require('express-rate-limit');
+const { body, validationResult, param, query } = require('express-validator');
+const hpp = require('hpp');
+const cookieParser = require('cookie-parser');
+
+// MILITARY-GRADE SECURITY MODULE
+const {
+  EncryptionService,
+  JWTSecurityService,
+  CSRFProtection,
+  SSRFProtection,
+  XSSSanitizer,
+  AuditLogger,
+  TenantIsolation,
+  AdvancedRateLimiter,
+  securityHeaders,
+  // SuperAdmin Module
+  SuperAdminAuthService,
+  createSuperAdminMiddleware,
+  createSuperAdminRoutes,
+} = require('./backend/security');
 
 // SEO AI Services
 const KeywordOptimizer = require('./src/seo-ai/keyword-optimizer');
@@ -15,17 +37,199 @@ const LocalSEOManager = require('./src/seo-ai/local-seo-manager');
 
 const app = express();
 const PORT = process.env.PORT || 5000;
+
+// Validate critical environment variables
+const requiredEnvVars = ['JWT_SECRET', 'JWT_REFRESH_SECRET', 'ENCRYPTION_KEY', 'DATABASE_URL'];
+const missingEnvVars = requiredEnvVars.filter(varName => !process.env[varName] || process.env[varName] === 'your-secret-key-change-in-production');
+if (missingEnvVars.length > 0 && process.env.NODE_ENV === 'production') {
+  console.error(`❌ SECURITY ERROR: Missing or insecure environment variables: ${missingEnvVars.join(', ')}`);
+  process.exit(1);
+}
+
 const JWT_SECRET = process.env.JWT_SECRET || 'your-secret-key-change-in-production';
+const JWT_REFRESH_SECRET = process.env.JWT_REFRESH_SECRET || 'your-refresh-secret-change-in-production';
+const ENCRYPTION_KEY = process.env.ENCRYPTION_KEY || 'default-encryption-key-32-chars!';
+const CSRF_SECRET = process.env.CSRF_SECRET || 'csrf-secret-key-change-in-prod!';
 const DATABASE_URL = process.env.DATABASE_URL || 'postgresql://localhost:5432/finaceverse_analytics';
 const REDIS_URL = process.env.REDIS_URL || 'redis://localhost:6379';
 const GOOGLE_API_KEY = process.env.GOOGLE_API_KEY || '';
 const GOOGLE_CLIENT_ID = process.env.GOOGLE_CLIENT_ID || '';
 const GOOGLE_CLIENT_SECRET = process.env.GOOGLE_CLIENT_SECRET || '';
 const GOOGLE_REFRESH_TOKEN = process.env.GOOGLE_REFRESH_TOKEN || '';
+const ALLOWED_ORIGINS = process.env.ALLOWED_ORIGINS ? process.env.ALLOWED_ORIGINS.split(',') : ['http://localhost:3000', 'https://www.finaceverse.io', 'https://finaceverse.io'];
 
-// Middleware
-app.use(cors());
-app.use(express.json());
+// ============ INITIALIZE SECURITY SERVICES ============
+
+// Encryption Service (AES-256-GCM)
+const encryptionService = new EncryptionService(ENCRYPTION_KEY);
+console.log('✓ Encryption Service initialized (AES-256-GCM)');
+
+// JWT Security Service with fingerprinting & rotation
+const jwtService = new JWTSecurityService({
+  accessSecret: JWT_SECRET,
+  refreshSecret: JWT_REFRESH_SECRET,
+  accessTokenExpiry: '15m',
+  refreshTokenExpiry: '7d',
+  issuer: 'finaceverse',
+  audience: 'finaceverse-app',
+});
+console.log('✓ JWT Security Service initialized (fingerprinting enabled)');
+
+// CSRF Protection (Double Submit Cookie)
+const csrfProtection = new CSRFProtection(CSRF_SECRET);
+console.log('✓ CSRF Protection initialized');
+
+// SSRF Protection for URL fetching
+const ssrfProtection = new SSRFProtection();
+// Add allowed domains for SEO scanning
+ssrfProtection.allowDomain('finaceverse.io');
+ssrfProtection.allowDomain('www.finaceverse.io');
+console.log('✓ SSRF Protection initialized');
+
+// XSS Sanitizer for Cheerio
+const xssSanitizer = new XSSSanitizer();
+console.log('✓ XSS Sanitizer initialized');
+
+// Tenant Isolation
+const tenantIsolation = new TenantIsolation();
+console.log('✓ Multi-tenant isolation initialized');
+
+// ============ SECURITY MIDDLEWARE ============
+
+// Helmet - Security headers
+app.use(helmet({
+  contentSecurityPolicy: {
+    directives: {
+      defaultSrc: ["'self'"],
+      scriptSrc: ["'self'", "'unsafe-inline'", "'unsafe-eval'", "https://www.googletagmanager.com", "https://www.google-analytics.com"],
+      styleSrc: ["'self'", "'unsafe-inline'", "https://fonts.googleapis.com"],
+      imgSrc: ["'self'", "data:", "https:", "blob:"],
+      fontSrc: ["'self'", "https://fonts.gstatic.com"],
+      connectSrc: ["'self'", "https://www.google-analytics.com", "https://analytics.google.com"],
+      frameSrc: ["'self'"],
+      objectSrc: ["'none'"],
+      upgradeInsecureRequests: process.env.NODE_ENV === 'production' ? [] : null,
+    },
+  },
+  hsts: {
+    maxAge: 31536000,
+    includeSubDomains: true,
+    preload: true,
+  },
+}));
+
+// CORS - Hardened configuration
+const corsOptions = {
+  origin: function (origin, callback) {
+    if (!origin || ALLOWED_ORIGINS.indexOf(origin) !== -1 || process.env.NODE_ENV === 'development') {
+      callback(null, true);
+    } else {
+      callback(new Error('Not allowed by CORS'));
+    }
+  },
+  credentials: true,
+  optionsSuccessStatus: 200,
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization'],
+};
+app.use(cors(corsOptions));
+
+// Body parser with size limits
+app.use(express.json({ limit: '10mb' }));
+app.use(express.urlencoded({ extended: true, limit: '10mb' }));
+
+// Prevent HTTP Parameter Pollution
+app.use(hpp());
+
+// ============ RATE LIMITING (SCALE-READY FOR 100K+ USERS) ============
+// 
+// Strategy:
+// - Auth: Strict per-IP (brute force protection) - stays low
+// - API: Per-user/tenant with high limits for authenticated users
+// - Tracking: Very permissive (public analytics from all visitors)
+// - SEO: Per-tenant admin operations (can stay moderate)
+// - DDoS: Handled at infrastructure level (Cloudflare/Railway)
+//
+
+// Auth limiter - STRICT (brute force protection, keeps low)
+const authLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000, // 15 minutes
+  max: 10, // 10 attempts per IP (slightly higher for shared IPs/NAT)
+  message: 'Too many authentication attempts, please try again later',
+  standardHeaders: true,
+  legacyHeaders: false,
+  keyGenerator: (req) => req.ip, // Per IP
+});
+
+// API limiter - HIGH LIMITS for authenticated users
+// Key: Per-user + per-IP for fairness
+const apiLimiter = rateLimit({
+  windowMs: 1 * 60 * 1000, // 1 minute window (more granular)
+  max: 300, // 300 requests per minute per user (5 req/sec avg)
+  message: 'API rate limit exceeded, please slow down',
+  standardHeaders: true,
+  legacyHeaders: false,
+  keyGenerator: (req) => {
+    // Use userId if authenticated, otherwise IP
+    return req.userId ? `user:${req.userId}` : `ip:${req.ip}`;
+  },
+  skip: (req) => {
+    // Skip rate limiting for health checks
+    return req.path === '/api/health';
+  },
+});
+
+// Public tracking - VERY PERMISSIVE (analytics from all visitors)
+// These are lightweight writes, can handle high volume
+const publicTrackingLimiter = rateLimit({
+  windowMs: 1 * 60 * 1000, // 1 minute
+  max: 1000, // 1000 requests per minute per IP
+  message: 'Rate limit exceeded',
+  standardHeaders: true,
+  legacyHeaders: false,
+  // For tracking, we use a sliding window to be more forgiving
+  skip: (req) => {
+    // Skip for internal health monitoring
+    return req.headers['x-internal-request'] === process.env.INTERNAL_SECRET;
+  },
+});
+
+// SEO admin operations - MODERATE (expensive but per-tenant)
+const seoLimiter = rateLimit({
+  windowMs: 60 * 1000, // 1 minute
+  max: 30, // 30 requests per minute per tenant
+  message: 'SEO operations rate limit exceeded - these are resource-intensive',
+  standardHeaders: true,
+  legacyHeaders: false,
+  keyGenerator: (req) => {
+    // Per tenant, not per IP (allows multiple admins)
+    return `tenant:${req.tenantId || 'platform'}`;
+  },
+});
+
+// Burst limiter for sudden spikes (optional, applies globally)
+const burstLimiter = rateLimit({
+  windowMs: 1000, // 1 second
+  max: 50, // 50 requests per second per IP (prevents DoS)
+  message: 'Request burst detected, please slow down',
+  standardHeaders: true,
+  legacyHeaders: false,
+});
+
+// Apply burst limiter globally (first line of defense)
+app.use(burstLimiter);
+
+// Cookie parser for CSRF
+app.use(cookieParser());
+
+// Additional security headers
+app.use(securityHeaders);
+
+// Tenant isolation middleware
+app.use(tenantIsolation.middleware());
+
+// CSRF Protection (skip for API tracking endpoints)
+app.use(csrfProtection.middleware());
 
 // Serve static files from React build
 app.use(express.static(path.join(__dirname, 'build')));
@@ -36,16 +240,29 @@ const pool = new Pool({
   ssl: process.env.NODE_ENV === 'production' ? { rejectUnauthorized: false } : false,
 });
 
-// Initialize SEO AI services
+// Initialize SEO AI services with security wrappers
 let keywordOptimizer;
 let localSEOManager;
+let auditLogger;
+let advancedRateLimiter;
+let superAdminAuth;
 
 try {
-  keywordOptimizer = new KeywordOptimizer(pool);
+  // Pass SSRF protection and XSS sanitizer to SEO services
+  keywordOptimizer = new KeywordOptimizer(pool, { ssrfProtection, xssSanitizer });
   localSEOManager = new LocalSEOManager(pool);
-  console.log('✓ SEO AI services initialized');
+  console.log('✓ SEO AI services initialized (with security wrappers)');
 } catch (error) {
   console.warn('⚠️  SEO AI services not available:', error.message);
+}
+
+// Initialize SuperAdmin Service
+try {
+  superAdminAuth = new SuperAdminAuthService(pool, jwtService, encryptionService);
+  console.log('✓ SuperAdmin Auth Service initialized');
+  console.log(`🔐 SuperAdmin secret path: ${superAdminAuth.getSecretPath()}`);
+} catch (error) {
+  console.error('❌ SuperAdmin initialization failed:', error.message);
 }
 
 // Initialize database tables before starting server
@@ -309,108 +526,325 @@ const startScheduledJobs = () => {
   }, 6 * 60 * 60 * 1000); // Every 6 hours
 };
 
-// Authentication middleware
+// ============ UTILITY FUNCTIONS ============
+
+// Sanitize input to prevent SQL injection
+const sanitizeInput = (input) => {
+  if (typeof input === 'string') {
+    return input.replace(/[<>'"]/g, '');
+  }
+  return input;
+};
+
+// Validate password strength
+const validatePassword = (password) => {
+  if (password.length < 12) {
+    return { valid: false, message: 'Password must be at least 12 characters long' };
+  }
+  if (!/[a-z]/.test(password)) {
+    return { valid: false, message: 'Password must contain at least one lowercase letter' };
+  }
+  if (!/[A-Z]/.test(password)) {
+    return { valid: false, message: 'Password must contain at least one uppercase letter' };
+  }
+  if (!/[0-9]/.test(password)) {
+    return { valid: false, message: 'Password must contain at least one number' };
+  }
+  if (!/[^a-zA-Z0-9]/.test(password)) {
+    return { valid: false, message: 'Password must contain at least one special character' };
+  }
+  return { valid: true };
+};
+
+// Authentication middleware with military-grade security (fingerprinting + JWT service)
 const authMiddleware = (req, res, next) => {
-  const token = req.headers.authorization?.split(' ')[1];
+  const authHeader = req.headers.authorization;
+  
+  if (!authHeader || !authHeader.startsWith('Bearer ')) {
+    return res.status(401).json({ error: 'No valid token provided' });
+  }
+  
+  const token = authHeader.split(' ')[1];
   
   if (!token) {
     return res.status(401).json({ error: 'No token provided' });
   }
   
   try {
-    const decoded = jwt.verify(token, JWT_SECRET);
+    // Use military-grade JWT service with fingerprint verification
+    const decoded = jwtService.verifyAccessToken(token, req);
+    
+    // Add user info to request
     req.userId = decoded.userId;
+    req.username = decoded.username;
+    req.role = decoded.role || 'admin';
+    req.tenantId = decoded.tenantId || req.tenantId || 'platform';
+    
     next();
   } catch (err) {
+    if (err.name === 'TokenExpiredError') {
+      return res.status(401).json({ error: 'Token expired, please refresh', code: 'TOKEN_EXPIRED' });
+    }
+    if (err.message === 'Token has been revoked') {
+      return res.status(401).json({ error: 'Token has been revoked', code: 'TOKEN_REVOKED' });
+    }
     return res.status(401).json({ error: 'Invalid token' });
   }
 };
 
+// Role-based access control middleware
+const requireRole = (role) => {
+  return (req, res, next) => {
+    if (req.role !== role && req.role !== 'superadmin') {
+      return res.status(403).json({ error: 'Insufficient permissions' });
+    }
+    next();
+  };
+};
+
+// Validation error handler
+const handleValidationErrors = (req, res, next) => {
+  const errors = validationResult(req);
+  if (!errors.isEmpty()) {
+    return res.status(400).json({ 
+      error: 'Validation failed', 
+      details: errors.array().map(e => ({ field: e.path, message: e.msg }))
+    });
+  }
+  next();
+};
+
+// ============ SUPERADMIN ROUTES (Secret Path - SEO/Analytics) ============
+
+// Mount SuperAdmin middleware and routes
+if (superAdminAuth) {
+  // SuperAdmin middleware for session validation
+  app.use(createSuperAdminMiddleware(superAdminAuth));
+  
+  // Mount SuperAdmin routes at secret path
+  createSuperAdminRoutes(app, superAdminAuth, pool, keywordOptimizer, localSEOManager);
+  
+  console.log('✓ SuperAdmin routes mounted (SEO & Analytics features)');
+}
+
 // ============ AUTHENTICATION ROUTES ============
 
-// Login
-app.post('/api/auth/login', async (req, res) => {
-  try {
-    const { username, password } = req.body;
-    
-    const result = await pool.query('SELECT * FROM users WHERE username = \$1', [username]);
-    
-    if (result.rows.length === 0) {
-      return res.status(401).json({ error: 'Invalid credentials' });
+// Login with validation and rate limiting
+app.post('/api/auth/login', 
+  authLimiter,
+  [
+    body('username')
+      .trim()
+      .isLength({ min: 3, max: 50 })
+      .withMessage('Username must be between 3 and 50 characters')
+      .matches(/^[a-zA-Z0-9_-]+$/)
+      .withMessage('Username can only contain letters, numbers, underscores, and hyphens'),
+    body('password')
+      .notEmpty()
+      .withMessage('Password is required'),
+  ],
+  handleValidationErrors,
+  async (req, res) => {
+    try {
+      const { username, password } = req.body;
+      
+      // Sanitize username
+      const sanitizedUsername = sanitizeInput(username);
+      
+      const result = await pool.query('SELECT * FROM users WHERE username = $1', [sanitizedUsername]);
+      
+      if (result.rows.length === 0) {
+        // Use same error message to prevent username enumeration
+        return res.status(401).json({ error: 'Invalid credentials' });
+      }
+      
+      const user = result.rows[0];
+      
+      // Verify password with timing-safe comparison
+      const validPassword = await bcrypt.compare(password, user.password);
+      if (!validPassword) {
+        return res.status(401).json({ error: 'Invalid credentials' });
+      }
+      
+      // Generate JWT token pair with fingerprinting (military-grade)
+      const tokens = jwtService.generateTokenPair(
+        { 
+          userId: user.id, 
+          username: user.username,
+          role: user.role || 'admin',
+          tenantId: user.tenant_id || 'platform',
+        }, 
+        req // Pass request for fingerprinting
+      );
+      
+      // Log successful login (without sensitive data)
+      console.log(`✓ User logged in: ${user.username} (ID: ${user.id}, Tenant: ${user.tenant_id || 'platform'})`);
+      
+      res.json({ 
+        ...tokens,
+        username: user.username,
+        role: user.role,
+      });
+    } catch (err) {
+      console.error('Login error:', err);
+      res.status(500).json({ error: 'Login failed' });
     }
-    
-    const user = result.rows[0];
-    
-    // Verify password
-    const validPassword = await bcrypt.compare(password, user.password);
-    if (!validPassword) {
-      return res.status(401).json({ error: 'Invalid credentials' });
-    }
-    
-    // Generate JWT
-    const token = jwt.sign({ userId: user.id, username: user.username }, JWT_SECRET, {
-      expiresIn: '24h',
-    });
-    
-    res.json({ token, username: user.username });
-  } catch (err) {
-    console.error('Login error:', err);
-    res.status(500).json({ error: 'Login failed' });
   }
+);
+
+// Create initial admin user with enhanced security
+app.post('/api/auth/create-admin',
+  authLimiter,
+  [
+    body('username')
+      .trim()
+      .isLength({ min: 3, max: 50 })
+      .withMessage('Username must be between 3 and 50 characters')
+      .matches(/^[a-zA-Z0-9_-]+$/)
+      .withMessage('Username can only contain letters, numbers, underscores, and hyphens'),
+    body('password')
+      .isLength({ min: 12 })
+      .withMessage('Password must be at least 12 characters long')
+      .matches(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]/)
+      .withMessage('Password must contain uppercase, lowercase, number, and special character'),
+    body('secretKey')
+      .notEmpty()
+      .withMessage('Secret key is required'),
+  ],
+  handleValidationErrors,
+  async (req, res) => {
+    try {
+      const { username, password, secretKey } = req.body;
+      
+      // Verify secret key
+      if (!process.env.ADMIN_SECRET_KEY || secretKey !== process.env.ADMIN_SECRET_KEY) {
+        return res.status(403).json({ error: 'Invalid secret key' });
+      }
+      
+      // Additional password validation
+      const passwordCheck = validatePassword(password);
+      if (!passwordCheck.valid) {
+        return res.status(400).json({ error: passwordCheck.message });
+      }
+      
+      // Sanitize username
+      const sanitizedUsername = sanitizeInput(username);
+      
+      const existingUser = await pool.query('SELECT id FROM users WHERE username = $1', [sanitizedUsername]);
+      
+      if (existingUser.rows.length > 0) {
+        return res.status(400).json({ error: 'User already exists' });
+      }
+      
+      // Hash password with high cost factor
+      const hashedPassword = await bcrypt.hash(password, 12);
+      await pool.query(
+        'INSERT INTO users (username, password, role) VALUES ($1, $2, $3)',
+        [sanitizedUsername, hashedPassword, 'admin']
+      );
+      
+      console.log(`✓ Admin user created: ${sanitizedUsername}`);
+      
+      res.json({ message: 'Admin user created successfully' });
+    } catch (err) {
+      console.error('Create admin error:', err);
+      res.status(500).json({ error: 'Failed to create admin' });
+    }
+  }
+);
+
+// ============ CSRF TOKEN ENDPOINT ============
+
+// Get CSRF token for frontend
+app.get('/api/csrf-token', (req, res) => {
+  const token = csrfProtection.generateToken(res);
+  res.json({ csrfToken: token });
 });
 
-// Create initial admin user (run once)
-app.post('/api/auth/create-admin', async (req, res) => {
-  try {
-    const { username, password, secretKey } = req.body;
-    
-    // Verify secret key
-    if (secretKey !== process.env.ADMIN_SECRET_KEY) {
-      return res.status(403).json({ error: 'Invalid secret key' });
+// ============ TOKEN REFRESH ENDPOINT ============
+
+// Refresh access token using refresh token
+app.post('/api/auth/refresh',
+  authLimiter,
+  [
+    body('refreshToken')
+      .notEmpty()
+      .withMessage('Refresh token is required'),
+  ],
+  handleValidationErrors,
+  async (req, res) => {
+    try {
+      const { refreshToken } = req.body;
+      
+      // Helper function to get user by ID
+      const getUserById = async (userId) => {
+        const result = await pool.query('SELECT * FROM users WHERE id = $1', [userId]);
+        return result.rows[0];
+      };
+      
+      const tokens = await jwtService.refreshTokens(refreshToken, req, getUserById);
+      
+      res.json(tokens);
+    } catch (err) {
+      console.error('Token refresh error:', err.message);
+      res.status(401).json({ error: 'Invalid or expired refresh token' });
     }
-    
-    const existingUser = await pool.query('SELECT id FROM users WHERE username = \$1', [username]);
-    
-    if (existingUser.rows.length > 0) {
-      return res.status(400).json({ error: 'User already exists' });
-    }
-    
-    const hashedPassword = await bcrypt.hash(password, 10);
-    await pool.query(
-      'INSERT INTO users (username, password, role) VALUES (\$1, \$2, \$3)',
-      [username, hashedPassword, 'admin']
-    );
-    
-    res.json({ message: 'Admin user created successfully' });
-  } catch (err) {
-    console.error('Create admin error:', err);
-    res.status(500).json({ error: 'Failed to create admin' });
   }
+);
+
+// Logout - Revoke tokens
+app.post('/api/auth/logout', authMiddleware, (req, res) => {
+  const authHeader = req.headers.authorization;
+  if (authHeader) {
+    const token = authHeader.split(' ')[1];
+    jwtService.revokeToken(token);
+  }
+  res.json({ message: 'Logged out successfully' });
 });
 
 // ============ TRACKING ROUTES (Public) ============
 
-// Track performance metrics
-app.post('/api/track-performance', async (req, res) => {
-  try {
-    const { name, delta, value, id, page, timestamp, userAgent, connection } = req.body;
-    
-    await pool.query(
-      'INSERT INTO performance_metrics (name, delta, value, metric_id, page, user_agent, connection, ip, timestamp) VALUES (\$1, \$2, \$3, \$4, \$5, \$6, \$7, \$8, \$9)',
-      [name, delta, value, id, page, userAgent, JSON.stringify(connection), req.ip, timestamp]
-    );
-    
-    res.json({ success: true });
-  } catch (err) {
-    console.error('Track performance error:', err);
-    res.status(500).json({ error: 'Failed to track performance' });
+// Track performance metrics with rate limiting and validation
+app.post('/api/track-performance',
+  publicTrackingLimiter,
+  [
+    body('name').trim().isIn(['CLS', 'FCP', 'FID', 'INP', 'LCP', 'TTFB']).withMessage('Invalid metric name'),
+    body('value').isFloat({ min: 0 }).withMessage('Value must be a positive number'),
+    body('page').trim().isLength({ max: 500 }).withMessage('Page URL too long'),
+  ],
+  handleValidationErrors,
+  async (req, res) => {
+    try {
+      const { name, delta, value, id, page, timestamp, userAgent, connection } = req.body;
+      
+      // Get real IP address
+      const ip = req.headers['x-forwarded-for']?.split(',')[0] || req.socket.remoteAddress || req.ip;
+      
+      await pool.query(
+        'INSERT INTO performance_metrics (name, delta, value, metric_id, page, user_agent, connection, ip, timestamp) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)',
+        [name, delta, value, id, page, userAgent, JSON.stringify(connection), ip, timestamp]
+      );
+      
+      res.json({ success: true });
+    } catch (err) {
+      console.error('Track performance error:', err);
+      res.status(500).json({ error: 'Failed to track performance' });
+    }
   }
-});
+);
 
-// Track visit with geography
-app.post('/api/track-visit', async (req, res) => {
-  try {
-    const ip = req.headers['x-forwarded-for'] || req.connection.remoteAddress;
+// Track visit with geography and rate limiting
+app.post('/api/track-visit',
+  publicTrackingLimiter,
+  [
+    body('page').trim().isLength({ max: 500 }).withMessage('Page URL too long'),
+    body('referrer').optional().trim().isLength({ max: 1000 }).withMessage('Referrer too long'),
+  ],
+  handleValidationErrors,
+  async (req, res) => {
+    try {
+      // Get real IP address
+      const ip = req.headers['x-forwarded-for']?.split(',')[0] || req.socket.remoteAddress || req.ip;
     
     // Get geo data from IP (using ipapi.co)
     let geoData = {};
@@ -488,10 +922,11 @@ app.post('/api/track-error', async (req, res) => {
   }
 });
 
-// ============ ANALYTICS ROUTES (Protected) ============
+// ============ ANALYTICS ROUTES (SuperAdmin Only) ============
+// Note: Full analytics dashboard available at secret SuperAdmin path
 
-// Get performance metrics
-app.get('/api/analytics/performance', authMiddleware, async (req, res) => {
+// Get performance metrics (SuperAdmin only)
+app.get('/api/analytics/performance', apiLimiter, authMiddleware, requireRole('superadmin'), async (req, res) => {
   try {
     const { startDate, endDate, page } = req.query;
     
@@ -540,7 +975,7 @@ app.get('/api/analytics/performance', authMiddleware, async (req, res) => {
 });
 
 // Get geographic data
-app.get('/api/analytics/geography', authMiddleware, async (req, res) => {
+app.get('/api/analytics/geography', apiLimiter, authMiddleware, requireRole('superadmin'), async (req, res) => {
   try {
     // Aggregate by country
     const byCountryResult = await pool.query(`
@@ -585,7 +1020,7 @@ app.get('/api/analytics/geography', authMiddleware, async (req, res) => {
 });
 
 // Get events
-app.get('/api/analytics/events', authMiddleware, async (req, res) => {
+app.get('/api/analytics/events', apiLimiter, authMiddleware, requireRole('superadmin'), async (req, res) => {
   try {
     const { type, startDate, endDate } = req.query;
     
@@ -616,7 +1051,7 @@ app.get('/api/analytics/events', authMiddleware, async (req, res) => {
 });
 
 // Get errors
-app.get('/api/analytics/errors', authMiddleware, async (req, res) => {
+app.get('/api/analytics/errors', apiLimiter, authMiddleware, requireRole('superadmin'), async (req, res) => {
   try {
     const result = await pool.query('SELECT * FROM errors ORDER BY timestamp DESC LIMIT 100');
     
@@ -628,7 +1063,7 @@ app.get('/api/analytics/errors', authMiddleware, async (req, res) => {
 });
 
 // Get dashboard summary
-app.get('/api/analytics/summary', authMiddleware, async (req, res) => {
+app.get('/api/analytics/summary', apiLimiter, authMiddleware, requireRole('superadmin'), async (req, res) => {
   try {
     const now = new Date();
     const last24h = new Date(now - 24 * 60 * 60 * 1000);
@@ -665,7 +1100,7 @@ app.get('/api/analytics/summary', authMiddleware, async (req, res) => {
 });
 
 // Get PageSpeed Insights results
-app.get('/api/analytics/pagespeed', authMiddleware, async (req, res) => {
+app.get('/api/analytics/pagespeed', apiLimiter, authMiddleware, requireRole('superadmin'), async (req, res) => {
   try {
     // Get latest results for mobile and desktop
     const latestMobile = await pool.query(
@@ -794,7 +1229,7 @@ app.post('/api/predict-route', async (req, res) => {
 // ========== A/B Testing Endpoints ==========
 
 // Create new A/B test experiment
-app.post('/api/experiments', authMiddleware, async (req, res) => {
+app.post('/api/experiments', authMiddleware, requireRole('superadmin'), async (req, res) => {
   try {
     const { name, description, variants } = req.body;
     
@@ -811,7 +1246,7 @@ app.post('/api/experiments', authMiddleware, async (req, res) => {
 });
 
 // Get all experiments
-app.get('/api/experiments', authMiddleware, async (req, res) => {
+app.get('/api/experiments', authMiddleware, requireRole('superadmin'), async (req, res) => {
   try {
     const result = await pool.query(
       'SELECT * FROM experiments ORDER BY created_at DESC'
@@ -824,7 +1259,7 @@ app.get('/api/experiments', authMiddleware, async (req, res) => {
 });
 
 // Get experiment by ID with statistics
-app.get('/api/experiments/:id', authMiddleware, async (req, res) => {
+app.get('/api/experiments/:id', authMiddleware, requireRole('superadmin'), async (req, res) => {
   try {
     const { id } = req.params;
     
@@ -940,7 +1375,7 @@ app.post('/api/experiments/:id/convert', async (req, res) => {
 });
 
 // End experiment
-app.post('/api/experiments/:id/end', authMiddleware, async (req, res) => {
+app.post('/api/experiments/:id/end', authMiddleware, requireRole('superadmin'), async (req, res) => {
   try {
     const { id } = req.params;
     
@@ -984,7 +1419,7 @@ async function getGoogleAccessToken() {
 }
 
 // Get Search Console queries data
-app.get('/api/search-console/queries', authMiddleware, async (req, res) => {
+app.get('/api/search-console/queries', authMiddleware, requireRole('superadmin'), async (req, res) => {
   try {
     const accessToken = await getGoogleAccessToken();
     const siteUrl = 'https://www.finaceverse.io';
@@ -1035,7 +1470,7 @@ app.get('/api/search-console/queries', authMiddleware, async (req, res) => {
 });
 
 // Get Search Console performance over time
-app.get('/api/search-console/performance', authMiddleware, async (req, res) => {
+app.get('/api/search-console/performance', authMiddleware, requireRole('superadmin'), async (req, res) => {
   try {
     const accessToken = await getGoogleAccessToken();
     const siteUrl = 'https://www.finaceverse.io';
@@ -1080,14 +1515,17 @@ app.get('/api/search-console/performance', authMiddleware, async (req, res) => {
 });
 
 // =====================================================================
-// SEO AI INFRASTRUCTURE ENDPOINTS
+// SEO AI INFRASTRUCTURE ENDPOINTS (with military-grade security)
 // =====================================================================
 
-// Get all target keywords
-app.get('/api/seo/keywords', authMiddleware, async (req, res) => {
+// Get all target keywords (with tenant isolation)
+app.get('/api/seo/keywords', authMiddleware, requireRole('superadmin'), seoLimiter, async (req, res) => {
   try {
+    // Tenant-isolated query
+    const tenantId = req.tenantId || 'platform';
     const result = await pool.query(`
       SELECT * FROM target_keywords 
+      WHERE tenant_id = $1
       ORDER BY 
         CASE keyword_type
           WHEN 'primary' THEN 1
@@ -1096,7 +1534,7 @@ app.get('/api/seo/keywords', authMiddleware, async (req, res) => {
           ELSE 4
         END,
         priority DESC
-    `);
+    `, [tenantId]);
     
     res.json({
       keywords: result.rows,
@@ -1108,19 +1546,27 @@ app.get('/api/seo/keywords', authMiddleware, async (req, res) => {
   }
 });
 
-// Scan a specific page for keyword optimization
-app.get('/api/seo/scan/:page', authMiddleware, async (req, res) => {
+// Scan a specific page for keyword optimization (with SSRF protection)
+app.get('/api/seo/scan/:page', authMiddleware, requireRole('superadmin'), seoLimiter, async (req, res) => {
   try {
     if (!keywordOptimizer) {
       return res.status(503).json({ error: 'SEO optimizer not available' });
     }
     
     const { page } = req.params;
-    const pageUrl = page === 'home' ? 
-      'https://www.finaceverse.io/' : 
-      `https://www.finaceverse.io/${page}`;
     
-    console.log(`📊 Scanning page: ${pageUrl}`);
+    // SECURITY: Validate page parameter to prevent path traversal
+    const sanitizedPage = page.replace(/[^a-zA-Z0-9-_]/g, '');
+    if (sanitizedPage !== page) {
+      console.warn(`🚨 Potential path traversal attempt: ${page}`);
+      return res.status(400).json({ error: 'Invalid page parameter' });
+    }
+    
+    const pageUrl = sanitizedPage === 'home' ? 
+      'https://www.finaceverse.io/' : 
+      `https://www.finaceverse.io/${sanitizedPage}`;
+    
+    console.log(`📊 Scanning page: ${pageUrl} (tenant: ${req.tenantId})`);
     const analysis = await keywordOptimizer.scanPageOptimization(pageUrl);
     
     res.json(analysis);
@@ -1130,14 +1576,14 @@ app.get('/api/seo/scan/:page', authMiddleware, async (req, res) => {
   }
 });
 
-// Scan all pages
-app.post('/api/seo/scan-all', authMiddleware, async (req, res) => {
+// Scan all pages (expensive operation - strict rate limit)
+app.post('/api/seo/scan-all', authMiddleware, requireRole('superadmin'), seoLimiter, async (req, res) => {
   try {
     if (!keywordOptimizer) {
       return res.status(503).json({ error: 'SEO optimizer not available' });
     }
     
-    console.log('📊 Starting full site scan...');
+    console.log(`📊 Starting full site scan... (tenant: ${req.tenantId}, user: ${req.username})`);
     const results = await keywordOptimizer.scanAllPages();
     
     res.json({
@@ -1152,7 +1598,7 @@ app.post('/api/seo/scan-all', authMiddleware, async (req, res) => {
 });
 
 // Generate SEO report
-app.get('/api/seo/report', authMiddleware, async (req, res) => {
+app.get('/api/seo/report', authMiddleware, requireRole('superadmin'), seoLimiter, async (req, res) => {
   try {
     if (!keywordOptimizer) {
       return res.status(503).json({ error: 'SEO optimizer not available' });
@@ -1167,7 +1613,7 @@ app.get('/api/seo/report', authMiddleware, async (req, res) => {
 });
 
 // Get content analysis history for a page
-app.get('/api/seo/history/:page', authMiddleware, async (req, res) => {
+app.get('/api/seo/history/:page', authMiddleware, requireRole('superadmin'), async (req, res) => {
   try {
     const { page } = req.params;
     const pageUrl = page === 'home' ? 
@@ -1203,7 +1649,7 @@ app.get('/api/seo/history/:page', authMiddleware, async (req, res) => {
 });
 
 // Get SEO issues
-app.get('/api/seo/issues', authMiddleware, async (req, res) => {
+app.get('/api/seo/issues', authMiddleware, requireRole('superadmin'), async (req, res) => {
   try {
     const { severity, page, autoFixable } = req.query;
     
@@ -1249,7 +1695,7 @@ app.get('/api/seo/issues', authMiddleware, async (req, res) => {
 // =====================================================================
 
 // Get local SEO status for all countries
-app.get('/api/local-seo/status', authMiddleware, async (req, res) => {
+app.get('/api/local-seo/status', authMiddleware, requireRole('superadmin'), async (req, res) => {
   try {
     if (!localSEOManager) {
       return res.status(503).json({ error: 'Local SEO manager not available' });
@@ -1267,7 +1713,7 @@ app.get('/api/local-seo/status', authMiddleware, async (req, res) => {
 });
 
 // Setup local SEO for a specific country
-app.post('/api/local-seo/setup/:countryCode', authMiddleware, async (req, res) => {
+app.post('/api/local-seo/setup/:countryCode', authMiddleware, requireRole('superadmin'), async (req, res) => {
   try {
     if (!localSEOManager) {
       return res.status(503).json({ error: 'Local SEO manager not available' });
@@ -1285,7 +1731,7 @@ app.post('/api/local-seo/setup/:countryCode', authMiddleware, async (req, res) =
 });
 
 // Setup all countries at once
-app.post('/api/local-seo/setup-all', authMiddleware, async (req, res) => {
+app.post('/api/local-seo/setup-all', authMiddleware, requireRole('superadmin'), async (req, res) => {
   try {
     if (!localSEOManager) {
       return res.status(503).json({ error: 'Local SEO manager not available' });
@@ -1311,7 +1757,7 @@ app.post('/api/local-seo/setup-all', authMiddleware, async (req, res) => {
 });
 
 // Get country priorities
-app.get('/api/local-seo/priorities', authMiddleware, async (req, res) => {
+app.get('/api/local-seo/priorities', authMiddleware, requireRole('superadmin'), async (req, res) => {
   try {
     if (!localSEOManager) {
       return res.status(503).json({ error: 'Local SEO manager not available' });
@@ -1326,7 +1772,7 @@ app.get('/api/local-seo/priorities', authMiddleware, async (req, res) => {
 });
 
 // Get city pages for a country
-app.get('/api/local-seo/cities/:countryCode', authMiddleware, async (req, res) => {
+app.get('/api/local-seo/cities/:countryCode', authMiddleware, requireRole('superadmin'), async (req, res) => {
   try {
     const { countryCode } = req.params;
     
@@ -1351,6 +1797,74 @@ app.get('/api/local-seo/cities/:countryCode', authMiddleware, async (req, res) =
 app.get('/api/health', (req, res) => {
   res.json({ status: 'healthy', timestamp: new Date().toISOString() });
 });
+
+// ============ SECURITY STATUS ENDPOINT ============
+
+// Get security status (admin only)
+app.get('/api/security/status', authMiddleware, requireRole('admin'), (req, res) => {
+  res.json({
+    status: 'active',
+    features: {
+      encryption: 'AES-256-GCM',
+      jwt: {
+        algorithm: 'HS256',
+        accessTokenExpiry: '15m',
+        refreshTokenExpiry: '7d',
+        fingerprinting: true,
+      },
+      csrf: 'Double Submit Cookie',
+      ssrf: 'URL Whitelist + IP Blocking',
+      xss: 'HTML Sanitization via Cheerio wrapper',
+      rateLimit: {
+        strategy: 'Scale-ready for 100K+ users',
+        burst: '50 per second per IP (DoS protection)',
+        auth: '10 per 15min per IP (brute force protection)',
+        api: '300 per min per user (authenticated)',
+        seo: '30 per min per tenant (admin operations)',
+        tracking: '1000 per min per IP (public analytics)',
+      },
+      multiTenant: true,
+      auditLog: true,
+    },
+    headers: {
+      helmet: true,
+      hsts: true,
+      csp: true,
+      cors: 'Whitelist only',
+    },
+    timestamp: new Date().toISOString(),
+  });
+});
+
+// Encrypt sensitive data endpoint (admin only)
+app.post('/api/security/encrypt', authMiddleware, requireRole('admin'),
+  [body('data').notEmpty().withMessage('Data is required')],
+  handleValidationErrors,
+  (req, res) => {
+    try {
+      const { data } = req.body;
+      const encrypted = encryptionService.encrypt(data);
+      res.json({ encrypted });
+    } catch (error) {
+      res.status(500).json({ error: 'Encryption failed' });
+    }
+  }
+);
+
+// Decrypt sensitive data endpoint (admin only)
+app.post('/api/security/decrypt', authMiddleware, requireRole('admin'),
+  [body('encrypted').notEmpty().withMessage('Encrypted data is required')],
+  handleValidationErrors,
+  (req, res) => {
+    try {
+      const { encrypted } = req.body;
+      const decrypted = encryptionService.decrypt(encrypted);
+      res.json({ decrypted });
+    } catch (error) {
+      res.status(500).json({ error: 'Decryption failed - data may be corrupted' });
+    }
+  }
+);
 
 // Catch-all route - serve React app for any non-API routes (Express 5 compatible)
 app.use((req, res) => {

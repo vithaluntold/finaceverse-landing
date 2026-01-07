@@ -103,7 +103,7 @@ const Home = (props) => {
       </section>
       <section className="market-bento">
         <div className="container-wrapper">
-          <div className="section-header">
+          <div className="section-header centered">
             <h2 className="section-title">
               <span>
                 {' '}
@@ -116,9 +116,8 @@ const Home = (props) => {
               </span>
               <span className="home-thq-text-accent-elm1">Crisis</span>
             </h2>
-            <p className="section-subtitle">
-              Outdated systems and siloed data are hindering the effectiveness
-              of modern financial professions.
+            <p className="section-subtitle" style={{maxWidth: '600px', margin: 'var(--spacing-md) auto 0', textAlign: 'center'}}>
+              Outdated systems and siloed data are hindering the effectiveness of modern financial professions.
             </p>
           </div>
           <div className="bento-grid">
@@ -191,7 +190,7 @@ const Home = (props) => {
               <span>Who </span>
               <span className="home-thq-text-gradient-elm2">It&apos;s Built For</span>
             </h2>
-            <p className="section-subtitle">
+            <p className="section-subtitle" style={{maxWidth: '600px', margin: 'var(--spacing-md) auto 0', textAlign: 'center'}}>
               Whether you&apos;re a solo practitioner or a global enterprise, FinACEverse scales to your needs
             </p>
           </div>
@@ -273,9 +272,8 @@ const Home = (props) => {
               </span>
               <span className="home-thq-text-gradient-elm2">Architecture</span>
             </h2>
-            <p className="section-subtitle">
-              How FinACEverse transforms documents into indisputable financial
-              facts.
+            <p className="section-subtitle" style={{maxWidth: '600px', margin: 'var(--spacing-md) auto 0', textAlign: 'center'}}>
+              How FinACEverse transforms documents into indisputable financial facts
             </p>
           </div>
           <div className="timeline-wrapper">
@@ -523,16 +521,15 @@ const Home = (props) => {
           </div>
         </div>
       </section>
-      <section className="market-bento" style={{background: 'var(--color-surface)', padding: 'var(--spacing-4xl) 0'}}>
+      <section className="modules-together" style={{background: 'var(--color-surface)', padding: 'var(--spacing-4xl) 0'}}>
         <div className="container-wrapper">
-          <div className="section-header" style={{textAlign: 'center', maxWidth: '800px', margin: '0 auto var(--spacing-3xl)'}}>
-            <h2 className="section-title">
+          <div style={{textAlign: 'center', maxWidth: '900px', margin: '0 auto var(--spacing-3xl)', width: '100%'}}>
+            <h2 className="section-title" style={{textAlign: 'center', marginBottom: 'var(--spacing-md)'}}>
               <span>How the </span>
               <span className="home-thq-text-gradient-elm2">7 Modules Work Together</span>
             </h2>
-            <p className="section-subtitle">
-              Each module solves a specific problem. Together, they create an intelligent ecosystem 
-              where the whole is greater than the sum of its parts.
+            <p style={{opacity: 0.85, fontSize: 'var(--font-size-lg)', maxWidth: '700px', margin: '0 auto', textAlign: 'center', lineHeight: 1.6}}>
+              Each module solves a specific problem. Together, they create an intelligent ecosystem where the whole is greater than the sum of its parts.
             </p>
           </div>
           

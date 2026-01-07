@@ -1340,6 +1340,16 @@
   padding: var(--spacing-4xl) 0;
   background: var(--color-surface);
 }
+
+.modules-together {
+  padding: var(--spacing-4xl) 0;
+  background: var(--color-surface);
+}
+
+.modules-together .container-wrapper > div:first-child {
+  display: block;
+  width: 100%;
+}
  
 .container-wrapper {
   margin: 0 auto;
