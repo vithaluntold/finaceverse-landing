@@ -38,6 +38,9 @@ const LocalSEOManager = require('./src/seo-ai/local-seo-manager');
 const app = express();
 const PORT = process.env.PORT || 5000;
 
+// Trust proxy for Railway/Cloudflare (required for rate limiting behind reverse proxy)
+app.set('trust proxy', 1);
+
 // Validate critical environment variables
 const requiredEnvVars = ['JWT_SECRET', 'JWT_REFRESH_SECRET', 'ENCRYPTION_KEY', 'DATABASE_URL'];
 const missingEnvVars = requiredEnvVars.filter(varName => !process.env[varName] || process.env[varName] === 'your-secret-key-change-in-production');
@@ -158,7 +161,7 @@ const authLimiter = rateLimit({
   message: 'Too many authentication attempts, please try again later',
   standardHeaders: true,
   legacyHeaders: false,
-  keyGenerator: (req) => req.ip, // Per IP
+  validate: { trustProxy: false, xForwardedForHeader: false },
 });
 
 // API limiter - HIGH LIMITS for authenticated users
@@ -169,6 +172,7 @@ const apiLimiter = rateLimit({
   message: 'API rate limit exceeded, please slow down',
   standardHeaders: true,
   legacyHeaders: false,
+  validate: { trustProxy: false, xForwardedForHeader: false },
   keyGenerator: (req) => {
     // Use userId if authenticated, otherwise IP
     return req.userId ? `user:${req.userId}` : `ip:${req.ip}`;
@@ -187,6 +191,7 @@ const publicTrackingLimiter = rateLimit({
   message: 'Rate limit exceeded',
   standardHeaders: true,
   legacyHeaders: false,
+  validate: { trustProxy: false, xForwardedForHeader: false },
   // For tracking, we use a sliding window to be more forgiving
   skip: (req) => {
     // Skip for internal health monitoring
@@ -201,6 +206,7 @@ const seoLimiter = rateLimit({
   message: 'SEO operations rate limit exceeded - these are resource-intensive',
   standardHeaders: true,
   legacyHeaders: false,
+  validate: { trustProxy: false, xForwardedForHeader: false },
   keyGenerator: (req) => {
     // Per tenant, not per IP (allows multiple admins)
     return `tenant:${req.tenantId || 'platform'}`;
@@ -214,6 +220,7 @@ const burstLimiter = rateLimit({
   message: 'Request burst detected, please slow down',
   standardHeaders: true,
   legacyHeaders: false,
+  validate: { trustProxy: false, xForwardedForHeader: false },
 });
 
 // Apply burst limiter globally (first line of defense)
