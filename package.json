@@ -24,12 +24,14 @@
     "fingerprintjs2": "^2.1.4",
     "form-data": "^4.0.0",
     "geoip-lite": "^1.4.10",
+    "googleapis": "^144.0.0",
     "helmet": "^8.1.0",
     "hpp": "^0.2.3",
     "jsonwebtoken": "^9.0.3",
     "mailgun.js": "^9.2.0",
     "maxmind": "^5.0.3",
     "node-fetch": "^2.7.0",
+    "nodemailer": "^6.9.15",
     "pg": "^8.11.3",
     "puppeteer": "^24.34.0",
     "react": "^17.0.2",
@@ -53,7 +55,9 @@
     "build": "craco build",
     "test": "craco test --env=jsdom",
     "eject": "craco eject",
-    "init-db": "node init-db.js"
+    "init-db": "node init-db.js",
+    "seo:scan": "node daily-seo-cron.js",
+    "seo:daily": "node daily-seo-cron.js"
   },
   "engines": {
     "node": ">=18.x"

@@ -34,6 +34,10 @@ const {
 // SEO AI Services
 const KeywordOptimizer = require('./src/seo-ai/keyword-optimizer');
 const LocalSEOManager = require('./src/seo-ai/local-seo-manager');
+const AutoScanner = require('./src/seo-ai/auto-scanner');
+const BacklinkCrawler = require('./src/seo-ai/backlink-crawler');
+const GSCIntegration = require('./src/seo-ai/gsc-integration');
+const AutoFixer = require('./src/seo-ai/auto-fixer');
 
 const app = express();
 const PORT = process.env.PORT || 5000;
@@ -250,6 +254,10 @@ const pool = new Pool({
 // Initialize SEO AI services with security wrappers
 let keywordOptimizer;
 let localSEOManager;
+let autoScanner;
+let backlinkCrawler;
+let gscIntegration;
+let autoFixer;
 let auditLogger;
 let advancedRateLimiter;
 let superAdminAuth;
@@ -258,6 +266,10 @@ try {
   // Pass SSRF protection and XSS sanitizer to SEO services
   keywordOptimizer = new KeywordOptimizer(pool, { ssrfProtection, xssSanitizer });
   localSEOManager = new LocalSEOManager(pool);
+  autoScanner = new AutoScanner({ pool, ssrfProtection, xssSanitizer });
+  backlinkCrawler = new BacklinkCrawler(pool);
+  gscIntegration = new GSCIntegration(pool);
+  autoFixer = new AutoFixer(pool);
   console.log('✓ SEO AI services initialized (with security wrappers)');
 } catch (error) {
   console.warn('⚠️  SEO AI services not available:', error.message);
@@ -1694,6 +1706,168 @@ app.get('/api/seo/issues', authMiddleware, requireRole('superadmin'), async (req
   } catch (error) {
     console.error('Issues fetch error:', error);
     res.status(500).json({ error: 'Failed to fetch issues' });
+  }
+});
+
+// Auto-scan endpoint (run daily scan manually)
+app.post('/api/seo/auto-scan', authMiddleware, requireRole('superadmin'), seoLimiter, async (req, res) => {
+  try {
+    if (!autoScanner) {
+      return res.status(503).json({ error: 'Auto-scanner not available' });
+    }
+    
+    const result = await autoScanner.runDailyScan();
+    res.json(result);
+  } catch (error) {
+    console.error('Auto-scan error:', error);
+    res.status(500).json({ error: error.message });
+  }
+});
+
+// Backlink crawler endpoints
+app.post('/api/seo/backlinks/crawl', authMiddleware, requireRole('superadmin'), seoLimiter, async (req, res) => {
+  try {
+    if (!backlinkCrawler) {
+      return res.status(503).json({ error: 'Backlink crawler not available' });
+    }
+    
+    const result = await backlinkCrawler.crawlBacklinks();
+    res.json(result);
+  } catch (error) {
+    console.error('Backlink crawl error:', error);
+    res.status(500).json({ error: error.message });
+  }
+});
+
+app.get('/api/seo/backlinks/stats', authMiddleware, requireRole('superadmin'), async (req, res) => {
+  try {
+    if (!backlinkCrawler) {
+      return res.status(503).json({ error: 'Backlink crawler not available' });
+    }
+    
+    const stats = await backlinkCrawler.getBacklinkStats();
+    res.json({ stats });
+  } catch (error) {
+    console.error('Backlink stats error:', error);
+    res.status(500).json({ error: error.message });
+  }
+});
+
+app.get('/api/seo/backlinks/top', authMiddleware, requireRole('superadmin'), async (req, res) => {
+  try {
+    if (!backlinkCrawler) {
+      return res.status(503).json({ error: 'Backlink crawler not available' });
+    }
+    
+    const limit = parseInt(req.query.limit) || 10;
+    const backlinks = await backlinkCrawler.getTopBacklinks(limit);
+    res.json({ backlinks, count: backlinks.length });
+  } catch (error) {
+    console.error('Top backlinks error:', error);
+    res.status(500).json({ error: error.message });
+  }
+});
+
+// Google Search Console integration endpoints
+app.post('/api/seo/gsc/fetch-rankings', authMiddleware, requireRole('superadmin'), seoLimiter, async (req, res) => {
+  try {
+    if (!gscIntegration) {
+      return res.status(503).json({ error: 'GSC integration not available' });
+    }
+    
+    const days = parseInt(req.body.days) || 7;
+    const result = await gscIntegration.fetchKeywordRankings(days);
+    res.json(result);
+  } catch (error) {
+    console.error('GSC fetch error:', error);
+    res.status(500).json({ error: error.message });
+  }
+});
+
+app.get('/api/seo/gsc/summary', authMiddleware, requireRole('superadmin'), async (req, res) => {
+  try {
+    if (!gscIntegration) {
+      return res.status(503).json({ error: 'GSC integration not available' });
+    }
+    
+    const summary = await gscIntegration.getPerformanceSummary();
+    res.json(summary);
+  } catch (error) {
+    console.error('GSC summary error:', error);
+    res.status(500).json({ error: error.message });
+  }
+});
+
+app.get('/api/seo/gsc/top-keywords', authMiddleware, requireRole('superadmin'), async (req, res) => {
+  try {
+    if (!gscIntegration) {
+      return res.status(503).json({ error: 'GSC integration not available' });
+    }
+    
+    const limit = parseInt(req.query.limit) || 20;
+    const keywords = await gscIntegration.getTopKeywords(limit);
+    res.json({ keywords, count: keywords.length });
+  } catch (error) {
+    console.error('Top keywords error:', error);
+    res.status(500).json({ error: error.message });
+  }
+});
+
+app.get('/api/seo/gsc/opportunities', authMiddleware, requireRole('superadmin'), async (req, res) => {
+  try {
+    if (!gscIntegration) {
+      return res.status(503).json({ error: 'GSC integration not available' });
+    }
+    
+    const opportunities = await gscIntegration.getKeywordOpportunities();
+    res.json({ opportunities, count: opportunities.length });
+  } catch (error) {
+    console.error('Opportunities error:', error);
+    res.status(500).json({ error: error.message });
+  }
+});
+
+// Auto-fix endpoints
+app.post('/api/seo/auto-fix', authMiddleware, requireRole('superadmin'), seoLimiter, async (req, res) => {
+  try {
+    if (!autoFixer) {
+      return res.status(503).json({ error: 'Auto-fixer not available' });
+    }
+    
+    const result = await autoFixer.fixAllIssues();
+    res.json(result);
+  } catch (error) {
+    console.error('Auto-fix error:', error);
+    res.status(500).json({ error: error.message });
+  }
+});
+
+app.get('/api/seo/auto-fix/history', authMiddleware, requireRole('superadmin'), async (req, res) => {
+  try {
+    if (!autoFixer) {
+      return res.status(503).json({ error: 'Auto-fixer not available' });
+    }
+    
+    const limit = parseInt(req.query.limit) || 20;
+    const history = await autoFixer.getFixHistory(limit);
+    res.json({ history, count: history.length });
+  } catch (error) {
+    console.error('Fix history error:', error);
+    res.status(500).json({ error: error.message });
+  }
+});
+
+app.get('/api/seo/auto-fix/stats', authMiddleware, requireRole('superadmin'), async (req, res) => {
+  try {
+    if (!autoFixer) {
+      return res.status(503).json({ error: 'Auto-fixer not available' });
+    }
+    
+    const stats = await autoFixer.getFixStats();
+    res.json(stats);
+  } catch (error) {
+    console.error('Fix stats error:', error);
+    res.status(500).json({ error: error.message });
   }
 });
 
