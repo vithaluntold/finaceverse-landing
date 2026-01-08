@@ -40,7 +40,7 @@ class KeywordOptimizer {
       });
       
       // Wait for React to render
-      await page.waitForTimeout(2000);
+      await new Promise(resolve => setTimeout(resolve, 2000));
       
       // Get rendered HTML
       const html = await page.content();
@@ -422,7 +422,7 @@ class KeywordOptimizer {
     try {
       await this.pool.query(
         `INSERT INTO content_analysis 
-         (page_url, seo_score, heading_structure, images_count, images_without_alt, meta_title, meta_description, analyzed_at)
+         (page_url, seo_score, heading_structure, images_count, images_without_alt, meta_title, meta_description, scanned_at)
          VALUES ($1, $2, $3, $4, $5, $6, $7, CURRENT_TIMESTAMP)`,
         [
           analysis.pageUrl,

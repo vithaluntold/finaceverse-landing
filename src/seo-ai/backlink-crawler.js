@@ -176,22 +176,35 @@ class BacklinkCrawler {
   }
 
   async storeBacklink(backlink) {
-    await this.pool.query(
-      `INSERT INTO backlink_monitor 
-       (source_url, target_url, anchor_text, discovered_via, status, domain_authority, is_dofollow, first_seen, last_checked)
-       VALUES ($1, $2, $3, $4, $5, $6, $7, NOW(), NOW())
-       ON CONFLICT (source_url, target_url) DO UPDATE SET
-       last_checked = NOW(), status = $5`,
-      [
-        backlink.source_url,
-        `https://${this.domain}`,
-        backlink.anchor_text,
-        backlink.discovered_via,
-        backlink.status,
-        backlink.domain_authority,
-        backlink.is_dofollow
-      ]
+    // Check if backlink already exists
+    const existing = await this.pool.query(
+      'SELECT id FROM backlink_monitor WHERE source_url = $1 AND target_url = $2',
+      [backlink.source_url, `https://${this.domain}`]
     );
+    
+    if (existing.rows.length > 0) {
+      // Update existing
+      await this.pool.query(
+        `UPDATE backlink_monitor SET last_checked = NOW(), status = $1 WHERE id = $2`,
+        [backlink.status, existing.rows[0].id]
+      );
+    } else {
+      // Insert new
+      await this.pool.query(
+        `INSERT INTO backlink_monitor 
+         (source_url, target_url, anchor_text, discovered_via, status, domain_authority, is_dofollow, first_seen, last_checked)
+         VALUES ($1, $2, $3, $4, $5, $6, $7, NOW(), NOW())`,
+        [
+          backlink.source_url,
+          `https://${this.domain}`,
+          backlink.anchor_text,
+          backlink.discovered_via,
+          backlink.status,
+          backlink.domain_authority,
+          backlink.is_dofollow
+        ]
+      );
+    }
   }
 
   async getBacklinkStats() {
