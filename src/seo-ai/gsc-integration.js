@@ -11,7 +11,7 @@ class GSCIntegration {
       ssl: process.env.NODE_ENV === 'production' ? { rejectUnauthorized: false } : false
     });
     
-    this.siteUrl = options.siteUrl || 'sc-domain:finaceverse.io';
+    this.siteUrl = options.siteUrl || 'https://www.finaceverse.io/';
     
     // Initialize Google Search Console API client
     this.initializeGSC();
@@ -96,15 +96,32 @@ class GSCIntegration {
     const [query, page] = row.keys;
     const { clicks, impressions, ctr, position } = row;
     
+    // Find or create keyword in target_keywords
+    let keywordResult = await this.pool.query(
+      'SELECT id FROM target_keywords WHERE keyword = $1',
+      [query]
+    );
+    
+    let keywordId;
+    if (keywordResult.rows.length === 0) {
+      // Create new keyword discovered from GSC
+      const insertResult = await this.pool.query(
+        `INSERT INTO target_keywords (keyword, keyword_type, target_page, search_volume, created_at, updated_at)
+         VALUES ($1, 'discovered', $2, $3, NOW(), NOW())
+         RETURNING id`,
+        [query, page, impressions]
+      );
+      keywordId = insertResult.rows[0].id;
+    } else {
+      keywordId = keywordResult.rows[0].id;
+    }
+    
+    // Store the ranking
     await this.pool.query(
       `INSERT INTO keyword_rankings_history 
-       (keyword_id, page_url, ranking_position, search_volume, ranking_date, clicks, impressions, ctr)
-       VALUES (
-         (SELECT id FROM target_keywords WHERE keyword_text = $1 LIMIT 1),
-         $2, $3, $4, NOW(), $5, $6, $7
-       )
-       ON CONFLICT DO NOTHING`,
-      [query, page, Math.round(position), impressions, clicks, impressions, ctr]
+       (keyword_id, url, position, search_volume, recorded_at, clicks, impressions, ctr)
+       VALUES ($1, $2, $3, $4, NOW(), $5, $6, $7)`,
+      [keywordId, page, Math.round(position), impressions, clicks, impressions, ctr]
     );
   }
 
@@ -172,15 +189,15 @@ class GSCIntegration {
     const result = await this.pool.query(`
       SELECT 
         COUNT(DISTINCT tk.id) as tracked_keywords,
-        AVG(krh.ranking_position) as avg_position,
+        AVG(krh.position) as avg_position,
         SUM(krh.clicks) as total_clicks,
         SUM(krh.impressions) as total_impressions,
         AVG(krh.ctr) as avg_ctr,
-        COUNT(CASE WHEN krh.ranking_position <= 3 THEN 1 END) as top_3_rankings,
-        COUNT(CASE WHEN krh.ranking_position <= 10 THEN 1 END) as top_10_rankings
+        COUNT(CASE WHEN krh.position <= 3 THEN 1 END) as top_3_rankings,
+        COUNT(CASE WHEN krh.position <= 10 THEN 1 END) as top_10_rankings
       FROM target_keywords tk
       LEFT JOIN keyword_rankings_history krh ON krh.keyword_id = tk.id
-      WHERE krh.ranking_date > NOW() - INTERVAL '7 days'
+      WHERE krh.recorded_at > NOW() - INTERVAL '7 days'
     `);
     
     return result.rows[0];
