@@ -62,7 +62,7 @@ const Home = (props) => {
             <p className="hero-subtitle">
               FinACEverse is a <strong>Cognitive Operating System</strong> for finance - AI software that thinks, 
               learns, and orchestrates your entire financial ecosystem. <strong>Accute</strong> orchestrates workflows, 
-              <strong>VAMN</strong> is the brain (an LLM with a cool mind of its own for numbers), and specialized 
+              <strong>VAMN</strong> is the quantitative intelligence engine (an LLM purpose-built for financial reasoning), and specialized 
               modules handle everything from document verification to process mining. We eliminate fragmentation 
               and restore coherence across all financial operations.
             </p>
