@@ -192,6 +192,12 @@ const ExpertConsultation = (props) => {
       </section>
 
       <Footer></Footer>
+      <a href="/request-demo">
+        <div aria-label="FinACEverse" className="consultation-container-floating">
+          <img src="/logo.svg" alt="FinACEverse" style={{width: '24px', height: '24px'}} />
+          <span className="consultation-text-floating">Propel Past Paradigms</span>
+        </div>
+      </a>
     </div>
   )
 }

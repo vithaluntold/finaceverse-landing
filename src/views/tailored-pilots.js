@@ -188,6 +188,12 @@ const TailoredPilots = (props) => {
       </section>
 
       <Footer></Footer>
+      <a href="/request-demo">
+        <div aria-label="FinACEverse" className="pilots-container-floating">
+          <img src="/logo.svg" alt="FinACEverse" style={{width: '24px', height: '24px'}} />
+          <span className="pilots-text-floating">Propel Past Paradigms</span>
+        </div>
+      </a>
     </div>
   )
 }

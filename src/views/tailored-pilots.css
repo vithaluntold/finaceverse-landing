@@ -203,4 +203,50 @@
   .process-timeline {
     gap: var(--spacing-2xl);
   }
+
+  .pilots-container-floating {
+    right: 15px;
+    bottom: 15px;
+    padding: 6px 10px;
+  }
+  
+  .pilots-container-floating img {
+    width: 20px !important;
+    height: 20px !important;
+  }
+  
+  .pilots-text-floating {
+    font-size: 11px;
+  }
+}
+
+.pilots-container-floating {
+  right: 50px;
+  border: 1px solid #ffffff5c;
+  bottom: 30px;
+  display: flex;
+  gap: 12px;
+  z-index: 22;
+  position: fixed;
+  box-shadow: 5px 5px 10px 0px rgba(31, 31, 31, 0.4);
+  min-height: auto;
+  align-items: center;
+  padding-top: 8px;
+  padding-left: 12px;
+  border-radius: 8px;
+  padding-right: 12px;
+  padding-bottom: 8px;
+  -webkit-backdrop-filter: blur(6px);
+  backdrop-filter: blur(6px);
+  background-color: rgba(41, 41, 41, 0.41);
+  white-space: nowrap;
+  overflow: hidden;
+}
+
+.pilots-text-floating {
+  color: white;
+  font-size: 13px;
+  font-style: normal;
+  font-weight: 500;
+  line-height: 24px;
 }
