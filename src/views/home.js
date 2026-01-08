@@ -955,7 +955,7 @@ const Home = (props) => {
                   onSubmit={(e) => {
                     e.preventDefault();
                     const email = e.target.elements.email.value;
-                    window.location.href = `mailto:vithal@finacegroup.com?subject=Demo Request from ${email}&body=Business email: ${email}%0D%0A%0D%0AI'm interested in scheduling a demo of FinACEverse.`;
+                    window.location.href = `mailto:info@finacegroup.com?subject=Demo Request from ${email}&body=Business email: ${email}%0D%0A%0D%0AI'm interested in scheduling a demo of FinACEverse.`;
                   }}
                   className="cta-form"
                 >

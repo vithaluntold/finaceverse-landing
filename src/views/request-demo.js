@@ -182,7 +182,7 @@ const RequestDemo = (props) => {
           
           <div className="demo-cta-container">
             <a 
-              href="mailto:vithal@finacegroup.com?subject=Demo Request&body=I'm interested in scheduling a demo of FinACEverse.%0D%0A%0D%0AName:%0D%0ACompany:%0D%0ARole:%0D%0APreferred Date/Time:%0D%0ASpecific Areas of Interest:" 
+              href="mailto:info@finacegroup.com?subject=Demo Request&body=I'm interested in scheduling a demo of FinACEverse.%0D%0A%0D%0AName:%0D%0ACompany:%0D%0ARole:%0D%0APreferred Date/Time:%0D%0ASpecific Areas of Interest:" 
               className="btn btn-primary btn-lg"
             >
               Request Demo via Email

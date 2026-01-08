@@ -129,7 +129,7 @@ const Unsubscribe = () => {
                   
                   <p className="form-note">
                     You can also contact us at{' '}
-                    <a href="mailto:vithal@finacegroup.com">vithal@finacegroup.com</a>
+                    <a href="mailto:info@finacegroup.com">info@finacegroup.com</a>
                     {' '}for assistance.
                   </p>
                 </form>
@@ -146,7 +146,7 @@ const Unsubscribe = () => {
                     <li>Subscribe to specific topics like compliance or technology</li>
                   </ul>
                   <p className="section-content" style={{marginTop: '16px'}}>
-                    <a href="mailto:vithal@finacegroup.com?subject=Newsletter Preferences">
+                    <a href="mailto:info@finacegroup.com?subject=Newsletter Preferences">
                       Contact us to adjust your preferences
                     </a>
                   </p>

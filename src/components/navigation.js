@@ -236,7 +236,7 @@ const Navigation = (props) => {
             </li>
           </ul>
           <div className="navigation-mobile-actions">
-            <a href="mailto:vithal@finacegroup.com?subject=Demo Request">
+            <a href="mailto:info@finacegroup.com?subject=Demo Request">
               <div className="btn btn-primary btn-lg">
                 <span>Request Demo</span>
               </div>

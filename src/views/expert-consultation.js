@@ -179,7 +179,7 @@ const ExpertConsultation = (props) => {
               Open Calendar & Book Appointment
             </a>
             <p className="booking-alternative section-content">
-              Or email us at <a href="mailto:vithal@finacegroup.com?subject=Consultation Request&body=I'd like to schedule a 45-minute consultation.%0D%0A%0D%0AName:%0D%0ACompany:%0D%0ARole:%0D%0APreferred Date/Time:%0D%0ATopics to Discuss:" style={{color: 'var(--color-primary)'}}>vithal@finacegroup.com</a> with your preferred date and time.
+              Or email us at <a href="mailto:info@finacegroup.com?subject=Consultation Request&body=I'd like to schedule a 45-minute consultation.%0D%0A%0D%0AName:%0D%0ACompany:%0D%0ARole:%0D%0APreferred Date/Time:%0D%0ATopics to Discuss:" style={{color: 'var(--color-primary)'}}>info@finacegroup.com</a> with your preferred date and time.
             </p>
           </div>
           
