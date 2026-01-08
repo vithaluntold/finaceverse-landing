@@ -485,12 +485,12 @@ const Modules = (props) => {
                 FinACEverse is built for your scale.
               </p>
               <div className="cta-buttons">
-                <a href="#">
+                <a href="/tailored-pilots">
                   <div className="btn btn-accent btn-xl">
                     <span>Request Enterprise Pilot</span>
                   </div>
                 </a>
-                <a href="#">
+                <a href="/expert-consultation">
                   <div className="btn btn-outline btn-xl">
                     <span>Speak to a Technical Expert</span>
                   </div>

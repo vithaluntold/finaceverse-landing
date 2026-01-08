@@ -411,7 +411,7 @@ const CompliancePrivacy = (props) => {
                 <p className="section-content">
                   The VAMN Architecture: Arithmetic Verification in Finance.
                 </p>
-                <a href="#">
+                <a href="/request-demo">
                   <div className="btn btn-link">
                     <span>Download PDF</span>
                   </div>
@@ -425,7 +425,7 @@ const CompliancePrivacy = (props) => {
                   Step-by-step guides for SOC 2 and GDPR alignment using
                   FinACEverse.
                 </p>
-                <a href="#">
+                <a href="/request-demo">
                   <div className="btn btn-link">
                     <span>View Guides</span>
                   </div>
@@ -452,7 +452,7 @@ const CompliancePrivacy = (props) => {
                   Common questions about data residency, encryption, and our
                   privacy-by-design approach.
                 </p>
-                <a href="#">
+                <a href="/request-demo">
                   <div className="btn btn-link">
                     <span>Read FAQ</span>
                   </div>
