@@ -308,6 +308,8 @@ class SuperAdminAuthService {
     const expectedBuffer = Buffer.from(expectedKey);
     const providedBuffer = Buffer.from(providedKey.slice(0, expectedKey.length));
     
+    console.log(`🔍 Master Key Check - Expected length: ${expectedKey?.length}, Provided length: ${masterKey?.length}, Match: ${expectedKey === masterKey}`);
+    
     const masterKeyMatch = crypto.timingSafeEqual(providedBuffer, expectedBuffer);
     
     if (!masterKeyMatch) {
