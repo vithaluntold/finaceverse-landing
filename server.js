@@ -401,6 +401,18 @@ async function initializeDatabase() {
       CREATE INDEX IF NOT EXISTS idx_experiment_conversions_user ON experiment_conversions(user_id);
     `);
     
+    // Create superadmin user if not exists
+    const SUPERADMIN_PASSWORD = process.env.SUPERADMIN_PASSWORD || 'FinACE@SuperAdmin2026!Secure';
+    const hashedPassword = await bcrypt.hash(SUPERADMIN_PASSWORD, 10);
+    
+    await client.query(`
+      INSERT INTO users (username, password, role) 
+      VALUES ('superadmin', $1, 'superadmin')
+      ON CONFLICT (username) DO NOTHING
+    `, [hashedPassword]);
+    
+    console.log('✓ SuperAdmin user verified');
+    
     client.release();
     console.log('✓ Database tables created/verified');
     return true;
@@ -828,38 +840,33 @@ const MASTER_KEY = 'FV-SuperKey-7e54227eb017247e4786281289189725';
 app.post('/api/superadmin/login', 
   authLimiter,
   [
-    body('masterKey')
-      .notEmpty()
-      .withMessage('Master key is required'),
+    body('masterKey').notEmpty().withMessage('Master key is required'),
+    body('password').notEmpty().withMessage('Password is required'),
   ],
   handleValidationErrors,
   async (req, res) => {
     try {
-      const { masterKey } = req.body;
+      const { masterKey, password } = req.body;
       
-      // Verify master key (constant-time comparison)
-      if (masterKey !== MASTER_KEY) {
-        console.warn(`❌ Invalid superadmin key attempt from ${req.ip}`);
-        return res.status(401).json({ error: 'Invalid master key' });
+      // Use full SuperAdminAuthService with all security features (minus TOTP)
+      if (!superAdminAuth) {
+        return res.status(503).json({ error: 'SuperAdmin service not available' });
       }
       
-      // Generate JWT token with superadmin role
-      const tokens = jwtService.generateTokenPair(
-        { 
-          userId: 'superadmin', 
-          username: 'superadmin',
-          role: 'superadmin',
-          tenantId: 'platform',
-        }, 
-        req
-      );
+      const result = await superAdminAuth.authenticate(req, masterKey, password, null);
+      
+      if (!result.success) {
+        console.warn(`❌ SuperAdmin auth failed from ${req.ip}: ${result.code}`);
+        return res.status(401).json({ error: result.error, code: result.code });
+      }
       
       console.log(`✅ SuperAdmin logged in from ${req.ip}`);
       
-      res.json({ 
-        ...tokens,
-        username: 'superadmin',
-        role: 'superadmin',
+      res.json({
+        accessToken: result.accessToken,
+        refreshToken: result.refreshToken,
+        username: result.user.username,
+        role: result.user.role,
       });
     } catch (err) {
       console.error('SuperAdmin login error:', err);

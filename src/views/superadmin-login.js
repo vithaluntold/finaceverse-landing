@@ -4,6 +4,7 @@ import './superadmin-login.css'
 
 const SuperAdminLogin = () => {
   const [masterKey, setMasterKey] = useState('')
+  const [password, setPassword] = useState('')
   const [error, setError] = useState('')
   const [loading, setLoading] = useState(false)
 
@@ -20,6 +21,7 @@ const SuperAdminLogin = () => {
         },
         body: JSON.stringify({
           masterKey,
+          password,
         }),
       })
 
@@ -77,6 +79,19 @@ const SuperAdminLogin = () => {
             />
           </div>
 
+          <div className="form-group">
+            <label htmlFor="password">Password</label>
+            <input
+              type="password"
+              id="password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              placeholder="Enter password"
+              required
+              autoComplete="current-password"
+            />
+          </div>
+
           <button 
             type="submit" 
             className="login-button"
@@ -87,8 +102,8 @@ const SuperAdminLogin = () => {
         </form>
 
         <div className="login-footer">
-          <p>🔐 Simplified authentication (master key only)</p>
-          <p>Session valid for analytics & SEO dashboards</p>
+          <p>🔐 Master key + password authentication</p>
+          <p>IP whitelist • Session fingerprinting • Auto-lockout</p>
         </div>
       </div>
     </div>
