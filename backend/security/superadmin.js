@@ -951,8 +951,16 @@ function createSuperAdminRoutes(app, superAdminAuth, pool, keywordOptimizer, loc
     }
   });
   
-  // Mount router at secret path
-  app.use(secretPath, router);
+  // Mount router at secret path (only for API routes, not for React SPA)
+  // This allows GET /vault-xxx to serve React, while POST /vault-xxx/login works
+  app.use(secretPath, (req, res, next) => {
+    // If it's a GET request to the exact secret path (no subpath), skip to React SPA
+    if (req.method === 'GET' && req.path === '/') {
+      return next('route'); // Skip this router, let static middleware handle it
+    }
+    // Otherwise, let the router handle API routes
+    router(req, res, next);
+  });
   
   console.log(`🔐 SuperAdmin routes mounted at: ${secretPath}`);
   console.log(`   Login: POST ${secretPath}/login`);
