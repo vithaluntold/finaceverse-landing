@@ -16,27 +16,20 @@ const SuperAdminLogin = () => {
     setLoading(true)
 
     try {
-      const response = await fetch('/vault-e9232b8eefbaa45e/login', {
+      const response = await fetch('/api/superadmin/login', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
           masterKey,
-          password,
-          totpCode: totpCode || undefined,
         }),
       })
 
       const data = await response.json()
 
       if (!response.ok) {
-        if (data.code === 'TOTP_REQUIRED') {
-          setShowTotp(true)
-          setError('TOTP code required')
-        } else {
-          setError(data.error || 'Authentication failed')
-        }
+        setError(data.error || 'Authentication failed')
         setLoading(false)
         return
       }

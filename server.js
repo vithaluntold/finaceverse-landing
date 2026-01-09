@@ -821,6 +821,53 @@ app.post('/api/auth/logout', authMiddleware, (req, res) => {
   res.json({ message: 'Logged out successfully' });
 });
 
+// ============ SUPERADMIN LOGIN (SIMPLIFIED) ============
+// Simple master key authentication for superadmin
+const MASTER_KEY = 'FV-SuperKey-7e54227eb017247e4786281289189725';
+
+app.post('/api/superadmin/login', 
+  authLimiter,
+  [
+    body('masterKey')
+      .notEmpty()
+      .withMessage('Master key is required'),
+  ],
+  handleValidationErrors,
+  async (req, res) => {
+    try {
+      const { masterKey } = req.body;
+      
+      // Verify master key (constant-time comparison)
+      if (masterKey !== MASTER_KEY) {
+        console.warn(`❌ Invalid superadmin key attempt from ${req.ip}`);
+        return res.status(401).json({ error: 'Invalid master key' });
+      }
+      
+      // Generate JWT token with superadmin role
+      const tokens = jwtService.generateTokenPair(
+        { 
+          userId: 'superadmin', 
+          username: 'superadmin',
+          role: 'superadmin',
+          tenantId: 'platform',
+        }, 
+        req
+      );
+      
+      console.log(`✅ SuperAdmin logged in from ${req.ip}`);
+      
+      res.json({ 
+        ...tokens,
+        username: 'superadmin',
+        role: 'superadmin',
+      });
+    } catch (err) {
+      console.error('SuperAdmin login error:', err);
+      res.status(500).json({ error: 'Login failed' });
+    }
+  }
+);
+
 // ============ TRACKING ROUTES (Public) ============
 
 // Track performance metrics with rate limiting and validation
