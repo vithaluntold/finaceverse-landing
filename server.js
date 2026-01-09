@@ -254,7 +254,7 @@ app.use(express.static(path.join(__dirname, 'build')));
 
 // PostgreSQL connection pool
 const pool = new Pool({
-  connectionString: DATABASE_URL,
+  connectionString: process.env.DATABASE_PUBLIC_URL || DATABASE_URL,
   ssl: process.env.NODE_ENV === 'production' ? { rejectUnauthorized: false } : false,
 });
 
