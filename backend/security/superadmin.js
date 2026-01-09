@@ -493,6 +493,11 @@ function createSuperAdminMiddleware(superAdminAuth) {
       return next();
     }
     
+    // ALSO allow /api/superadmin/login (main login endpoint)
+    if (req.path === '/api/superadmin/login' && req.method === 'POST') {
+      return next();
+    }
+    
     // For all other superadmin API routes, require valid session
     const authHeader = req.headers.authorization;
     if (!authHeader || !authHeader.startsWith('Bearer ')) {
