@@ -580,7 +580,7 @@ function createSuperAdminRoutes(app, superAdminAuth, pool, keywordOptimizer, loc
   
   // ============ ANALYTICS (SUPERADMIN ONLY) ============
   
-  app.get(`${secretPath}/analytics/summary', async (req, res) => {
+  app.get(`${secretPath}/analytics/summary`, async (req, res) => {
     try {
       const now = new Date();
       const last24h = new Date(now - 24 * 60 * 60 * 1000);
@@ -616,7 +616,7 @@ function createSuperAdminRoutes(app, superAdminAuth, pool, keywordOptimizer, loc
     }
   });
   
-  app.get(`${secretPath}/analytics/performance', async (req, res) => {
+  app.get(`${secretPath}/analytics/performance`, async (req, res) => {
     try {
       const { startDate, endDate, page } = req.query;
       
@@ -644,7 +644,7 @@ function createSuperAdminRoutes(app, superAdminAuth, pool, keywordOptimizer, loc
     }
   });
   
-  app.get(`${secretPath}/analytics/geography', async (req, res) => {
+  app.get(`${secretPath}/analytics/geography`, async (req, res) => {
     try {
       const byCountry = await pool.query(`
         SELECT country as name, COUNT(*) as count 
@@ -668,7 +668,7 @@ function createSuperAdminRoutes(app, superAdminAuth, pool, keywordOptimizer, loc
     }
   });
   
-  app.get(`${secretPath}/analytics/events', async (req, res) => {
+  app.get(`${secretPath}/analytics/events`, async (req, res) => {
     try {
       const result = await pool.query('SELECT * FROM events ORDER BY timestamp DESC LIMIT 500');
       res.json({ data: result.rows, count: result.rows.length });
@@ -678,7 +678,7 @@ function createSuperAdminRoutes(app, superAdminAuth, pool, keywordOptimizer, loc
     }
   });
   
-  app.get(`${secretPath}/analytics/errors', async (req, res) => {
+  app.get(`${secretPath}/analytics/errors`, async (req, res) => {
     try {
       const result = await pool.query('SELECT * FROM errors ORDER BY timestamp DESC LIMIT 100');
       res.json({ data: result.rows, count: result.rows.length });
@@ -688,7 +688,7 @@ function createSuperAdminRoutes(app, superAdminAuth, pool, keywordOptimizer, loc
     }
   });
   
-  app.get(`${secretPath}/analytics/pagespeed', async (req, res) => {
+  app.get(`${secretPath}/analytics/pagespeed`, async (req, res) => {
     try {
       const latestMobile = await pool.query(
         'SELECT * FROM pagespeed_results WHERE strategy = $1 ORDER BY timestamp DESC LIMIT 1',
@@ -713,7 +713,7 @@ function createSuperAdminRoutes(app, superAdminAuth, pool, keywordOptimizer, loc
   
   // ============ SEO (SUPERADMIN ONLY) ============
   
-  app.get(`${secretPath}/seo/keywords', async (req, res) => {
+  app.get(`${secretPath}/seo/keywords`, async (req, res) => {
     try {
       const result = await pool.query(`
         SELECT * FROM target_keywords 
@@ -728,7 +728,7 @@ function createSuperAdminRoutes(app, superAdminAuth, pool, keywordOptimizer, loc
     }
   });
   
-  app.get(`${secretPath}/seo/scan/:page', async (req, res) => {
+  app.get(`${secretPath}/seo/scan/:page`, async (req, res) => {
     try {
       if (!keywordOptimizer) {
         return res.status(503).json({ error: 'SEO optimizer not available' });
@@ -749,7 +749,7 @@ function createSuperAdminRoutes(app, superAdminAuth, pool, keywordOptimizer, loc
     }
   });
   
-  app.post(`${secretPath}/seo/scan-all', async (req, res) => {
+  app.post(`${secretPath}/seo/scan-all`, async (req, res) => {
     try {
       if (!keywordOptimizer) {
         return res.status(503).json({ error: 'SEO optimizer not available' });
@@ -763,7 +763,7 @@ function createSuperAdminRoutes(app, superAdminAuth, pool, keywordOptimizer, loc
     }
   });
   
-  app.get(`${secretPath}/seo/report', async (req, res) => {
+  app.get(`${secretPath}/seo/report`, async (req, res) => {
     try {
       if (!keywordOptimizer) {
         return res.status(503).json({ error: 'SEO optimizer not available' });
@@ -777,7 +777,7 @@ function createSuperAdminRoutes(app, superAdminAuth, pool, keywordOptimizer, loc
     }
   });
   
-  app.get(`${secretPath}/seo/issues', async (req, res) => {
+  app.get(`${secretPath}/seo/issues`, async (req, res) => {
     try {
       const { severity, autoFixable } = req.query;
       
@@ -805,7 +805,7 @@ function createSuperAdminRoutes(app, superAdminAuth, pool, keywordOptimizer, loc
   
   // ============ LOCAL SEO (SUPERADMIN ONLY) ============
   
-  app.get(`${secretPath}/local-seo/status', async (req, res) => {
+  app.get(`${secretPath}/local-seo/status`, async (req, res) => {
     try {
       if (!localSEOManager) {
         return res.status(503).json({ error: 'Local SEO manager not available' });
@@ -819,7 +819,7 @@ function createSuperAdminRoutes(app, superAdminAuth, pool, keywordOptimizer, loc
     }
   });
   
-  app.post(`${secretPath}/local-seo/setup/:countryCode', async (req, res) => {
+  app.post(`${secretPath}/local-seo/setup/:countryCode`, async (req, res) => {
     try {
       if (!localSEOManager) {
         return res.status(503).json({ error: 'Local SEO manager not available' });
@@ -834,7 +834,7 @@ function createSuperAdminRoutes(app, superAdminAuth, pool, keywordOptimizer, loc
     }
   });
   
-  app.post(`${secretPath}/local-seo/setup-all', async (req, res) => {
+  app.post(`${secretPath}/local-seo/setup-all`, async (req, res) => {
     try {
       if (!localSEOManager) {
         return res.status(503).json({ error: 'Local SEO manager not available' });
@@ -848,7 +848,7 @@ function createSuperAdminRoutes(app, superAdminAuth, pool, keywordOptimizer, loc
     }
   });
   
-  app.get(`${secretPath}/local-seo/priorities', async (req, res) => {
+  app.get(`${secretPath}/local-seo/priorities`, async (req, res) => {
     try {
       if (!localSEOManager) {
         return res.status(503).json({ error: 'Local SEO manager not available' });
@@ -862,7 +862,7 @@ function createSuperAdminRoutes(app, superAdminAuth, pool, keywordOptimizer, loc
     }
   });
   
-  app.get(`${secretPath}/local-seo/cities/:countryCode', async (req, res) => {
+  app.get(`${secretPath}/local-seo/cities/:countryCode`, async (req, res) => {
     try {
       const { countryCode } = req.params;
       const result = await pool.query(
@@ -878,7 +878,7 @@ function createSuperAdminRoutes(app, superAdminAuth, pool, keywordOptimizer, loc
   
   // ============ EXPERIMENTS (SUPERADMIN ONLY) ============
   
-  app.get(`${secretPath}/experiments', async (req, res) => {
+  app.get(`${secretPath}/experiments`, async (req, res) => {
     try {
       const result = await pool.query('SELECT * FROM experiments ORDER BY created_at DESC');
       res.json({ experiments: result.rows });
@@ -888,7 +888,7 @@ function createSuperAdminRoutes(app, superAdminAuth, pool, keywordOptimizer, loc
     }
   });
   
-  app.post(`${secretPath}/experiments', async (req, res) => {
+  app.post(`${secretPath}/experiments`, async (req, res) => {
     try {
       const { name, description, variants, targetUrl, trafficPercent } = req.body;
       
