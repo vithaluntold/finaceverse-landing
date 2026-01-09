@@ -40,7 +40,7 @@ const GSCIntegration = require('./src/seo-ai/gsc-integration');
 const AutoFixer = require('./src/seo-ai/auto-fixer');
 
 const app = express();
-const PORT = process.env.PORT || 5000;
+const PORT = process.env.PORT || 8080;
 
 // Trust proxy for Railway/Cloudflare (required for rate limiting behind reverse proxy)
 app.set('trust proxy', 1);
