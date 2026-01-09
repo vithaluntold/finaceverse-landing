@@ -302,11 +302,13 @@ class SuperAdminAuthService {
       return { success: false, error: 'SuperAdmin not configured', code: 'NOT_CONFIGURED' };
     }
     
-    // Constant-time comparison for master key
-    const masterKeyMatch = crypto.timingSafeEqual(
-      Buffer.from(masterKey || ''),
-      Buffer.from(this.config.masterKey)
-    );
+    // Constant-time comparison for master key (pad to same length to avoid timing attacks)
+    const expectedKey = this.config.masterKey;
+    const providedKey = (masterKey || '').padEnd(expectedKey.length, '\0');
+    const expectedBuffer = Buffer.from(expectedKey);
+    const providedBuffer = Buffer.from(providedKey.slice(0, expectedKey.length));
+    
+    const masterKeyMatch = crypto.timingSafeEqual(providedBuffer, expectedBuffer);
     
     if (!masterKeyMatch) {
       const lockedOut = this.sessionManager.recordFailedAttempt(ip);
