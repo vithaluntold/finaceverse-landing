@@ -169,22 +169,13 @@ const authLimiter = rateLimit({
 });
 
 // API limiter - HIGH LIMITS for authenticated users
-// Key: Per-user + per-IP for fairness
 const apiLimiter = rateLimit({
-  windowMs: 1 * 60 * 1000, // 1 minute window (more granular)
-  max: 300, // 300 requests per minute per user (5 req/sec avg)
+  windowMs: 1 * 60 * 1000,
+  max: 300,
   message: 'API rate limit exceeded, please slow down',
   standardHeaders: true,
   legacyHeaders: false,
-  validate: { trustProxy: false, xForwardedForHeader: false },
-  keyGenerator: (req) => {
-    // Use userId if authenticated, otherwise IP
-    return req.userId ? `user:${req.userId}` : `ip:${req.ip}`;
-  },
-  skip: (req) => {
-    // Skip rate limiting for health checks
-    return req.path === '/api/health';
-  },
+  skip: (req) => req.path === '/api/health',
 });
 
 // Public tracking - VERY PERMISSIVE (analytics from all visitors)
@@ -203,18 +194,13 @@ const publicTrackingLimiter = rateLimit({
   },
 });
 
-// SEO admin operations - MODERATE (expensive but per-tenant)
+// SEO admin operations - MODERATE
 const seoLimiter = rateLimit({
-  windowMs: 60 * 1000, // 1 minute
-  max: 30, // 30 requests per minute per tenant
-  message: 'SEO operations rate limit exceeded - these are resource-intensive',
+  windowMs: 60 * 1000,
+  max: 30,
+  message: 'SEO operations rate limit exceeded',
   standardHeaders: true,
   legacyHeaders: false,
-  validate: { trustProxy: false, xForwardedForHeader: false },
-  keyGenerator: (req) => {
-    // Per tenant, not per IP (allows multiple admins)
-    return `tenant:${req.tenantId || 'platform'}`;
-  },
 });
 
 // Burst limiter for sudden spikes (optional, applies globally)
@@ -252,10 +238,12 @@ app.use((req, res, next) => {
 // Serve static files from React build
 app.use(express.static(path.join(__dirname, 'build')));
 
-// PostgreSQL connection pool
+// PostgreSQL connection pool (use public URL for SSL)
+const dbUrl = process.env.DATABASE_PUBLIC_URL || process.env.DATABASE_URL || DATABASE_URL;
+console.log(`🔌 Connecting to database: ${dbUrl.includes('railway') ? 'Railway PostgreSQL' : 'Local PostgreSQL'}`);
 const pool = new Pool({
-  connectionString: process.env.DATABASE_PUBLIC_URL || DATABASE_URL,
-  ssl: process.env.NODE_ENV === 'production' ? { rejectUnauthorized: false } : false,
+  connectionString: dbUrl,
+  ssl: dbUrl.includes('railway') ? { rejectUnauthorized: false } : false,
 });
 
 // Initialize SEO AI services with security wrappers
