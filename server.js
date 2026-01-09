@@ -239,8 +239,15 @@ app.use(securityHeaders);
 // Tenant isolation middleware
 app.use(tenantIsolation.middleware());
 
-// CSRF Protection (skip for API tracking endpoints)
-app.use(csrfProtection.middleware());
+// CSRF Protection (skip for authentication endpoints and API tracking)
+app.use((req, res, next) => {
+  // Skip CSRF for superadmin login (no token exists yet for unauthenticated users)
+  if (req.path === '/api/superadmin/login' && req.method === 'POST') {
+    return next();
+  }
+  // Apply CSRF protection to everything else
+  csrfProtection.middleware()(req, res, next);
+});
 
 // Serve static files from React build
 app.use(express.static(path.join(__dirname, 'build')));
