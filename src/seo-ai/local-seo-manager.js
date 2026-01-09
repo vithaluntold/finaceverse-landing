@@ -4,7 +4,7 @@
 const { Pool } = require('pg');
 
 class LocalSEOManager {
-  constructor(pool) {
+  constructor({ pool }) {
     this.pool = pool;
     this.countries = this.getCountryConfig();
   }
@@ -302,12 +302,12 @@ class LocalSEOManager {
     const h1Content = `Cognitive Finance Platform for ${config.name}`;
     
     await this.pool.query(
-      `INSERT INTO city_pages 
-       (country_code, city_name, page_url, meta_title, meta_description, h1_content, status, published_at)
-       VALUES ($1, $2, $3, $4, $5, $6, 'published', CURRENT_TIMESTAMP)
-       ON CONFLICT DO NOTHING`,
+      `INSERT INTO local_seo_pages 
+       (country_code, country_name, city, page_url, meta_title, meta_description, h1_title)
+       VALUES ($1, $2, $3, $4, $5, $6, $7)`,
       [
         config.countryCode,
+        config.name,
         config.name,
         config.landingPage,
         metaTitle,
@@ -324,22 +324,17 @@ class LocalSEOManager {
     const h1Content = `Transform Finance Operations in ${location.city}`;
     
     await this.pool.query(
-      `INSERT INTO city_pages 
-       (country_code, city_name, page_url, meta_title, meta_description, h1_content, local_keywords, status)
-       VALUES ($1, $2, $3, $4, $5, $6, $7, 'draft')
-       ON CONFLICT DO NOTHING`,
+      `INSERT INTO local_seo_pages 
+       (country_code, country_name, city, page_url, meta_title, meta_description, h1_title)
+       VALUES ($1, $2, $3, $4, $5, $6, $7)`,
       [
         config.countryCode,
+        config.name,
         location.city,
         location.slug,
         metaTitle,
         metaDescription,
-        h1Content,
-        JSON.stringify([
-          `AI accounting software ${location.city}`,
-          `financial automation ${location.city}`,
-          `${location.city} fintech`
-        ])
+        h1Content
       ]
     );
   }
