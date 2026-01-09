@@ -316,7 +316,7 @@ class SuperAdminAuthService {
       return { 
         success: false, 
         error: lockedOut ? 'Account locked. Try again later.' : 'Invalid credentials',
-        code: 'INVALID_CREDENTIALS'
+        code: lockedOut ? 'LOCKED_OUT' : 'INVALID_CREDENTIALS'
       };
     }
     
@@ -341,7 +341,7 @@ class SuperAdminAuthService {
         return { 
           success: false, 
           error: lockedOut ? 'Account locked. Try again later.' : 'Invalid credentials',
-          code: 'INVALID_CREDENTIALS'
+          code: lockedOut ? 'LOCKED_OUT' : 'INVALID_CREDENTIALS'
         };
       }
       
@@ -358,7 +358,7 @@ class SuperAdminAuthService {
           return { 
             success: false, 
             error: lockedOut ? 'Account locked. Try again later.' : 'Invalid TOTP code',
-            code: 'INVALID_TOTP'
+            code: lockedOut ? 'LOCKED_OUT' : 'INVALID_TOTP'
           };
         }
       }
