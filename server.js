@@ -856,6 +856,11 @@ app.post('/api/superadmin/login',
       const { masterKey, password } = req.body;
       const ip = req.ip || req.headers['x-forwarded-for']?.split(',')[0] || 'unknown';
       
+      console.log(`🔍 Login attempt from ${ip}`);
+      console.log(`🔍 Master key received: "${masterKey}" (length: ${masterKey?.length})`);
+      console.log(`🔍 Password received: "${password}" (length: ${password?.length})`);
+      console.log(`🔍 Expected master key: "${process.env.SUPERADMIN_MASTER_KEY}" (length: ${process.env.SUPERADMIN_MASTER_KEY?.length})`);
+      
       // Clear any lockout before attempting (temporary fix to get you in)
       if (superAdminAuth && superAdminAuth.sessionManager) {
         superAdminAuth.sessionManager.failedAttempts.delete(ip);
