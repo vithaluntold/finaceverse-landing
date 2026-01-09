@@ -475,12 +475,23 @@ function createSuperAdminMiddleware(superAdminAuth) {
       return next();
     }
     
-    // For login endpoint, skip session check
+    // CRITICAL: Allow GET requests to the BASE secret path (React SPA login page)
+    // This must come BEFORE any auth checks
+    if (req.path === secretPath && req.method === 'GET') {
+      return next(); // Let static middleware serve React app
+    }
+    
+    // Also allow GET to /dashboard (React SPA dashboard page)
+    if (req.path === `${secretPath}/dashboard` && req.method === 'GET') {
+      return next(); // Let static middleware serve React app
+    }
+    
+    // For login API endpoint, skip session check but still process through route handler
     if (req.path === `${secretPath}/login` && req.method === 'POST') {
       return next();
     }
     
-    // For all other superadmin routes, require valid session
+    // For all other superadmin API routes, require valid session
     const authHeader = req.headers.authorization;
     if (!authHeader || !authHeader.startsWith('Bearer ')) {
       return res.status(401).json({ error: 'SuperAdmin authentication required' });
