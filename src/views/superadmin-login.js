@@ -4,11 +4,8 @@ import './superadmin-login.css'
 
 const SuperAdminLogin = () => {
   const [masterKey, setMasterKey] = useState('')
-  const [password, setPassword] = useState('')
-  const [totpCode, setTotpCode] = useState('')
   const [error, setError] = useState('')
   const [loading, setLoading] = useState(false)
-  const [showTotp, setShowTotp] = useState(false)
 
   const handleSubmit = async (e) => {
     e.preventDefault()
@@ -74,53 +71,24 @@ const SuperAdminLogin = () => {
               id="masterKey"
               value={masterKey}
               onChange={(e) => setMasterKey(e.target.value)}
-              placeholder="Enter master key"
+              placeholder="Paste master key"
               required
               autoComplete="off"
             />
           </div>
-
-          <div className="form-group">
-            <label htmlFor="password">Password</label>
-            <input
-              type="password"
-              id="password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              placeholder="Enter password"
-              required
-              autoComplete="current-password"
-            />
-          </div>
-
-          {showTotp && (
-            <div className="form-group">
-              <label htmlFor="totpCode">TOTP Code</label>
-              <input
-                type="text"
-                id="totpCode"
-                value={totpCode}
-                onChange={(e) => setTotpCode(e.target.value)}
-                placeholder="Enter 6-digit code"
-                maxLength={6}
-                pattern="[0-9]{6}"
-                autoComplete="one-time-code"
-              />
-            </div>
-          )}
 
           <button 
             type="submit" 
             className="login-button"
             disabled={loading}
           >
-            {loading ? 'Authenticating...' : 'Access Vault'}
+            {loading ? 'Verifying...' : 'Login'}
           </button>
         </form>
 
         <div className="login-footer">
-          <p>🔐 Multi-factor authentication required</p>
-          <p>15-minute session timeout • IP logged</p>
+          <p>🔐 Simplified authentication (master key only)</p>
+          <p>Session valid for analytics & SEO dashboards</p>
         </div>
       </div>
     </div>
