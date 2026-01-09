@@ -238,12 +238,15 @@ app.use((req, res, next) => {
 // Serve static files from React build
 app.use(express.static(path.join(__dirname, 'build')));
 
-// PostgreSQL connection pool (use public URL for SSL)
-const dbUrl = process.env.DATABASE_PUBLIC_URL || process.env.DATABASE_URL || DATABASE_URL;
-console.log(`🔌 Connecting to database: ${dbUrl.includes('railway') ? 'Railway PostgreSQL' : 'Local PostgreSQL'}`);
+// PostgreSQL connection pool (use internal Railway URL without SSL for same-project services)
+const dbUrl = process.env.DATABASE_URL || DATABASE_URL;
+const isRailwayInternal = dbUrl.includes('railway.internal');
+const isRailwayExternal = dbUrl.includes('interchange.proxy.rlwy.net');
+console.log(`🔌 Connecting to database: ${isRailwayInternal ? 'Railway PostgreSQL (internal)' : isRailwayExternal ? 'Railway PostgreSQL (external)' : 'Local PostgreSQL'}`);
 const pool = new Pool({
   connectionString: dbUrl,
-  ssl: dbUrl.includes('railway') ? { rejectUnauthorized: false } : false,
+  // Only use SSL for external Railway connections, not for internal private network
+  ssl: isRailwayExternal ? { rejectUnauthorized: false } : false,
 });
 
 // Initialize SEO AI services with security wrappers
