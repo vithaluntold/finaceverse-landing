@@ -23,6 +23,7 @@ import AnalyticsLogin from './views/analytics-login'
 import AnalyticsDashboard from './views/analytics-dashboard'
 import SEODashboard from './views/seo-dashboard'
 import SuperAdminLogin from './views/superadmin-login'
+import SuperAdminDashboard from './views/superadmin-dashboard'
 import NotFound from './views/not-found'
 import { initGA, trackPageView } from './utils/analytics'
 import { initPerformanceTracking, trackVisit } from './utils/performanceTracker'
@@ -72,6 +73,7 @@ const App = () => {
         <Route component={AnalyticsDashboard} exact path="/analytics/dashboard" />
         <Route component={SEODashboard} exact path="/seo-dashboard" />
         <Route component={SuperAdminLogin} exact path="/vault-e9232b8eefbaa45e" />
+        <Route component={SuperAdminDashboard} exact path="/vault-e9232b8eefbaa45e/dashboard" />
         <Route component={NotFound} path="**" />
         <Redirect to="**" />
       </Switch>

@@ -23,9 +23,9 @@ const SEODashboard = () => {
   const COLORS = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042', '#8884D8'];
 
   useEffect(() => {
-    const token = localStorage.getItem('analytics_token');
+    const token = localStorage.getItem('superadmin_token');
     if (!token) {
-      history.push('/analytics/login');
+      history.push('/vault-e9232b8eefbaa45e');
       return;
     }
 
@@ -36,7 +36,7 @@ const SEODashboard = () => {
   }, [history]);
 
   const fetchAllData = async () => {
-    const token = localStorage.getItem('analytics_token');
+    const token = localStorage.getItem('superadmin_token');
     const headers = {
       'Authorization': `Bearer ${token}`,
       'Content-Type': 'application/json',
@@ -123,7 +123,7 @@ const SEODashboard = () => {
   };
 
   const handleRefresh = async () => {
-    const token = localStorage.getItem('analytics_token');
+    const token = localStorage.getItem('superadmin_token');
     const headers = {
       'Authorization': `Bearer ${token}`,
       'Content-Type': 'application/json',
@@ -155,7 +155,7 @@ const SEODashboard = () => {
   };
 
   const handleAutoFix = async () => {
-    const token = localStorage.getItem('analytics_token');
+    const token = localStorage.getItem('superadmin_token');
     const headers = {
       'Authorization': `Bearer ${token}`,
       'Content-Type': 'application/json',

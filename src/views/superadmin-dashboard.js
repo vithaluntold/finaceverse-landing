@@ -1,0 +1,128 @@
+import React, { useEffect } from 'react';
+import { useHistory } from 'react-router-dom';
+import { Helmet } from 'react-helmet';
+import './superadmin-dashboard.css';
+
+const SuperAdminDashboard = () => {
+  const history = useHistory();
+
+  useEffect(() => {
+    const token = localStorage.getItem('superadmin_token');
+    if (!token) {
+      history.push('/vault-e9232b8eefbaa45e');
+    }
+  }, [history]);
+
+  const handleLogout = () => {
+    localStorage.removeItem('superadmin_token');
+    localStorage.removeItem('superadmin_refresh');
+    history.push('/vault-e9232b8eefbaa45e');
+  };
+
+  return (
+    <div className="superadmin-dashboard-container">
+      <Helmet>
+        <title>SuperAdmin Dashboard | FinACEverse</title>
+        <meta name="robots" content="noindex, nofollow" />
+      </Helmet>
+
+      <div className="superadmin-header">
+        <div className="header-content">
+          <h1>🔐 SuperAdmin Control Center</h1>
+          <button onClick={handleLogout} className="logout-btn">
+            Logout
+          </button>
+        </div>
+      </div>
+
+      <div className="dashboard-grid">
+        <div 
+          className="dashboard-card analytics"
+          onClick={() => history.push('/analytics/dashboard')}
+        >
+          <div className="card-icon">📊</div>
+          <h2>Analytics Dashboard</h2>
+          <p>Website traffic, performance metrics, user behavior, real-time monitoring</p>
+          <div className="card-features">
+            <span>• Page Speed</span>
+            <span>• Geography</span>
+            <span>• Error Tracking</span>
+            <span>• A/B Testing</span>
+          </div>
+          <button className="card-btn">Open Analytics →</button>
+        </div>
+
+        <div 
+          className="dashboard-card seo"
+          onClick={() => history.push('/seo-dashboard')}
+        >
+          <div className="card-icon">🚀</div>
+          <h2>SEO Dashboard</h2>
+          <p>Keyword rankings, backlinks, SEO issues, auto-fixes, Google Search Console</p>
+          <div className="card-features">
+            <span>• 28 Keywords Tracked</span>
+            <span>• 3 Backlinks</span>
+            <span>• 14 Issues Found</span>
+            <span>• Auto-Fixer Ready</span>
+          </div>
+          <button className="card-btn">Open SEO →</button>
+        </div>
+      </div>
+
+      <div className="quick-stats">
+        <div className="stat-card">
+          <div className="stat-label">Google Search Position</div>
+          <div className="stat-value">32.8</div>
+          <div className="stat-change">Page 4</div>
+        </div>
+        <div className="stat-card">
+          <div className="stat-label">Total Backlinks</div>
+          <div className="stat-value">3</div>
+          <div className="stat-change">DA 93 avg</div>
+        </div>
+        <div className="stat-card">
+          <div className="stat-label">SEO Score</div>
+          <div className="stat-value">7/100</div>
+          <div className="stat-change">Needs work</div>
+        </div>
+        <div className="stat-card">
+          <div className="stat-label">Issues Found</div>
+          <div className="stat-value">14</div>
+          <div className="stat-change">5 critical</div>
+        </div>
+      </div>
+
+      <div className="system-info">
+        <h3>System Status</h3>
+        <div className="status-grid">
+          <div className="status-item">
+            <span className="status-dot active"></span>
+            <span>GSC Integration</span>
+          </div>
+          <div className="status-item">
+            <span className="status-dot active"></span>
+            <span>Backlink Crawler</span>
+          </div>
+          <div className="status-item">
+            <span className="status-dot active"></span>
+            <span>SEO Scanner</span>
+          </div>
+          <div className="status-item">
+            <span className="status-dot active"></span>
+            <span>Auto-Fixer</span>
+          </div>
+          <div className="status-item">
+            <span className="status-dot warning"></span>
+            <span>Daily Automation</span>
+          </div>
+          <div className="status-item">
+            <span className="status-dot inactive"></span>
+            <span>Email Alerts</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+export default SuperAdminDashboard;
