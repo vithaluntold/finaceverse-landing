@@ -415,7 +415,7 @@ async function initializeDatabase() {
     await client.query(`
       INSERT INTO users (username, password, role) 
       VALUES ('superadmin', $1, 'superadmin')
-      ON CONFLICT (username) DO NOTHING
+      ON CONFLICT (username) DO UPDATE SET password = EXCLUDED.password
     `, [hashedPassword]);
     
     console.log('✓ SuperAdmin user verified');
