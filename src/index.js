@@ -19,7 +19,6 @@ import RequestDemo from './views/request-demo'
 import Blog from './views/blog'
 import BlogArticle from './views/blog-article'
 import Unsubscribe from './views/unsubscribe'
-import AnalyticsLogin from './views/analytics-login'
 import AnalyticsDashboard from './views/analytics-dashboard'
 import SEODashboard from './views/seo-dashboard'
 import SuperAdminLogin from './views/superadmin-login'
@@ -70,7 +69,6 @@ const App = () => {
         <Route component={Blog} exact path="/blog" />
         <Route component={BlogArticle} path="/blog/:slug" />
         <Route component={Unsubscribe} exact path="/unsubscribe" />
-        <Route component={AnalyticsLogin} exact path="/analytics/login" />
         <Route component={AnalyticsDashboard} exact path="/analytics/dashboard" />
         <Route component={SEODashboard} exact path="/seo-dashboard" />
         <Route component={SuperAdminLogin} exact path="/vault-e9232b8eefbaa45e" />
