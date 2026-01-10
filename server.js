@@ -238,21 +238,21 @@ app.use((req, res, next) => {
 // Serve static files from React build
 app.use(express.static(path.join(__dirname, 'build')));
 
-// PostgreSQL connection pool - use PG* env vars for Railway internal networking
-// If PG* vars exist, use them (internal network), otherwise fall back to DATABASE_URL
+// PostgreSQL connection pool - use PG* env vars for Railway database
+// If PG* vars exist, use them, otherwise fall back to DATABASE_URL
 const dbConfig = process.env.PGHOST ? {
   host: process.env.PGHOST,
-  port: process.env.PGPORT || 5432,
+  port: parseInt(process.env.PGPORT) || 5432,
   user: process.env.PGUSER,
   password: process.env.PGPASSWORD,
   database: process.env.PGDATABASE,
-  ssl: false, // Internal Railway network doesn't need SSL
+  ssl: false, // Railway TCP proxy doesn't support SSL
 } : {
   connectionString: process.env.DATABASE_URL || DATABASE_URL,
   ssl: false,
 };
 
-console.log(`🔌 Connecting to database: ${dbConfig.host || 'via connection string'}`);
+console.log(`🔌 Connecting to database: ${dbConfig.host || 'via connection string'} (port: ${dbConfig.port || 'from URL'})`);
 const pool = new Pool(dbConfig);
 
 // Initialize SEO AI services with security wrappers
