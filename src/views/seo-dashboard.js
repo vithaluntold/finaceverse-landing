@@ -567,7 +567,12 @@ const SEODashboard = () => {
   return (
     <div className="seo-dashboard">
       <div className="dashboard-header">
-        <h1>SEO Performance Dashboard</h1>
+        <div className="header-left">
+          <button onClick={() => history.push('/superadmin-dashboard')} className="btn-back">
+            ← Dashboard
+          </button>
+          <h1>SEO Performance Dashboard</h1>
+        </div>
         <div className="header-actions">
           <button onClick={handleRefresh} className="refresh-button">
             Refresh {activeTab === 'keywords' ? 'Keywords' : activeTab === 'backlinks' ? 'Backlinks' : 'Issues'}

@@ -215,7 +215,12 @@ const AnalyticsDashboard = () => {
     <div className="analytics-dashboard">
       <header className="analytics-header">
         <div className="analytics-header-content">
-          <h1>📊 FinACEverse Analytics</h1>
+          <div className="header-left">
+            <button onClick={() => history.push('/superadmin-dashboard')} className="btn-back">
+              ← Dashboard
+            </button>
+            <h1>📊 FinACEverse Analytics</h1>
+          </div>
           <div className="analytics-header-actions">
             <span className="analytics-user">
               {localStorage.getItem('analytics_user')}

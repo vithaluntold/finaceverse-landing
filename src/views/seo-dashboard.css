@@ -15,6 +15,29 @@
   border-bottom: 2px solid #e1e8ed;
 }
 
+.header-left {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.btn-back {
+  padding: 0.625rem 1rem;
+  background: white;
+  color: #1a1a1a;
+  border: 1px solid #e1e8ed;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 0.875rem;
+  font-weight: 500;
+  transition: all 0.2s ease;
+}
+
+.btn-back:hover {
+  background: #f5f7fa;
+  border-color: #cbd5e0;
+}
+
 .dashboard-header h1 {
   font-size: 2rem;
   color: #1a1a1a;
