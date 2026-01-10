@@ -216,7 +216,7 @@ const AnalyticsDashboard = () => {
       <header className="analytics-header">
         <div className="analytics-header-content">
           <div className="header-left">
-            <button onClick={() => history.push('/superadmin-dashboard')} className="btn-back">
+            <button onClick={() => history.push('/vault-e9232b8eefbaa45e/dashboard')} className="btn-back">
               ← Dashboard
             </button>
             <h1>📊 FinACEverse Analytics</h1>

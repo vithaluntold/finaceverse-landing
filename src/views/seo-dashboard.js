@@ -596,7 +596,7 @@ const SEODashboard = () => {
     <div className="seo-dashboard">
       <div className="dashboard-header">
         <div className="header-left">
-          <button onClick={() => history.push('/superadmin-dashboard')} className="btn-back">
+          <button onClick={() => history.push('/vault-e9232b8eefbaa45e/dashboard')} className="btn-back">
             ← Dashboard
           </button>
           <h1>SEO Performance Dashboard</h1>
