@@ -1,9 +1,9 @@
 import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useHistory } from 'react-router-dom';
 import './content-editor.css';
 
 function ContentEditor() {
-  const navigate = useNavigate();
+  const history = useHistory();
   const [content, setContent] = useState({});
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
@@ -17,11 +17,11 @@ function ContentEditor() {
 
   useEffect(() => {
     if (!masterKey || !password) {
-      navigate('/vault-e9232b8eefbaa45e');
+      history.push('/vault-e9232b8eefbaa45e');
       return;
     }
     fetchContent();
-  }, [masterKey, password, navigate]);
+  }, [masterKey, password, history]);
 
   const fetchContent = async () => {
     try {
@@ -236,7 +236,7 @@ function ContentEditor() {
   return (
     <div className="content-editor">
       <header className="editor-header">
-        <button className="back-btn" onClick={() => navigate('/vault-e9232b8eefbaa45e/dashboard')}>
+        <button className="back-btn" onClick={() => history.push('/vault-e9232b8eefbaa45e/dashboard')}>
           ← Back to Dashboard
         </button>
         <h1>Content Editor</h1>
