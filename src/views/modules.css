@@ -89,6 +89,48 @@
 .modules-hero-card {
   position: relative;
 }
+
+/* Loading states */
+.modules-hero-loading,
+.capabilities-loading,
+.capabilities-empty {
+  grid-column: 1 / -1;
+  text-align: center;
+  padding: 3rem 2rem;
+  color: #94a3b8;
+  font-size: 1rem;
+}
+
+.capabilities-empty {
+  background: rgba(30, 41, 59, 0.5);
+  border: 1px dashed #334155;
+  border-radius: 12px;
+}
+
+/* Capability cell status badge - inline not absolute */
+.capabilities-cell .product-status-badge {
+  position: relative;
+  top: auto;
+  right: auto;
+  display: inline-block;
+  margin-top: 12px;
+}
+
+/* Hero card icon container */
+.modules-hero-card-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 48px;
+  height: 48px;
+  margin-bottom: 12px;
+}
+
+.modules-hero-card-icon svg {
+  width: 28px;
+  height: 28px;
+  color: currentColor;
+}
  
 .modules-container2 {
   display: none;
