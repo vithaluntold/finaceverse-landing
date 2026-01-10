@@ -28,7 +28,10 @@ const SuperAdminDashboard = () => {
 
       <div className="superadmin-header">
         <div className="header-content">
-          <h1>🔐 SuperAdmin Control Center</h1>
+          <div className="header-left">
+            <span className="lock-icon">🔐</span>
+            <h1>SuperAdmin Control Center</h1>
+          </div>
           <button onClick={handleLogout} className="logout-btn">
             Logout
           </button>
@@ -40,8 +43,10 @@ const SuperAdminDashboard = () => {
           className="dashboard-card analytics"
           onClick={() => history.push('/analytics/dashboard')}
         >
-          <div className="card-icon">📊</div>
-          <h2>Analytics Dashboard</h2>
+          <div className="card-header">
+            <div className="card-icon">📊</div>
+            <h2>Analytics Dashboard</h2>
+          </div>
           <p>Website traffic, performance metrics, user behavior, real-time monitoring</p>
           <div className="card-features">
             <span>• Page Speed</span>
@@ -56,8 +61,10 @@ const SuperAdminDashboard = () => {
           className="dashboard-card seo"
           onClick={() => history.push('/seo-dashboard')}
         >
-          <div className="card-icon">🚀</div>
-          <h2>SEO Dashboard</h2>
+          <div className="card-header">
+            <div className="card-icon">🚀</div>
+            <h2>SEO Dashboard</h2>
+          </div>
           <p>Keyword rankings, backlinks, SEO issues, auto-fixes, Google Search Console</p>
           <div className="card-features">
             <span>• 28 Keywords Tracked</span>
@@ -71,24 +78,32 @@ const SuperAdminDashboard = () => {
 
       <div className="quick-stats">
         <div className="stat-card">
-          <div className="stat-label">Google Search Position</div>
+          <div className="stat-header">
+            <span className="stat-label">GOOGLE SEARCH POSITION</span>
+          </div>
           <div className="stat-value">32.8</div>
-          <div className="stat-change">Page 4</div>
+          <div className="stat-meta">Page 4</div>
         </div>
         <div className="stat-card">
-          <div className="stat-label">Total Backlinks</div>
+          <div className="stat-header">
+            <span className="stat-label">TOTAL BACKLINKS</span>
+          </div>
           <div className="stat-value">3</div>
-          <div className="stat-change">DA 93 avg</div>
+          <div className="stat-meta">DA 93 avg</div>
         </div>
         <div className="stat-card">
-          <div className="stat-label">SEO Score</div>
+          <div className="stat-header">
+            <span className="stat-label">SEO SCORE</span>
+          </div>
           <div className="stat-value">7/100</div>
-          <div className="stat-change">Needs work</div>
+          <div className="stat-meta">Needs work</div>
         </div>
         <div className="stat-card">
-          <div className="stat-label">Issues Found</div>
+          <div className="stat-header">
+            <span className="stat-label">ISSUES FOUND</span>
+          </div>
           <div className="stat-value">14</div>
-          <div className="stat-change">5 critical</div>
+          <div className="stat-meta">5 critical</div>
         </div>
       </div>
 
