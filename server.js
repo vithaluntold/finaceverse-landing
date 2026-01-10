@@ -238,17 +238,22 @@ app.use((req, res, next) => {
 // Serve static files from React build
 app.use(express.static(path.join(__dirname, 'build')));
 
-// PostgreSQL connection pool - Railway V2 external proxy requires specific SSL config
-const dbUrl = process.env.DATABASE_URL || DATABASE_URL;
-const isRailwayInternal = dbUrl.includes('railway.internal');
-const isRailwayExternal = dbUrl.includes('interchange.proxy.rlwy.net');
-console.log(`🔌 Connecting to database: ${isRailwayInternal ? 'Railway PostgreSQL (internal)' : isRailwayExternal ? 'Railway PostgreSQL (external)' : 'Local PostgreSQL'}`);
+// PostgreSQL connection pool - use PG* env vars for Railway internal networking
+// If PG* vars exist, use them (internal network), otherwise fall back to DATABASE_URL
+const dbConfig = process.env.PGHOST ? {
+  host: process.env.PGHOST,
+  port: process.env.PGPORT || 5432,
+  user: process.env.PGUSER,
+  password: process.env.PGPASSWORD,
+  database: process.env.PGDATABASE,
+  ssl: false, // Internal Railway network doesn't need SSL
+} : {
+  connectionString: process.env.DATABASE_URL || DATABASE_URL,
+  ssl: false,
+};
 
-// Railway V2 TCP proxy doesn't support SSL - use direct TCP connection
-const pool = new Pool({
-  connectionString: dbUrl,
-  ssl: false, // Railway TCP proxy handles encryption at proxy level
-});
+console.log(`🔌 Connecting to database: ${dbConfig.host || 'via connection string'}`);
+const pool = new Pool(dbConfig);
 
 // Initialize SEO AI services with security wrappers
 let keywordOptimizer;
