@@ -113,6 +113,29 @@ const SuperAdminDashboard = () => {
           </div>
           <button className="card-btn">Manage Products →</button>
         </div>
+
+        <div 
+          className="dashboard-card content"
+          onClick={() => history.push('/vault-e9232b8eefbaa45e/content')}
+        >
+          <div className="card-header">
+            <div className="card-icon">
+              <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M12 3H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/>
+                <path d="M18.375 2.625a1 1 0 0 1 3 3l-9.013 9.014a2 2 0 0 1-.853.505l-2.873.84a.5.5 0 0 1-.62-.62l.84-2.873a2 2 0 0 1 .506-.852z"/>
+              </svg>
+            </div>
+            <h2>Content Editor</h2>
+          </div>
+          <p>Edit page text content section-by-section without touching the code structure</p>
+          <div className="card-features">
+            <span>• Hero Section</span>
+            <span>• Capabilities</span>
+            <span>• Timeline Phases</span>
+            <span>• CTA Content</span>
+          </div>
+          <button className="card-btn">Edit Content →</button>
+        </div>
       </div>
 
       <div className="quick-stats">

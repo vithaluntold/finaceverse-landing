@@ -24,6 +24,7 @@ import SEODashboard from './views/seo-dashboard'
 import SuperAdminLogin from './views/superadmin-login'
 import SuperAdminDashboard from './views/superadmin-dashboard'
 import ProductManager from './views/product-manager'
+import ContentEditor from './views/content-editor'
 import NotFound from './views/not-found'
 import { initGA, trackPageView } from './utils/analytics'
 import { initPerformanceTracking, trackVisit } from './utils/performanceTracker'
@@ -74,6 +75,7 @@ const App = () => {
         <Route component={SuperAdminLogin} exact path="/vault-e9232b8eefbaa45e" />
         <Route component={SuperAdminDashboard} exact path="/vault-e9232b8eefbaa45e/dashboard" />
         <Route component={ProductManager} exact path="/vault-e9232b8eefbaa45e/products" />
+        <Route component={ContentEditor} exact path="/vault-e9232b8eefbaa45e/content" />
         <Route component={NotFound} path="**" />
         <Redirect to="**" />
       </Switch>

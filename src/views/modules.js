@@ -37,6 +37,21 @@ const Modules = () => {
   const [viewMode, setViewMode] = useState('current');
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [pageContent, setPageContent] = useState({});
+
+  // Fetch page content
+  useEffect(() => {
+    const fetchContent = async () => {
+      try {
+        const response = await fetch('/api/content/modules');
+        const data = await response.json();
+        setPageContent(data.content || {});
+      } catch (err) {
+        console.error('Failed to fetch content:', err);
+      }
+    };
+    fetchContent();
+  }, []);
 
   useEffect(() => {
     const fetchProducts = async () => {
@@ -54,6 +69,11 @@ const Modules = () => {
     };
     fetchProducts();
   }, [viewMode]);
+
+  // Get content value with fallback
+  const getContent = (section, key, fallback = '') => {
+    return pageContent[section]?.[key] || fallback;
+  };
 
   // Get icon for a product
   const getIcon = (product) => {
@@ -193,11 +213,9 @@ const Modules = () => {
         <div className="modules-hero-container">
           <div className="modules-hero-bento">
             <div className="modules-hero-main">
-              <h1 className="hero-title">Unified Cognitive Intelligence</h1>
+              <h1 className="hero-title">{getContent('hero', 'title', 'Unified Cognitive Intelligence')}</h1>
               <p className="hero-subtitle">
-                Experience the future of finance with FinACEverse. Our
-                integrated Cognitive Operating System harmonizes accounting,
-                finance, and taxation into a single source of truth.
+                {getContent('hero', 'subtitle', 'Experience the future of finance with FinACEverse. Our integrated Cognitive Operating System harmonizes accounting, finance, and taxation into a single source of truth.')}
               </p>
               <div className="modules-hero-actions">
                 <a href="#capabilities">
@@ -226,11 +244,13 @@ const Modules = () => {
       {/* Capabilities Section - Dynamic */}
       <section id="capabilities" className="capabilities-grid">
         <div className="capabilities-header">
-          <h2 className="section-title">Modular Capabilities</h2>
+          <h2 className="section-title">{getContent('capabilities', 'title', 'Modular Capabilities')}</h2>
           <p className="section-content">
-            {products.length > 0 
-              ? `Our ${products.length} specialized modules work in perfect synchronicity to redefine your capacity.`
-              : 'Our specialized modules work in perfect synchronicity to redefine your capacity.'}
+            {getContent('capabilities', 'subtitle', 
+              products.length > 0 
+                ? `Our ${products.length} specialized modules work in perfect synchronicity to redefine your capacity.`
+                : 'Our specialized modules work in perfect synchronicity to redefine your capacity.'
+            )}
           </p>
         </div>
         <div className="capabilities-bento">
@@ -249,52 +269,49 @@ const Modules = () => {
       {/* Integration Timeline */}
       <section id="integration" className="integration-section">
         <div className="integration-container">
-          <h2 className="section-title">Integration Journey</h2>
+          <h2 className="section-title">{getContent('integration', 'title', 'Integration Journey')}</h2>
           <p className="section-content integration-subtitle">
-            A structured approach to transforming your financial operations
+            {getContent('integration', 'subtitle', 'A structured approach to transforming your financial operations')}
           </p>
           <div className="modules-timeline">
             <div className="modules-timeline-item left">
               <div className="modules-timeline-dot"></div>
               <div className="modules-timeline-content">
-                <h3 className="section-subtitle">Phase 1: Discovery</h3>
+                <h3 className="section-subtitle">{getContent('timeline', 'phase1_title', 'Phase 1: Discovery')}</h3>
                 <p className="section-content">
-                  Analysis of existing tech stack and workflow fragmentation.
-                  Identification of key module bundles.
+                  {getContent('timeline', 'phase1_description', 'Analysis of existing tech stack and workflow fragmentation. Identification of key module bundles.')}
                 </p>
-                <span className="timeline-time">Week 1-2</span>
+                <span className="timeline-time">{getContent('timeline', 'phase1_time', 'Week 1-2')}</span>
               </div>
             </div>
             <div className="modules-timeline-item right">
               <div className="modules-timeline-dot"></div>
               <div className="modules-timeline-content">
-                <h3 className="section-subtitle">Phase 2: Core Integration</h3>
+                <h3 className="section-subtitle">{getContent('timeline', 'phase2_title', 'Phase 2: Core Integration')}</h3>
                 <p className="section-content">
-                  Establishing the data layer and connecting specialized
-                  cognitive streams to your core systems.
+                  {getContent('timeline', 'phase2_description', 'Establishing the data layer and connecting specialized cognitive streams to your core systems.')}
                 </p>
-                <span className="timeline-time">Week 3-5</span>
+                <span className="timeline-time">{getContent('timeline', 'phase2_time', 'Week 3-5')}</span>
               </div>
             </div>
             <div className="modules-timeline-item left">
               <div className="modules-timeline-dot"></div>
               <div className="modules-timeline-content">
-                <h3 className="section-subtitle">Phase 3: Module Activation</h3>
+                <h3 className="section-subtitle">{getContent('timeline', 'phase3_title', 'Phase 3: Module Activation')}</h3>
                 <p className="section-content">
-                  Sequential rollout of modules with tailored training programs.
+                  {getContent('timeline', 'phase3_description', 'Sequential rollout of modules with tailored training programs.')}
                 </p>
-                <span className="timeline-time">Week 6-8</span>
+                <span className="timeline-time">{getContent('timeline', 'phase3_time', 'Week 6-8')}</span>
               </div>
             </div>
             <div className="modules-timeline-item right">
               <div className="modules-timeline-dot"></div>
               <div className="modules-timeline-content">
-                <h3 className="section-subtitle">Phase 4: Optimization</h3>
+                <h3 className="section-subtitle">{getContent('timeline', 'phase4_title', 'Phase 4: Optimization')}</h3>
                 <p className="section-content">
-                  Success milestone review and performance tuning for maximum
-                  efficiency gains.
+                  {getContent('timeline', 'phase4_description', 'Success milestone review and performance tuning for maximum efficiency gains.')}
                 </p>
-                <span className="timeline-time">Week 9+</span>
+                <span className="timeline-time">{getContent('timeline', 'phase4_time', 'Week 9+')}</span>
               </div>
             </div>
           </div>
@@ -307,12 +324,10 @@ const Modules = () => {
           <div className="cta-grid">
             <div className="cta-main">
               <h2 className="section-title">
-                Ready to Transform Your Operations?
+                {getContent('cta', 'title', 'Ready to Transform Your Operations?')}
               </h2>
               <p className="section-content">
-                Join the pioneers of the Cognitive Operating System. Whether
-                you're a professional firm or an enterprise department,
-                FinACEverse is built for your scale.
+                {getContent('cta', 'subtitle', "Join the pioneers of the Cognitive Operating System. Whether you're a professional firm or an enterprise department, FinACEverse is built for your scale.")}
               </p>
               <div className="cta-buttons">
                 <a href="/tailored-pilots">
@@ -332,13 +347,13 @@ const Modules = () => {
                 <h4 className="section-subtitle">Module Bundles</h4>
                 <ul className="cta-list">
                   <li className="section-content">
-                    <span>Audit Excellence Pack</span>
+                    <span>{getContent('cta', 'bundle1', 'Audit Excellence Pack')}</span>
                   </li>
                   <li className="section-content">
-                    <span>Tax Scale Accelerator</span>
+                    <span>{getContent('cta', 'bundle2', 'Tax Scale Accelerator')}</span>
                   </li>
                   <li className="section-content">
-                    <span>Corporate OS Suite</span>
+                    <span>{getContent('cta', 'bundle3', 'Corporate OS Suite')}</span>
                   </li>
                 </ul>
               </div>

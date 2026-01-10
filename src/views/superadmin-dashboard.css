@@ -92,6 +92,10 @@
   border-top: 3px solid #10b981;
 }
 
+.dashboard-card.content {
+  border-top: 3px solid #f59e0b;
+}
+
 .card-header {
   display: flex;
   align-items: center;

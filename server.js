@@ -415,6 +415,18 @@ async function initializeDatabase() {
         updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
       );
 
+      CREATE TABLE IF NOT EXISTS page_content (
+        id SERIAL PRIMARY KEY,
+        page VARCHAR(100) NOT NULL,
+        section VARCHAR(100) NOT NULL,
+        content_key VARCHAR(100) NOT NULL,
+        content_value TEXT,
+        content_type VARCHAR(50) DEFAULT 'text',
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        UNIQUE(page, section, content_key)
+      );
+
       CREATE INDEX IF NOT EXISTS idx_performance_timestamp ON performance_metrics(timestamp);
       CREATE INDEX IF NOT EXISTS idx_visits_timestamp ON visits(timestamp);
       CREATE INDEX IF NOT EXISTS idx_events_timestamp ON events(timestamp);
@@ -424,6 +436,7 @@ async function initializeDatabase() {
       CREATE INDEX IF NOT EXISTS idx_experiment_conversions_user ON experiment_conversions(user_id);
       CREATE INDEX IF NOT EXISTS idx_products_status ON products(status);
       CREATE INDEX IF NOT EXISTS idx_products_display_order ON products(display_order);
+      CREATE INDEX IF NOT EXISTS idx_page_content_page ON page_content(page);
     `);
     
     // Create superadmin user if not exists
@@ -2342,6 +2355,197 @@ app.post('/api/admin/products/seed', authMiddleware, requireRole('superadmin'), 
   } catch (error) {
     console.error('Seed products error:', error);
     res.status(500).json({ error: 'Failed to seed products' });
+  }
+});
+
+// =====================================================================
+// PAGE CONTENT CMS - Editable text content
+// =====================================================================
+
+// Public - Get all content for a page
+app.get('/api/content/:page', async (req, res) => {
+  try {
+    const { page } = req.params;
+    const result = await pool.query(
+      'SELECT section, content_key, content_value, content_type FROM page_content WHERE page = $1',
+      [page]
+    );
+    
+    // Transform into nested object: { section: { key: value } }
+    const content = {};
+    for (const row of result.rows) {
+      if (!content[row.section]) content[row.section] = {};
+      content[row.section][row.content_key] = row.content_value;
+    }
+    
+    res.json({ page, content });
+  } catch (error) {
+    console.error('Get content error:', error);
+    res.status(500).json({ error: 'Failed to fetch content' });
+  }
+});
+
+// Admin - Get all content (all pages)
+app.get('/api/admin/content', authMiddleware, requireRole('superadmin'), async (req, res) => {
+  try {
+    const result = await pool.query(
+      'SELECT * FROM page_content ORDER BY page, section, content_key'
+    );
+    res.json({ content: result.rows });
+  } catch (error) {
+    console.error('Admin get content error:', error);
+    res.status(500).json({ error: 'Failed to fetch content' });
+  }
+});
+
+// Admin - Update or create content
+app.post('/api/admin/content', authMiddleware, requireRole('superadmin'), async (req, res) => {
+  try {
+    const { page, section, content_key, content_value, content_type } = req.body;
+    
+    if (!page || !section || !content_key) {
+      return res.status(400).json({ error: 'page, section, and content_key are required' });
+    }
+    
+    const result = await pool.query(`
+      INSERT INTO page_content (page, section, content_key, content_value, content_type)
+      VALUES ($1, $2, $3, $4, $5)
+      ON CONFLICT (page, section, content_key) 
+      DO UPDATE SET content_value = EXCLUDED.content_value, content_type = EXCLUDED.content_type, updated_at = CURRENT_TIMESTAMP
+      RETURNING *
+    `, [page, section, content_key, content_value, content_type || 'text']);
+    
+    res.json({ content: result.rows[0], message: 'Content saved' });
+  } catch (error) {
+    console.error('Save content error:', error);
+    res.status(500).json({ error: 'Failed to save content' });
+  }
+});
+
+// Admin - Bulk update content
+app.post('/api/admin/content/bulk', authMiddleware, requireRole('superadmin'), async (req, res) => {
+  try {
+    const { items } = req.body; // Array of { page, section, content_key, content_value }
+    
+    if (!items || !Array.isArray(items)) {
+      return res.status(400).json({ error: 'items array is required' });
+    }
+    
+    const client = await pool.connect();
+    try {
+      await client.query('BEGIN');
+      
+      for (const item of items) {
+        await client.query(`
+          INSERT INTO page_content (page, section, content_key, content_value, content_type)
+          VALUES ($1, $2, $3, $4, $5)
+          ON CONFLICT (page, section, content_key) 
+          DO UPDATE SET content_value = EXCLUDED.content_value, updated_at = CURRENT_TIMESTAMP
+        `, [item.page, item.section, item.content_key, item.content_value, item.content_type || 'text']);
+      }
+      
+      await client.query('COMMIT');
+      res.json({ message: `${items.length} content items saved` });
+    } catch (err) {
+      await client.query('ROLLBACK');
+      throw err;
+    } finally {
+      client.release();
+    }
+  } catch (error) {
+    console.error('Bulk content error:', error);
+    res.status(500).json({ error: 'Failed to save content' });
+  }
+});
+
+// Admin - Delete content
+app.delete('/api/admin/content/:id', authMiddleware, requireRole('superadmin'), async (req, res) => {
+  try {
+    const { id } = req.params;
+    await pool.query('DELETE FROM page_content WHERE id = $1', [id]);
+    res.json({ message: 'Content deleted' });
+  } catch (error) {
+    console.error('Delete content error:', error);
+    res.status(500).json({ error: 'Failed to delete content' });
+  }
+});
+
+// Admin - Seed default modules page content
+app.post('/api/admin/content/seed-modules', authMiddleware, requireRole('superadmin'), async (req, res) => {
+  try {
+    const defaultContent = [
+      // Hero section
+      { page: 'modules', section: 'hero', content_key: 'title', content_value: 'Unified Cognitive Intelligence' },
+      { page: 'modules', section: 'hero', content_key: 'subtitle', content_value: 'Experience the future of finance with FinACEverse. Our integrated Cognitive Operating System harmonizes accounting, finance, and taxation into a single source of truth.' },
+      
+      // Capabilities section
+      { page: 'modules', section: 'capabilities', content_key: 'title', content_value: 'Modular Capabilities' },
+      { page: 'modules', section: 'capabilities', content_key: 'subtitle', content_value: 'Our specialized modules work in perfect synchronicity to redefine your capacity.' },
+      
+      // Integration section
+      { page: 'modules', section: 'integration', content_key: 'title', content_value: 'Integration Journey' },
+      { page: 'modules', section: 'integration', content_key: 'subtitle', content_value: 'A structured approach to transforming your financial operations' },
+      
+      // Timeline phases
+      { page: 'modules', section: 'timeline', content_key: 'phase1_title', content_value: 'Phase 1: Discovery' },
+      { page: 'modules', section: 'timeline', content_key: 'phase1_description', content_value: 'Analysis of existing tech stack and workflow fragmentation. Identification of key module bundles.' },
+      { page: 'modules', section: 'timeline', content_key: 'phase1_time', content_value: 'Week 1-2' },
+      { page: 'modules', section: 'timeline', content_key: 'phase2_title', content_value: 'Phase 2: Core Integration' },
+      { page: 'modules', section: 'timeline', content_key: 'phase2_description', content_value: 'Establishing the data layer and connecting specialized cognitive streams to your core systems.' },
+      { page: 'modules', section: 'timeline', content_key: 'phase2_time', content_value: 'Week 3-5' },
+      { page: 'modules', section: 'timeline', content_key: 'phase3_title', content_value: 'Phase 3: Module Activation' },
+      { page: 'modules', section: 'timeline', content_key: 'phase3_description', content_value: 'Sequential rollout of modules with tailored training programs.' },
+      { page: 'modules', section: 'timeline', content_key: 'phase3_time', content_value: 'Week 6-8' },
+      { page: 'modules', section: 'timeline', content_key: 'phase4_title', content_value: 'Phase 4: Optimization' },
+      { page: 'modules', section: 'timeline', content_key: 'phase4_description', content_value: 'Success milestone review and performance tuning for maximum efficiency gains.' },
+      { page: 'modules', section: 'timeline', content_key: 'phase4_time', content_value: 'Week 9+' },
+      
+      // CTA section
+      { page: 'modules', section: 'cta', content_key: 'title', content_value: 'Ready to Transform Your Operations?' },
+      { page: 'modules', section: 'cta', content_key: 'subtitle', content_value: "Join the pioneers of the Cognitive Operating System. Whether you're a professional firm or an enterprise department, FinACEverse is built for your scale." },
+      { page: 'modules', section: 'cta', content_key: 'bundle1', content_value: 'Audit Excellence Pack' },
+      { page: 'modules', section: 'cta', content_key: 'bundle2', content_value: 'Tax Scale Accelerator' },
+      { page: 'modules', section: 'cta', content_key: 'bundle3', content_value: 'Corporate OS Suite' },
+    ];
+    
+    const client = await pool.connect();
+    let created = 0, updated = 0;
+    
+    try {
+      await client.query('BEGIN');
+      
+      for (const item of defaultContent) {
+        const existing = await client.query(
+          'SELECT id FROM page_content WHERE page = $1 AND section = $2 AND content_key = $3',
+          [item.page, item.section, item.content_key]
+        );
+        
+        if (existing.rows.length > 0) {
+          await client.query(
+            'UPDATE page_content SET content_value = $1, updated_at = CURRENT_TIMESTAMP WHERE page = $2 AND section = $3 AND content_key = $4',
+            [item.content_value, item.page, item.section, item.content_key]
+          );
+          updated++;
+        } else {
+          await client.query(
+            'INSERT INTO page_content (page, section, content_key, content_value) VALUES ($1, $2, $3, $4)',
+            [item.page, item.section, item.content_key, item.content_value]
+          );
+          created++;
+        }
+      }
+      
+      await client.query('COMMIT');
+      res.json({ message: `Content seeded: ${created} created, ${updated} updated` });
+    } catch (err) {
+      await client.query('ROLLBACK');
+      throw err;
+    } finally {
+      client.release();
+    }
+  } catch (error) {
+    console.error('Seed content error:', error);
+    res.status(500).json({ error: 'Failed to seed content' });
   }
 });
 
