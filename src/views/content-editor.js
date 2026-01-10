@@ -11,25 +11,22 @@ function ContentEditor() {
   const [success, setSuccess] = useState('');
   const [activeSection, setActiveSection] = useState('hero');
 
-  // Get stored credentials
-  const masterKey = sessionStorage.getItem('masterKey');
-  const password = sessionStorage.getItem('adminPassword');
-
   useEffect(() => {
-    if (!masterKey || !password) {
+    const token = localStorage.getItem('superadmin_token');
+    if (!token) {
       history.push('/vault-e9232b8eefbaa45e');
       return;
     }
     fetchContent();
-  }, [masterKey, password, history]);
+  }, [history]);
 
   const fetchContent = async () => {
     try {
       setLoading(true);
+      const token = localStorage.getItem('superadmin_token');
       const response = await fetch('/api/admin/content', {
         headers: {
-          'x-master-key': masterKey,
-          'x-admin-password': password
+          'Authorization': `Bearer ${token}`
         }
       });
       
@@ -62,12 +59,12 @@ function ContentEditor() {
       setSaving(true);
       setError('');
       
+      const token = localStorage.getItem('superadmin_token');
       const response = await fetch('/api/admin/content/seed-modules', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'x-master-key': masterKey,
-          'x-admin-password': password
+          'Authorization': `Bearer ${token}`
         }
       });
       
@@ -115,12 +112,12 @@ function ContentEditor() {
         content_type: data.type || 'text'
       }));
       
+      const token = localStorage.getItem('superadmin_token');
       const response = await fetch('/api/admin/content/bulk', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'x-master-key': masterKey,
-          'x-admin-password': password
+          'Authorization': `Bearer ${token}`
         },
         body: JSON.stringify({ items })
       });
