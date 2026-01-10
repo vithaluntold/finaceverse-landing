@@ -82,6 +82,31 @@ class KeywordOptimizer {
     
     const targetKeyword = await this.getTargetKeyword(pageUrl);
     
+    // Count internal and external links
+    const baseHostname = new URL(pageUrl).hostname;
+    let internalLinks = 0;
+    let externalLinks = 0;
+    
+    $('a[href]').each((i, el) => {
+      const href = $(el).attr('href');
+      if (!href) return;
+      
+      try {
+        if (href.startsWith('/') || href.startsWith('#')) {
+          internalLinks++;
+        } else {
+          const linkHostname = new URL(href, pageUrl).hostname;
+          if (linkHostname === baseHostname) {
+            internalLinks++;
+          } else {
+            externalLinks++;
+          }
+        }
+      } catch (e) {
+        // Invalid URL, skip
+      }
+    });
+    
     const analysis = {
       pageUrl,
       targetKeyword,
@@ -92,6 +117,8 @@ class KeywordOptimizer {
       urlCheck: this.checkUrlSlug(pageUrl, targetKeyword),
       densityCheck: this.checkKeywordDensity($, targetKeyword),
       metaTagsCheck: this.checkMetaTags($, targetKeyword),
+      internalLinks,
+      externalLinks,
       
       score: 0,
       issues: [],
@@ -443,7 +470,7 @@ class KeywordOptimizer {
     return results;
   }
 
-  // Generate summary report
+  // Generate summary report with detailed page data for dashboard
   async generateReport() {
     const results = await this.scanAllPages();
     
@@ -457,9 +484,17 @@ class KeywordOptimizer {
         sum + r.recommendations.filter(rec => rec.severity === 'critical').length, 0
       ),
       pages: results.map(r => ({
+        page: r.pageUrl.replace('https://www.finaceverse.io', '').replace('/', '') || 'home',
         url: r.pageUrl,
-        score: r.score,
-        issues: r.recommendations.length
+        seo_score: r.score,
+        keyword_density: r.densityCheck.density.toFixed(2),
+        word_count: r.densityCheck.totalWords,
+        internal_links: r.internalLinks || 0,
+        external_links: r.externalLinks || 0,
+        images_count: r.altTextCheck.total,
+        images_without_alt: r.altTextCheck.missing,
+        issues: r.recommendations.length,
+        last_scanned: new Date().toISOString()
       }))
     };
     
@@ -472,8 +507,8 @@ class KeywordOptimizer {
     console.log(`Critical Issues: ${summary.criticalIssues}`);
     console.log('\nPage Scores:');
     summary.pages.forEach(page => {
-      const emoji = page.score >= 80 ? '✅' : page.score >= 70 ? '⚠️' : '❌';
-      console.log(`  ${emoji} ${page.url}: ${page.score}/100 (${page.issues} issues)`);
+      const emoji = page.seo_score >= 80 ? '✅' : page.seo_score >= 70 ? '⚠️' : '❌';
+      console.log(`  ${emoji} ${page.url}: ${page.seo_score}/100 (${page.issues} issues)`);
     });
     console.log('='.repeat(60) + '\n');
     

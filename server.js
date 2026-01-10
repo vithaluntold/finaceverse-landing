@@ -1686,18 +1686,73 @@ app.post('/api/seo/scan-all', authMiddleware, requireRole('superadmin'), seoLimi
   }
 });
 
-// Generate SEO report
+// Generate SEO report (cached from last scan)
 app.get('/api/seo/report', authMiddleware, requireRole('superadmin'), seoLimiter, async (req, res) => {
   try {
     if (!keywordOptimizer) {
       return res.status(503).json({ error: 'SEO optimizer not available' });
     }
     
+    // Try to get cached report from last scan
+    const cacheResult = await pool.query(`
+      SELECT page_url, seo_score, word_count, keyword_density, internal_links, 
+             external_links, images_count, images_without_alt, scanned_at
+      FROM content_analysis
+      WHERE scanned_at > NOW() - INTERVAL '24 hours'
+      ORDER BY scanned_at DESC
+    `);
+    
+    if (cacheResult.rows.length > 0) {
+      // Return cached data
+      const pages = cacheResult.rows.map(row => ({
+        page: row.page_url.replace('https://www.finaceverse.io', '').replace('/', '') || 'home',
+        url: row.page_url,
+        seo_score: row.seo_score || 0,
+        keyword_density: parseFloat(row.keyword_density) || 0,
+        word_count: row.word_count || 0,
+        internal_links: row.internal_links || 0,
+        external_links: row.external_links || 0,
+        images_count: row.images_count || 0,
+        images_without_alt: row.images_without_alt || 0,
+        last_scanned: row.scanned_at
+      }));
+      
+      return res.json({
+        cached: true,
+        totalPages: pages.length,
+        averageScore: Math.round(pages.reduce((sum, p) => sum + p.seo_score, 0) / pages.length),
+        pages
+      });
+    }
+    
+    // No cache, trigger fresh scan
     const report = await keywordOptimizer.generateReport();
     res.json(report);
   } catch (error) {
     console.error('Report generation error:', error);
     res.status(500).json({ error: error.message || 'Failed to generate report' });
+  }
+});
+
+// Trigger fresh SEO scan of all pages
+app.post('/api/seo/scan', authMiddleware, requireRole('superadmin'), seoLimiter, async (req, res) => {
+  try {
+    if (!keywordOptimizer) {
+      return res.status(503).json({ error: 'SEO optimizer not available' });
+    }
+    
+    // Run scan in background
+    res.json({ message: 'SEO scan started', status: 'running' });
+    
+    // Trigger scan (don't await)
+    keywordOptimizer.generateReport().then(() => {
+      console.log('✅ SEO scan completed');
+    }).catch(err => {
+      console.error('❌ SEO scan failed:', err);
+    });
+  } catch (error) {
+    console.error('Scan trigger error:', error);
+    res.status(500).json({ error: error.message || 'Failed to trigger scan' });
   }
 });
 

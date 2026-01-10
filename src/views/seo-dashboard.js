@@ -146,11 +146,20 @@ const SEODashboard = () => {
           method: 'POST',
           headers
         });
+      } else if (activeTab === 'scores') {
+        // Trigger fresh SEO scan
+        setLoading(true);
+        await fetch(`${API_URL}/api/seo/scan`, {
+          method: 'POST',
+          headers
+        });
       }
       
       setTimeout(fetchAllData, 2000);
     } catch (error) {
       console.error('Error refreshing data:', error);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -506,52 +515,71 @@ const SEODashboard = () => {
   const renderScoresTab = () => (
     <div className="seo-tab-content">
       <div className="seo-section">
-        <h2>Page SEO Scores</h2>
-        <div className="scores-grid">
-          {pageScores.map((page, idx) => (
-            <div key={idx} className="score-card">
-              <div className="score-header">
-                <h3>{page.page}</h3>
-                <div className={`score-circle ${page.seo_score >= 70 ? 'good' : page.seo_score >= 40 ? 'medium' : 'poor'}`}>
-                  {page.seo_score}/100
-                </div>
-              </div>
-              <div className="score-details">
-                <div className="score-item">
-                  <span>Keyword Density</span>
-                  <span>{page.keyword_density}%</span>
-                </div>
-                <div className="score-item">
-                  <span>Word Count</span>
-                  <span>{page.word_count}</span>
-                </div>
-                <div className="score-item">
-                  <span>Internal Links</span>
-                  <span>{page.internal_links}</span>
-                </div>
-                <div className="score-item">
-                  <span>External Links</span>
-                  <span>{page.external_links}</span>
-                </div>
-                <div className="score-item">
-                  <span>Images</span>
-                  <span>{page.images_count}</span>
-                </div>
-                <div className="score-item">
-                  <span>Missing Alt Texts</span>
-                  <span className={page.images_without_alt > 0 ? 'error' : 'success'}>
-                    {page.images_without_alt}
-                  </span>
-                </div>
-              </div>
-              {page.last_scanned && (
-                <div className="score-footer">
-                  Last scanned: {format(new Date(page.last_scanned), 'MMM dd, yyyy')}
-                </div>
-              )}
-            </div>
-          ))}
+        <div className="section-header">
+          <h2>Page SEO Scores</h2>
+          {pageScores.length === 0 && !loading && (
+            <button onClick={handleRefresh} className="scan-button">
+              🚀 Run SEO Scan
+            </button>
+          )}
         </div>
+        {loading ? (
+          <div className="loading-state">
+            <p>Scanning pages for SEO optimization...</p>
+            <p className="loading-subtitle">This may take a few minutes</p>
+          </div>
+        ) : pageScores.length === 0 ? (
+          <div className="empty-state">
+            <p>No SEO data available yet</p>
+            <p className="empty-subtitle">Click "Run SEO Scan" to analyze all pages</p>
+          </div>
+        ) : (
+          <div className="scores-grid">
+            {pageScores.map((page, idx) => (
+              <div key={idx} className="score-card">
+                <div className="score-header">
+                  <h3>{page.page}</h3>
+                  <div className={`score-circle ${page.seo_score >= 70 ? 'good' : page.seo_score >= 40 ? 'medium' : 'poor'}`}>
+                    {page.seo_score}/100
+                  </div>
+                </div>
+                <div className="score-details">
+                  <div className="score-item">
+                    <span>Keyword Density</span>
+                    <span>{page.keyword_density}%</span>
+                  </div>
+                  <div className="score-item">
+                    <span>Word Count</span>
+                    <span>{page.word_count}</span>
+                  </div>
+                  <div className="score-item">
+                    <span>Internal Links</span>
+                    <span>{page.internal_links}</span>
+                  </div>
+                  <div className="score-item">
+                    <span>External Links</span>
+                    <span>{page.external_links}</span>
+                  </div>
+                  <div className="score-item">
+                    <span>Images</span>
+                    <span>{page.images_count}</span>
+                  </div>
+                  <div className="score-item">
+                    <span>Missing Alt Texts</span>
+                    <span className={page.images_without_alt > 0 ? 'error' : 'success'}>
+                      {page.images_without_alt}
+                    </span>
+                  </div>
+                </div>
+                {page.last_scanned && (
+                  <div className="score-footer">
+                    Last scanned: {format(new Date(page.last_scanned), 'MMM dd, yyyy')}
+                  </div>
+                )}
+              </div>
+            ))}
+          </div>
+        )}
       </div>
     </div>
   );
