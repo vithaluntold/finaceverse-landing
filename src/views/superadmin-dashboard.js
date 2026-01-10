@@ -74,6 +74,24 @@ const SuperAdminDashboard = () => {
           </div>
           <button className="card-btn">Open SEO →</button>
         </div>
+
+        <div 
+          className="dashboard-card products"
+          onClick={() => history.push('/vault-e9232b8eefbaa45e/products')}
+        >
+          <div className="card-header">
+            <div className="card-icon">📦</div>
+            <h2>Product Manager</h2>
+          </div>
+          <p>Manage modules, control visibility, toggle between current reality and future vision</p>
+          <div className="card-features">
+            <span>• Add/Edit Products</span>
+            <span>• Launch Status</span>
+            <span>• Visibility Control</span>
+            <span>• Content CMS</span>
+          </div>
+          <button className="card-btn">Manage Products →</button>
+        </div>
       </div>
 
       <div className="quick-stats">

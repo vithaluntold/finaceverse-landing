@@ -396,6 +396,25 @@ async function initializeDatabase() {
         converted_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
       );
 
+      CREATE TABLE IF NOT EXISTS products (
+        id SERIAL PRIMARY KEY,
+        slug VARCHAR(100) UNIQUE NOT NULL,
+        name VARCHAR(255) NOT NULL,
+        tagline VARCHAR(500),
+        description TEXT,
+        status VARCHAR(50) DEFAULT 'planned',
+        icon_svg TEXT,
+        image_url VARCHAR(500),
+        external_url VARCHAR(500),
+        display_order INTEGER DEFAULT 0,
+        features JSONB DEFAULT '[]',
+        cell_size VARCHAR(20) DEFAULT 'medium',
+        cell_tag VARCHAR(50),
+        is_hero BOOLEAN DEFAULT false,
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+      );
+
       CREATE INDEX IF NOT EXISTS idx_performance_timestamp ON performance_metrics(timestamp);
       CREATE INDEX IF NOT EXISTS idx_visits_timestamp ON visits(timestamp);
       CREATE INDEX IF NOT EXISTS idx_events_timestamp ON events(timestamp);
@@ -403,6 +422,8 @@ async function initializeDatabase() {
       CREATE INDEX IF NOT EXISTS idx_pagespeed_timestamp ON pagespeed_results(timestamp);
       CREATE INDEX IF NOT EXISTS idx_experiment_assignments_user ON experiment_assignments(user_id);
       CREATE INDEX IF NOT EXISTS idx_experiment_conversions_user ON experiment_conversions(user_id);
+      CREATE INDEX IF NOT EXISTS idx_products_status ON products(status);
+      CREATE INDEX IF NOT EXISTS idx_products_display_order ON products(display_order);
     `);
     
     // Create superadmin user if not exists
@@ -1993,6 +2014,334 @@ app.get('/api/seo/auto-fix/stats', authMiddleware, requireRole('superadmin'), as
   } catch (error) {
     console.error('Fix stats error:', error);
     res.status(500).json({ error: error.message });
+  }
+});
+
+// =====================================================================
+// PRODUCT MANAGEMENT - Dynamic Module/Product CMS
+// =====================================================================
+
+// Public endpoint - Get all products (for modules page)
+app.get('/api/products', async (req, res) => {
+  try {
+    const { view } = req.query; // 'current' or 'vision'
+    
+    let query = `
+      SELECT id, slug, name, tagline, description, status, icon_svg, image_url, 
+             external_url, display_order, features, cell_size, cell_tag, is_hero
+      FROM products 
+    `;
+    
+    if (view === 'current') {
+      query += ` WHERE status IN ('launched', 'launching', 'coming_soon') `;
+    }
+    // 'vision' or no filter shows all products
+    
+    query += ` ORDER BY display_order ASC, created_at ASC`;
+    
+    const result = await pool.query(query);
+    res.json({ products: result.rows });
+  } catch (error) {
+    console.error('Get products error:', error);
+    res.status(500).json({ error: 'Failed to fetch products' });
+  }
+});
+
+// Admin - Get all products with full details
+app.get('/api/admin/products', authMiddleware, requireRole('superadmin'), async (req, res) => {
+  try {
+    const result = await pool.query(`
+      SELECT * FROM products ORDER BY display_order ASC, created_at ASC
+    `);
+    res.json({ products: result.rows });
+  } catch (error) {
+    console.error('Admin get products error:', error);
+    res.status(500).json({ error: 'Failed to fetch products' });
+  }
+});
+
+// Admin - Create new product
+app.post('/api/admin/products', authMiddleware, requireRole('superadmin'), async (req, res) => {
+  try {
+    const { 
+      slug, name, tagline, description, status, icon_svg, 
+      image_url, external_url, display_order, features, cell_size, cell_tag, is_hero 
+    } = req.body;
+    
+    if (!slug || !name) {
+      return res.status(400).json({ error: 'Slug and name are required' });
+    }
+    
+    const result = await pool.query(`
+      INSERT INTO products (slug, name, tagline, description, status, icon_svg, image_url, external_url, display_order, features, cell_size, cell_tag, is_hero)
+      VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13)
+      RETURNING *
+    `, [slug, name, tagline, description, status || 'planned', icon_svg, image_url, external_url, display_order || 0, JSON.stringify(features || []), cell_size || 'medium', cell_tag, is_hero || false]);
+    
+    res.json({ product: result.rows[0], message: 'Product created successfully' });
+  } catch (error) {
+    console.error('Create product error:', error);
+    if (error.code === '23505') {
+      return res.status(400).json({ error: 'A product with this slug already exists' });
+    }
+    res.status(500).json({ error: 'Failed to create product' });
+  }
+});
+
+// Admin - Update product
+app.put('/api/admin/products/:id', authMiddleware, requireRole('superadmin'), async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { 
+      slug, name, tagline, description, status, icon_svg, 
+      image_url, external_url, display_order, features, cell_size, cell_tag, is_hero 
+    } = req.body;
+    
+    const result = await pool.query(`
+      UPDATE products SET 
+        slug = COALESCE($1, slug),
+        name = COALESCE($2, name),
+        tagline = COALESCE($3, tagline),
+        description = COALESCE($4, description),
+        status = COALESCE($5, status),
+        icon_svg = COALESCE($6, icon_svg),
+        image_url = COALESCE($7, image_url),
+        external_url = COALESCE($8, external_url),
+        display_order = COALESCE($9, display_order),
+        features = COALESCE($10, features),
+        cell_size = COALESCE($11, cell_size),
+        cell_tag = COALESCE($12, cell_tag),
+        is_hero = COALESCE($13, is_hero),
+        updated_at = CURRENT_TIMESTAMP
+      WHERE id = $14
+      RETURNING *
+    `, [slug, name, tagline, description, status, icon_svg, image_url, external_url, display_order, features ? JSON.stringify(features) : null, cell_size, cell_tag, is_hero, id]);
+    
+    if (result.rows.length === 0) {
+      return res.status(404).json({ error: 'Product not found' });
+    }
+    
+    res.json({ product: result.rows[0], message: 'Product updated successfully' });
+  } catch (error) {
+    console.error('Update product error:', error);
+    res.status(500).json({ error: 'Failed to update product' });
+  }
+});
+
+// Admin - Delete product
+app.delete('/api/admin/products/:id', authMiddleware, requireRole('superadmin'), async (req, res) => {
+  try {
+    const { id } = req.params;
+    
+    const result = await pool.query('DELETE FROM products WHERE id = $1 RETURNING *', [id]);
+    
+    if (result.rows.length === 0) {
+      return res.status(404).json({ error: 'Product not found' });
+    }
+    
+    res.json({ message: 'Product deleted successfully', product: result.rows[0] });
+  } catch (error) {
+    console.error('Delete product error:', error);
+    res.status(500).json({ error: 'Failed to delete product' });
+  }
+});
+
+// Admin - Reorder products
+app.post('/api/admin/products/reorder', authMiddleware, requireRole('superadmin'), async (req, res) => {
+  try {
+    const { orders } = req.body; // Array of { id, display_order }
+    
+    if (!orders || !Array.isArray(orders)) {
+      return res.status(400).json({ error: 'Orders array is required' });
+    }
+    
+    const client = await pool.connect();
+    try {
+      await client.query('BEGIN');
+      
+      for (const { id, display_order } of orders) {
+        await client.query('UPDATE products SET display_order = $1, updated_at = CURRENT_TIMESTAMP WHERE id = $2', [display_order, id]);
+      }
+      
+      await client.query('COMMIT');
+      res.json({ message: 'Products reordered successfully' });
+    } catch (err) {
+      await client.query('ROLLBACK');
+      throw err;
+    } finally {
+      client.release();
+    }
+  } catch (error) {
+    console.error('Reorder products error:', error);
+    res.status(500).json({ error: 'Failed to reorder products' });
+  }
+});
+
+// Admin - Seed default products
+app.post('/api/admin/products/seed', authMiddleware, requireRole('superadmin'), async (req, res) => {
+  try {
+    const defaultProducts = [
+      {
+        slug: 'accute',
+        name: 'Accute',
+        tagline: 'Precision accounting orchestration at scale.',
+        description: 'The cognitive brain of FinACEverse. Accute orchestrates workflows across the financial ecosystem with unparalleled precision.',
+        status: 'launched',
+        external_url: 'https://accute.io',
+        display_order: 1,
+        cell_tag: 'Foundation',
+        cell_size: 'large',
+        is_hero: true,
+        features: ['Workflow Automation', 'Multi-entity Support', 'Real-time Sync']
+      },
+      {
+        slug: 'luca',
+        name: 'Luca',
+        tagline: 'Domain intelligence for finance professionals.',
+        description: 'Domain intelligence that understands the nuances of accounting history and future taxation impacts.',
+        status: 'launched',
+        external_url: null,
+        display_order: 2,
+        cell_tag: 'Intelligence',
+        cell_size: 'medium',
+        is_hero: false,
+        features: ['Tax Intelligence', 'Historical Analysis', 'Predictive Insights']
+      },
+      {
+        slug: 'epi-q',
+        name: 'EPI-Q',
+        tagline: 'Enterprise Performance Intelligence.',
+        description: 'Advanced reporting and predictive analytics for modern enterprise operations.',
+        status: 'launched',
+        external_url: null,
+        display_order: 3,
+        cell_tag: 'Insights',
+        cell_size: 'medium',
+        is_hero: false,
+        features: ['Performance Dashboards', 'Predictive Analytics', 'Custom Reports']
+      },
+      {
+        slug: 'finaid-hub',
+        name: 'Fin(Ai)d Hub',
+        tagline: 'Execution at scale without increasing headcount.',
+        description: 'The central hub for AI-powered financial operations, enabling teams to scale efficiently.',
+        status: 'launching',
+        external_url: null,
+        display_order: 4,
+        cell_tag: 'Scale',
+        cell_size: 'small',
+        is_hero: false,
+        features: ['AI Agents', 'Task Automation', 'Resource Optimization']
+      },
+      {
+        slug: 'sumbuddy',
+        name: 'SumBuddy',
+        tagline: 'Smart collaboration and unified communication.',
+        description: 'Smart collaboration and unified communication layer for financial teams.',
+        status: 'coming_soon',
+        external_url: null,
+        display_order: 5,
+        cell_tag: 'Communication',
+        cell_size: 'small',
+        is_hero: false,
+        features: ['Team Chat', 'Document Sharing', 'Workflow Comments']
+      },
+      {
+        slug: 'vamn',
+        name: 'VAMN',
+        tagline: 'Verifiable Arithmetic Multi-Stream Network.',
+        description: 'VAMN provides the core intelligence through specialized cognitive streams for financial calculations.',
+        status: 'planned',
+        external_url: 'https://vamn.io',
+        display_order: 6,
+        cell_tag: 'Foundation',
+        cell_size: 'large',
+        is_hero: true,
+        features: ['Cognitive Streams', 'Regulatory Compliance', 'Shared Ontology']
+      },
+      {
+        slug: 'cyloid',
+        name: 'Cyloid',
+        tagline: 'Mathematical verification for every entry.',
+        description: 'Transforming documents into indisputable mathematical facts. Ensuring verification for every financial entry.',
+        status: 'planned',
+        external_url: 'https://cyloid.io',
+        display_order: 7,
+        cell_tag: 'Verification',
+        cell_size: 'medium',
+        is_hero: true,
+        features: ['Document Verification', 'Audit Trail', 'Compliance Proof']
+      },
+      {
+        slug: 'taxblitz',
+        name: 'TaxBlitz',
+        tagline: 'Automated tax compliance at lightning speed.',
+        description: 'Lightning-fast tax calculations and compliance automation across jurisdictions.',
+        status: 'planned',
+        external_url: null,
+        display_order: 8,
+        cell_tag: 'Tax',
+        cell_size: 'medium',
+        is_hero: false,
+        features: ['Multi-jurisdiction', 'Auto Filing', 'Deadline Tracking']
+      },
+      {
+        slug: 'audric',
+        name: 'Audric',
+        tagline: 'AI-powered audit preparation and execution.',
+        description: 'Continuous auditing enabled by AI, reducing seasonal spikes and ensuring 100% audit readiness.',
+        status: 'planned',
+        external_url: null,
+        display_order: 9,
+        cell_tag: 'Audit',
+        cell_size: 'medium',
+        is_hero: false,
+        features: ['Continuous Auditing', 'Risk Detection', 'Audit Scheduling']
+      }
+    ];
+    
+    const client = await pool.connect();
+    let created = 0, updated = 0;
+    
+    try {
+      await client.query('BEGIN');
+      
+      for (const product of defaultProducts) {
+        const existing = await client.query('SELECT id FROM products WHERE slug = $1', [product.slug]);
+        
+        if (existing.rows.length > 0) {
+          await client.query(`
+            UPDATE products SET 
+              name = $1, tagline = $2, description = $3, status = $4, 
+              external_url = $5, display_order = $6, cell_tag = $7, 
+              cell_size = $8, is_hero = $9, features = $10, updated_at = CURRENT_TIMESTAMP
+            WHERE slug = $11
+          `, [product.name, product.tagline, product.description, product.status, 
+              product.external_url, product.display_order, product.cell_tag, 
+              product.cell_size, product.is_hero, JSON.stringify(product.features), product.slug]);
+          updated++;
+        } else {
+          await client.query(`
+            INSERT INTO products (slug, name, tagline, description, status, external_url, display_order, cell_tag, cell_size, is_hero, features)
+            VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11)
+          `, [product.slug, product.name, product.tagline, product.description, product.status, 
+              product.external_url, product.display_order, product.cell_tag, 
+              product.cell_size, product.is_hero, JSON.stringify(product.features)]);
+          created++;
+        }
+      }
+      
+      await client.query('COMMIT');
+      res.json({ message: `Products seeded: ${created} created, ${updated} updated` });
+    } catch (err) {
+      await client.query('ROLLBACK');
+      throw err;
+    } finally {
+      client.release();
+    }
+  } catch (error) {
+    console.error('Seed products error:', error);
+    res.status(500).json({ error: 'Failed to seed products' });
   }
 });
 

@@ -88,6 +88,10 @@
   border-top: 3px solid #ec4899;
 }
 
+.dashboard-card.products {
+  border-top: 3px solid #10b981;
+}
+
 .card-header {
   display: flex;
   align-items: center;

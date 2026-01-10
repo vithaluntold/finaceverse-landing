@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useState, useEffect } from 'react'
 
 import Script from 'dangerous-html/react'
 import { Helmet } from 'react-helmet'
@@ -8,6 +8,51 @@ import Footer from '../components/footer'
 import './modules.css'
 
 const Modules = (props) => {
+  const [viewMode, setViewMode] = useState('current'); // 'current' or 'vision'
+  const [products, setProducts] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchProducts = async () => {
+      try {
+        const response = await fetch(`/api/products?view=${viewMode}`);
+        const data = await response.json();
+        setProducts(data.products || []);
+      } catch (err) {
+        console.error('Failed to fetch products:', err);
+        // Fallback to showing all static content if API fails
+        setProducts([]);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchProducts();
+  }, [viewMode]);
+
+  // Helper to check if a product should be shown
+  const isProductVisible = (slug) => {
+    if (products.length === 0) return true; // Show all if no API data
+    const product = products.find(p => p.slug === slug);
+    return product !== undefined;
+  };
+
+  // Helper to get status badge for a product
+  const getStatusBadge = (slug) => {
+    if (products.length === 0) return null;
+    const product = products.find(p => p.slug === slug);
+    if (!product) return null;
+    
+    if (product.status === 'launched') {
+      return <span className="product-status-badge launched">Live</span>;
+    } else if (product.status === 'launching') {
+      return <span className="product-status-badge launching">Launching Soon</span>;
+    } else if (product.status === 'coming_soon') {
+      return <span className="product-status-badge coming-soon">Coming Soon</span>;
+    } else {
+      return <span className="product-status-badge planned">In Development</span>;
+    }
+  };
+
   return (
     <div className="modules-container1">
       <Helmet>
@@ -20,6 +65,24 @@ const Modules = (props) => {
         <link rel="canonical" href="https://finaceverse.io/modules" />
       </Helmet>
       <Navigation></Navigation>
+      
+      {/* View Mode Toggle */}
+      <div className="view-mode-toggle">
+        <span className="toggle-label">View:</span>
+        <button 
+          className={`toggle-btn ${viewMode === 'current' ? 'active' : ''}`}
+          onClick={() => setViewMode('current')}
+        >
+          Current Products
+        </button>
+        <button 
+          className={`toggle-btn ${viewMode === 'vision' ? 'active' : ''}`}
+          onClick={() => setViewMode('vision')}
+        >
+          Full Vision
+        </button>
+      </div>
+
       <section className="modules-hero">
         <video
           autoPlay="true"
@@ -55,6 +118,7 @@ const Modules = (props) => {
             </div>
             <a href="https://accute.io" target="_blank" rel="noopener noreferrer" style={{textDecoration: 'none', color: 'inherit'}}>
               <div className="modules-hero-card modules-hero-accute" style={{cursor: 'pointer'}}>
+                {getStatusBadge('accute')}
                 <div className="modules-hero-card-icon">
                   <svg
                   xmlns="http://www.w3.org/2000/svg"
@@ -81,8 +145,10 @@ const Modules = (props) => {
               </p>
             </div>
             </a>
+            {isProductVisible('vamn') && (
             <a href="https://vamn.io" target="_blank" rel="noopener noreferrer" style={{textDecoration: 'none', color: 'inherit'}}>
               <div className="modules-hero-card modules-hero-vamn" style={{cursor: 'pointer'}}>
+                {getStatusBadge('vamn')}
                 <div className="modules-hero-card-icon">
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
@@ -109,8 +175,11 @@ const Modules = (props) => {
               </p>
             </div>
             </a>
+            )}
+            {isProductVisible('cyloid') && (
             <a href="https://cyloid.io" target="_blank" rel="noopener noreferrer" style={{textDecoration: 'none', color: 'inherit'}}>
               <div className="modules-hero-card modules-hero-cyloid" style={{cursor: 'pointer'}}>
+                {getStatusBadge('cyloid')}
                 <div className="modules-hero-card-icon">
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
@@ -134,6 +203,7 @@ const Modules = (props) => {
               </p>
             </div>
             </a>
+            )}
           </div>
         </div>
       </section>
