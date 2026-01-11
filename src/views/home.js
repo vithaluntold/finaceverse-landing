@@ -127,17 +127,17 @@ const Home = (props) => {
             <h1 className="hero-title">
               <span>
                 {' '}
-                We See What Others
+                Unifying the Finance
                 <span
                   dangerouslySetInnerHTML={{
                     __html: ' ',
                   }}
                 />
               </span>
-              <span className="home-thq-text-gradient-elm1">Don&apos;t</span>
+              <span className="home-thq-text-gradient-elm1">Multiverse</span>
             </h1>
             <p className="hero-subtitle">
-              The enterprise is reaching cognitive exhaustion. <strong>FinACEverse</strong> is the world&apos;s first 
+              We see what others don&apos;t. The enterprise is reaching cognitive exhaustion. <strong>FinACEverse</strong> is the world&apos;s first 
               <strong>Cognitive Operating System for Autonomous Enterprises</strong> — the foundational layer that 
               unifies cognition, execution, optimization, and structural evolution. Not an app. Not a bot. 
               A full-stack cognitive infrastructure where <strong>Understanding → Execution → Structure → Optimization</strong> becomes 
@@ -266,11 +266,12 @@ const Home = (props) => {
         <div className="container-wrapper">
           <div className="section-header centered">
             <h2 className="section-title">
-              <span>Who </span>
-              <span className="home-thq-text-gradient-elm2">It&apos;s Built For</span>
+              <span>Who&apos;s Building the </span>
+              <span className="home-thq-text-gradient-elm2">Future With Us</span>
             </h2>
-            <p className="section-subtitle" style={{maxWidth: '600px', margin: 'var(--spacing-md) auto 0', textAlign: 'center'}}>
-              Whether you&apos;re a solo practitioner or a global enterprise, FinACEverse scales to your needs
+            <p className="section-subtitle" style={{maxWidth: '750px', margin: 'var(--spacing-md) auto 0', textAlign: 'center'}}>
+              Finance is the proving ground — the most regulated, numerical, and audit-bound domain in the enterprise. 
+              We start here with the professionals who understand this complexity. Once organizational autonomy is proven in finance, it scales across the entire enterprise.
             </p>
           </div>
           <div className="bento-grid" style={{gap: 'var(--spacing-xl)', marginTop: 'var(--spacing-2xl)'}}>
@@ -356,6 +357,31 @@ const Home = (props) => {
               <p className="section-content" style={{marginTop: 'var(--spacing-md)'}}>
                 <strong>Solution:</strong> Luca + EPI-Q gives you complete audit trails with AI-powered document verification. Every number traces to source. 60% faster audits.
               </p>
+            </div>
+            
+            {/* Bridge Card - Enterprise Expansion */}
+            <div className="bento-cell cell-wide" style={{background: 'linear-gradient(135deg, color-mix(in srgb, var(--color-primary) 15%, var(--color-surface-elevated)) 0%, color-mix(in srgb, var(--color-accent) 10%, var(--color-surface-elevated)) 100%)', padding: 'var(--spacing-2xl)', borderRadius: 'var(--border-radius-lg)', border: '1px solid color-mix(in srgb, var(--color-primary) 30%, transparent)'}}>
+              <div style={{display: 'flex', alignItems: 'center', gap: 'var(--spacing-md)', marginBottom: 'var(--spacing-lg)'}}>
+                <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="var(--color-primary)" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+                  <circle cx="12" cy="12" r="10" />
+                  <path d="M12 2a14.5 14.5 0 0 0 0 20 14.5 14.5 0 0 0 0-20" />
+                  <path d="M2 12h20" />
+                </svg>
+                <div>
+                  <h3 className="cell-title" style={{color: 'var(--color-primary)'}}>And Then... The Entire Enterprise</h3>
+                </div>
+              </div>
+              <p className="section-content" style={{fontSize: 'var(--font-size-lg)', lineHeight: 1.7}}>
+                The Cognitive OS is built to replicate across domains. Each domain becomes a universe within the <strong>Futurus Multiverse</strong>. 
+                Marketing, Legal, HR, Supply Chain — all inheriting the same architecture: <em>Understanding → Execution → Structure → Optimization</em>. 
+                These early adopters are proving what becomes possible when the enterprise itself becomes intelligent.
+              </p>
+              <div style={{marginTop: 'var(--spacing-lg)', display: 'flex', gap: 'var(--spacing-md)', flexWrap: 'wrap'}}>
+                <span style={{padding: 'var(--spacing-sm) var(--spacing-md)', background: 'color-mix(in srgb, var(--color-primary) 20%, transparent)', borderRadius: 'var(--border-radius-sm)', fontSize: 'var(--font-size-sm)'}}>🎯 Marketing Universe</span>
+                <span style={{padding: 'var(--spacing-sm) var(--spacing-md)', background: 'color-mix(in srgb, var(--color-primary) 20%, transparent)', borderRadius: 'var(--border-radius-sm)', fontSize: 'var(--font-size-sm)'}}>⚖️ Legal Universe</span>
+                <span style={{padding: 'var(--spacing-sm) var(--spacing-md)', background: 'color-mix(in srgb, var(--color-primary) 20%, transparent)', borderRadius: 'var(--border-radius-sm)', fontSize: 'var(--font-size-sm)'}}>👥 HR Universe</span>
+                <span style={{padding: 'var(--spacing-sm) var(--spacing-md)', background: 'color-mix(in srgb, var(--color-primary) 20%, transparent)', borderRadius: 'var(--border-radius-sm)', fontSize: 'var(--font-size-sm)'}}>🔗 Supply Chain Universe</span>
+              </div>
             </div>
           </div>
         </div>
