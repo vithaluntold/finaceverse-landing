@@ -14,14 +14,14 @@ const Footer = (props) => {
               <div className="footer-logo-wrapper">
                 <span className="footer-logo-text">FinACEverse</span>
                 <div className="footer-brand-tagline">
-                  <span>Cognitive Operating System for Finance</span>
+                  <span>Cognitive Operating System for Autonomous Enterprises</span>
                 </div>
               </div>
               <p className="footer-brand-description section-content">
-                Revolutionizing the finance, accounting, and taxation landscape
-                through our unique Verifiable Arithmetic Multi-Stream Network
-                (VAMN). We unify the past, present, and future of financial
-                operations into a single, cohesive intelligence ecosystem.
+                We are Futurus. We build the Cognitive Operating System that 
+                enables organizational autonomy. FinACEverse is the first universe — 
+                where cognition, execution, optimization, and structural evolution 
+                converge to power the next era of enterprise intelligence.
               </p>
               <div className="footer-social-links">
                 <a href="https://www.linkedin.com/company/finacegroup/" target="_blank" rel="noopener noreferrer" aria-label="LinkedIn">

@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 
 import Script from 'dangerous-html/react'
 import { Helmet } from 'react-helmet'
@@ -7,24 +7,101 @@ import Navigation from '../components/navigation'
 import Footer from '../components/footer'
 import './home.css'
 
+// Default SVG icons for products
+const DEFAULT_ICONS = {
+  accute: `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"><path d="M12 20v2m0-20v2m5 16v2m0-20v2M2 12h2m-2 5h2M2 7h2m16 5h2m-2 5h2M20 7h2M7 20v2M7 2v2"></path><rect width="16" height="16" x="4" y="4" rx="2"></rect><rect width="8" height="8" x="8" y="8" rx="1"></rect></g></svg>`,
+  luca: `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"><path d="M12 2a10 10 0 1 0 10 10H12z"/><path d="M12 2v10h10a10 10 0 0 0-10-10z"/></g></svg>`,
+  'finaid-hub': `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 2a14.5 14.5 0 0 0 0 20 14.5 14.5 0 0 0 0-20"/><path d="M2 12h20"/></g></svg>`,
+  'epi-q': `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"><path d="M3 3v18h18"/><path d="m19 9-5 5-4-4-3 3"/></g></svg>`,
+  vamn: `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"><ellipse cx="12" cy="5" rx="9" ry="3"></ellipse><path d="M3 5v14a9 3 0 0 0 18 0V5"></path><path d="M3 12a9 3 0 0 0 18 0"></path></g></svg>`,
+  cyloid: `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 13c0 5-3.5 7.5-7.66 8.95a1 1 0 0 1-.67-.01C7.5 20.5 4 18 4 13V6a1 1 0 0 1 1-1c2 0 4.5-1.2 6.24-2.72a1.17 1.17 0 0 1 1.52 0C14.51 3.81 17 5 19 5a1 1 0 0 1 1 1z"></path></svg>`,
+  taxblitz: `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"><path d="M4 2v20l2-1 2 1 2-1 2 1 2-1 2 1 2-1 2 1V2l-2 1-2-1-2 1-2-1-2 1-2-1-2 1z"/><path d="M14 8H8m6 4H8m2 4H8"/></g></svg>`,
+  audric: `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></g></svg>`,
+  sumbuddy: `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"><path d="M17 18a2 2 0 0 0-2-2H9a2 2 0 0 0-2 2"/><rect width="18" height="18" x="3" y="4" rx="2"/><circle cx="12" cy="10" r="2"/><path d="M8 2v2m8-2v2"/></g></svg>`,
+  finory: `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"><path d="m7.5 4.27 9 5.15"/><path d="M21 8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16Z"/><path d="m3.3 7 8.7 5 8.7-5M12 22V12"/></g></svg>`,
+  default: `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"><rect width="18" height="18" x="3" y="3" rx="2"/><path d="M12 8v8m-4-4h8"/></g></svg>`
+};
+
+// Product image URLs mapped by slug
+const PRODUCT_IMAGES = {
+  accute: '/images/Accute Transparent symbol.png',
+  luca: '/images/Luca Transparent symbol (2).png',
+  'finaid-hub': '/images/Fin(Ai)d Studio Transparent symbol.png',
+  'epi-q': '/images/EPI-Q Transparent symbol.png',
+  vamn: '/images/VAMN-7B Transparent logo.png',
+  cyloid: '/images/Cyloid.png',
+  finory: '/images/Finory Transparent symbol.png',
+  sumbuddy: '/images/SumBuddy Transparent symbol.png'
+};
+
 const Home = (props) => {
-  // Phase toggle - Phase 1 products are live, Phase 2 coming soon
-  const [showPhase2] = useState(false); // Set to true via SuperAdmin to show Phase 2
+  // Dynamic content state
+  const [products, setProducts] = useState([]);
+  const [pageContent, setPageContent] = useState({});
+  const [loading, setLoading] = useState(true);
+  
+  // Fetch products and content on mount
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        // Fetch products
+        const productsRes = await fetch('/api/products?view=current');
+        const productsData = await productsRes.json();
+        setProducts(productsData.products || []);
+        
+        // Fetch page content
+        const contentRes = await fetch('/api/content/home');
+        const contentData = await contentRes.json();
+        setPageContent(contentData.content || {});
+      } catch (err) {
+        console.error('Failed to fetch data:', err);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchData();
+  }, []);
+  
+  // Get content value with fallback
+  const getContent = (section, key, fallback = '') => {
+    return pageContent[section]?.[key] || fallback;
+  };
+  
+  // Get icon for a product
+  const getProductIcon = (product) => {
+    if (product.icon_svg) {
+      return <div dangerouslySetInnerHTML={{ __html: product.icon_svg }} />;
+    }
+    const defaultIcon = DEFAULT_ICONS[product.slug] || DEFAULT_ICONS.default;
+    return <div dangerouslySetInnerHTML={{ __html: defaultIcon }} />;
+  };
+  
+  // Get image for a product
+  const getProductImage = (product) => {
+    return product.image_url || PRODUCT_IMAGES[product.slug] || null;
+  };
+  
+  // Filter products by phase
+  const phase1Products = products.filter(p => p.phase === 1 || p.phase === '1');
+  const phase2Products = products.filter(p => p.phase === 2 || p.phase === '2');
+  // Show Phase 2 if there are products AND admin setting allows (default to true if there are phase 2 products)
+  const showPhase2Setting = getContent('modules_header', 'show_phase2', 'true');
+  const showPhase2 = phase2Products.length > 0 && (showPhase2Setting === 'true' || showPhase2Setting === true);
   
   return (
     <div className="home-container1">
       <Helmet>
-        <title>FinACEverse - Cognitive Operating System for Finance | AI-Powered Financial Intelligence</title>
-        <meta name="description" content="Transform fragmented financial operations with FinACEverse, the world's first Cognitive OS for finance. Unify accounting, taxation, and financial workflows through VAMN AI technology." />
-        <meta name="keywords" content="cognitive finance, VAMN, financial automation, AI accounting, tax compliance, Accute, Cyloid, financial intelligence" />
-        <meta property="og:title" content="FinACEverse - Cognitive Operating System for Finance" />
-        <meta property="og:description" content="Transform fragmented financial operations into a unified, intelligent ecosystem. VAMN-powered cognitive finance for modern enterprises." />
+        <title>FinACEverse - Cognitive Operating System for Autonomous Enterprises | Futurus</title>
+        <meta name="description" content="We see what others don't. FinACEverse is the world's first Cognitive Operating System for Autonomous Enterprises — enabling organizational autonomy through understanding, execution, structure, and optimization." />
+        <meta name="keywords" content="cognitive OS, autonomous enterprises, VAMN-70B, organizational autonomy, AI finance, Futurus, Accute, Luca, EPI-Q, Finory" />
+        <meta property="og:title" content="FinACEverse - Cognitive Operating System for Autonomous Enterprises" />
+        <meta property="og:description" content="We are Futurus. We build the Cognitive Operating System for Autonomous Enterprises. FinACEverse is only the beginning." />
         <meta property="og:url" content="https://finaceverse.io/" />
         <meta property="og:type" content="website" />
         <meta property="og:image" content="https://finaceverse.io/logo.png" />
         <meta name="twitter:card" content="summary_large_image" />
-        <meta name="twitter:title" content="FinACEverse - Cognitive Operating System for Finance" />
-        <meta name="twitter:description" content="Transform fragmented financial operations into a unified, intelligent ecosystem." />
+        <meta name="twitter:title" content="FinACEverse - Cognitive OS for Autonomous Enterprises" />
+        <meta name="twitter:description" content="The question is no longer 'How will AI fit into the enterprise?' The question is 'What becomes possible when the enterprise itself becomes intelligent?'" />
         <link rel="canonical" href="https://finaceverse.io/" />
       </Helmet>
       <Navigation></Navigation>
@@ -44,27 +121,27 @@ const Home = (props) => {
           <div className="hero-content-left">
             <div className="hero-badge">
               <span className="hero-badge-text">
-                The World&apos;s First Cognitive OS for Finance
+                The World&apos;s First Cognitive OS for Autonomous Enterprises
               </span>
             </div>
             <h1 className="hero-title">
               <span>
                 {' '}
-                Unifying the Finance
+                We See What Others
                 <span
                   dangerouslySetInnerHTML={{
                     __html: ' ',
                   }}
                 />
               </span>
-              <span className="home-thq-text-gradient-elm1">Multiverse</span>
+              <span className="home-thq-text-gradient-elm1">Don&apos;t</span>
             </h1>
             <p className="hero-subtitle">
-              FinACEverse is a <strong>Cognitive Operating System</strong> for finance - AI software that thinks, 
-              learns, and orchestrates your entire financial ecosystem. <strong>Accute</strong> orchestrates workflows, 
-              <strong>VAMN</strong> is the quantitative intelligence engine (an LLM purpose-built for financial reasoning), and specialized 
-              modules handle everything from document verification to process mining. We eliminate fragmentation 
-              and restore coherence across all financial operations.
+              The enterprise is reaching cognitive exhaustion. <strong>FinACEverse</strong> is the world&apos;s first 
+              <strong>Cognitive Operating System for Autonomous Enterprises</strong> — the foundational layer that 
+              unifies cognition, execution, optimization, and structural evolution. Not an app. Not a bot. 
+              A full-stack cognitive infrastructure where <strong>Understanding → Execution → Structure → Optimization</strong> becomes 
+              the continuous cycle of enterprise intelligence.
             </p>
             <div className="hero-actions">
               <a href="/request-demo" className="btn btn-primary btn-lg">Request Demo</a>
@@ -109,17 +186,17 @@ const Home = (props) => {
             <h2 className="section-title">
               <span>
                 {' '}
-                The Fragmentation
+                Built for Stability.
                 <span
                   dangerouslySetInnerHTML={{
                     __html: ' ',
                   }}
                 />
               </span>
-              <span className="home-thq-text-accent-elm1">Crisis</span>
+              <span className="home-thq-text-accent-elm1">Facing Complexity.</span>
             </h2>
-            <p className="section-subtitle" style={{maxWidth: '600px', margin: 'var(--spacing-md) auto 0', textAlign: 'center'}}>
-              Outdated systems and siloed data are hindering the effectiveness of modern financial professions.
+            <p className="section-subtitle" style={{maxWidth: '700px', margin: 'var(--spacing-md) auto 0', textAlign: 'center'}}>
+              Legacy enterprise software assumed the world would remain slow, linear, predictable. It assumed humans would always be the cognitive center. These assumptions are obsolete.
             </p>
           </div>
           <div className="bento-grid">
@@ -142,11 +219,11 @@ const Home = (props) => {
                     ></path>
                   </svg>
                 </div>
-                <h3 className="cell-title">Systemic Fragmentation</h3>
+                <h3 className="cell-title">Intelligence Lives in Heads</h3>
                 <p className="section-content">
-                  Accounting records the past, finance interprets the present,
-                  and taxation shapes the future. Yet, they operate in silos,
-                  creating massive inefficiencies and compliance blind spots.
+                  Organizations run on human memory, tribal knowledge, and manual coordination. 
+                  An enterprise cannot call itself digital if its intelligence still lives in people&apos;s heads. 
+                  This fragility is unsustainable.
                 </p>
                 <div className="cell-image-overlay">
                   <img
@@ -158,27 +235,27 @@ const Home = (props) => {
             </div>
             <div className="bento-cell cell-narrow">
               <div className="cell-content">
-                <h3 className="cell-title">Compliance Risk</h3>
+                <h3 className="cell-title">Systems Don&apos;t Reason</h3>
                 <p className="section-content">
-                  Manual data reentry and disconnected workflows increase the
-                  risk of regulatory failure in an era of tightening pressure.
+                  ERP, workflows, documents, emails — they were built to record, route, and store. 
+                  Never to reason, infer, adapt, or evolve. Humans fill the cognitive gaps.
                 </p>
                 <div className="cell-footer">
-                  <span className="stat-highlight">85%</span>
-                  <span className="stat-label">Manual Effort</span>
+                  <span className="stat-highlight">Record</span>
+                  <span className="stat-label">Not Reason</span>
                 </div>
               </div>
             </div>
             <div className="bento-cell cell-narrow">
               <div className="cell-content">
-                <h3 className="cell-title">Talent Shortage</h3>
+                <h3 className="cell-title">Scale Exceeds Limits</h3>
                 <p className="section-content">
-                  A shrinking workforce is struggling to keep up with rising AI
-                  capabilities and data complexity without integrated tools.
+                  The world demands more decisions than people can make, more accuracy than 
+                  people can maintain, more continuity than teams can provide.
                 </p>
                 <div className="cell-footer">
-                  <span className="stat-highlight">Capacity</span>
-                  <span className="stat-label">Bottleneck</span>
+                  <span className="stat-highlight">Exponential</span>
+                  <span className="stat-label">Complexity</span>
                 </div>
               </div>
             </div>
@@ -289,17 +366,17 @@ const Home = (props) => {
             <h2 className="section-title">
               <span>
                 {' '}
-                Cognitive OS
+                The Cognitive
                 <span
                   dangerouslySetInnerHTML={{
                     __html: ' ',
                   }}
                 />
               </span>
-              <span className="home-thq-text-gradient-elm2">Architecture</span>
+              <span className="home-thq-text-gradient-elm2">Cycle</span>
             </h2>
-            <p className="section-subtitle" style={{maxWidth: '600px', margin: 'var(--spacing-md) auto 0', textAlign: 'center'}}>
-              How FinACEverse transforms documents into indisputable financial facts
+            <p className="section-subtitle" style={{maxWidth: '700px', margin: 'var(--spacing-md) auto 0', textAlign: 'center'}}>
+              To enable organizational autonomy, four capabilities must converge. We have built all four.
             </p>
           </div>
           <div className="timeline-wrapper">
@@ -310,13 +387,12 @@ const Home = (props) => {
                 <div className="step-number">
                   <span>01</span>
                 </div>
-                <h3 className="step-title">VAMN AI Stream Input</h3>
+                <h3 className="step-title">Cognitive Understanding</h3>
                 <p className="section-content">
-                  Financial intelligence begins with our <strong>Verifiable Arithmetic
-                  Multi-Stream Network (VAMN)</strong> - think of it as multiple AI specialists 
-                  working simultaneously. Each "cognitive stream" is a specialized AI model 
-                  that processes specific types of financial data (invoices, receipts, contracts) 
-                  with mathematical precision, ensuring every number is traceable and verified.
+                  <strong>VAMN-70B</strong> is our neuro-symbolic foundation model — integrating 
+                  neural language reasoning, symbolic numeric logic, and grounded citation generation. 
+                  It reads with legal-grade accuracy, interprets with accountant-grade precision, 
+                  and calculates with mathematical determinism. <em>Coming Soon.</em>
                 </p>
               </div>
             </div>
@@ -326,13 +402,12 @@ const Home = (props) => {
                 <div className="step-number">
                   <span>02</span>
                 </div>
-                <h3 className="step-title">Accute AI Orchestration</h3>
+                <h3 className="step-title">Understanding Layer</h3>
                 <p className="section-content">
-                  <strong>Accute</strong> is your AI conductor - it creates a <strong>shared 
-                  financial language</strong> (what we call a "shared ontology") that ensures 
-                  accounting, finance, and tax all speak the same dialect. This AI orchestrator 
-                  coordinates workflows across financial reporting, tax prep, and audits, 
-                  becoming your firm&apos;s intelligent central hub and single source of truth.
+                  <strong>Intellexion</strong> provides document intelligence for financial, legal, 
+                  and operational documents. <strong>Synapse</strong> delivers retrieval and semantic 
+                  indexing across structured and unstructured data. Together, they give the OS complete 
+                  visibility into the information fabric of your enterprise.
                 </p>
               </div>
             </div>
@@ -342,12 +417,12 @@ const Home = (props) => {
                 <div className="step-number">
                   <span>03</span>
                 </div>
-                <h3 className="step-title">EPI-Q Process Discovery</h3>
+                <h3 className="step-title">Execution Layer</h3>
                 <p className="section-content">
-                  <strong>EPI-Q</strong> maps how work actually happens in your organization. 
-                  Enterprise process, task, and communication mining reveals bottlenecks, 
-                  identifies automation opportunities, and creates a <strong>digital twin 
-                  of your workflows</strong> - the foundation for intelligent transformation.
+                  Understanding without execution is incomplete. <strong>Fin(Ai)d Studio</strong> enables 
+                  AI agent creation. <strong>Luca</strong> delivers accounting superintelligence. 
+                  <strong>TaxBlitz</strong> and <strong>Audric</strong> will power autonomous tax and audit 
+                  operations. This is where cognition becomes action. <em>(TaxBlitz & Audric coming soon)</em>
                 </p>
               </div>
             </div>
@@ -357,14 +432,119 @@ const Home = (props) => {
                 <div className="step-number">
                   <span>04</span>
                 </div>
-                <h3 className="step-title">Compliant Execution</h3>
+                <h3 className="step-title">Self-Optimization</h3>
                 <p className="section-content">
-                  The Luca module provides domain intelligence, allowing Finaid
-                  Hub to execute at scale, delivering accurate, compliant
-                  results with zero headcount increase.
+                  An autonomous enterprise must understand how work actually flows. 
+                  <strong>EPI-Q</strong> provides process mining, task mining, and communication mining. 
+                  It reveals bottlenecks, shadow processes, and deviations — becoming the continuous 
+                  feedback loop for enterprise evolution. The OS perceives, acts, adapts, and improves — endlessly.
                 </p>
               </div>
             </div>
+          </div>
+        </div>
+      </section>
+      <section className="ai-maturity-stages" style={{background: 'var(--color-surface)', padding: 'var(--spacing-4xl) 0'}}>
+        <div className="container-wrapper">
+          <div className="section-header centered">
+            <h2 className="section-title">
+              <span>The Five Stages of </span>
+              <span className="home-thq-text-gradient-elm2">AI Maturity</span>
+            </h2>
+            <p className="section-subtitle" style={{maxWidth: '600px', margin: 'var(--spacing-md) auto 0', textAlign: 'center'}}>
+              The future demands autonomous enterprises. FinACEverse enables Stage 5.
+            </p>
+          </div>
+          <div style={{display: 'flex', justifyContent: 'center', alignItems: 'center', gap: 'var(--spacing-md)', flexWrap: 'wrap', marginTop: 'var(--spacing-2xl)'}}>
+            <div style={{padding: 'var(--spacing-lg)', background: 'var(--color-surface-elevated)', borderRadius: 'var(--border-radius-md)', textAlign: 'center', minWidth: '140px', opacity: 0.6}}>
+              <div style={{fontSize: 'var(--font-size-sm)', fontWeight: '600', color: 'var(--color-text-muted)'}}>Stage 1</div>
+              <div style={{fontSize: 'var(--font-size-lg)', fontWeight: '700', marginTop: 'var(--spacing-xs)'}}>Automation</div>
+              <div style={{fontSize: 'var(--font-size-xs)', marginTop: 'var(--spacing-xs)'}}>✓ Complete</div>
+            </div>
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="var(--color-text-muted)" strokeWidth="2" style={{opacity: 0.5}}><path d="M5 12h14m-7-7l7 7-7 7"/></svg>
+            <div style={{padding: 'var(--spacing-lg)', background: 'var(--color-surface-elevated)', borderRadius: 'var(--border-radius-md)', textAlign: 'center', minWidth: '140px', opacity: 0.6}}>
+              <div style={{fontSize: 'var(--font-size-sm)', fontWeight: '600', color: 'var(--color-text-muted)'}}>Stage 2</div>
+              <div style={{fontSize: 'var(--font-size-lg)', fontWeight: '700', marginTop: 'var(--spacing-xs)'}}>Assistance</div>
+              <div style={{fontSize: 'var(--font-size-xs)', marginTop: 'var(--spacing-xs)'}}>✓ Complete</div>
+            </div>
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="var(--color-text-muted)" strokeWidth="2" style={{opacity: 0.5}}><path d="M5 12h14m-7-7l7 7-7 7"/></svg>
+            <div style={{padding: 'var(--spacing-lg)', background: 'var(--color-surface-elevated)', borderRadius: 'var(--border-radius-md)', textAlign: 'center', minWidth: '140px', opacity: 0.6}}>
+              <div style={{fontSize: 'var(--font-size-sm)', fontWeight: '600', color: 'var(--color-text-muted)'}}>Stage 3</div>
+              <div style={{fontSize: 'var(--font-size-lg)', fontWeight: '700', marginTop: 'var(--spacing-xs)'}}>Augmentation</div>
+              <div style={{fontSize: 'var(--font-size-xs)', marginTop: 'var(--spacing-xs)'}}>✓ Complete</div>
+            </div>
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="var(--color-text-muted)" strokeWidth="2" style={{opacity: 0.5}}><path d="M5 12h14m-7-7l7 7-7 7"/></svg>
+            <div style={{padding: 'var(--spacing-lg)', background: 'var(--color-surface-elevated)', borderRadius: 'var(--border-radius-md)', textAlign: 'center', minWidth: '140px', opacity: 0.7}}>
+              <div style={{fontSize: 'var(--font-size-sm)', fontWeight: '600', color: 'var(--color-text-muted)'}}>Stage 4</div>
+              <div style={{fontSize: 'var(--font-size-lg)', fontWeight: '700', marginTop: 'var(--spacing-xs)'}}>Functional Autonomy</div>
+              <div style={{fontSize: 'var(--font-size-xs)', marginTop: 'var(--spacing-xs)'}}>✓ Complete</div>
+            </div>
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="var(--color-primary)" strokeWidth="2"><path d="M5 12h14m-7-7l7 7-7 7"/></svg>
+            <div style={{padding: 'var(--spacing-lg)', background: 'linear-gradient(135deg, var(--color-primary), var(--color-accent))', borderRadius: 'var(--border-radius-md)', textAlign: 'center', minWidth: '160px', color: 'white', boxShadow: '0 4px 20px rgba(var(--color-primary-rgb), 0.4)'}}>
+              <div style={{fontSize: 'var(--font-size-sm)', fontWeight: '600', opacity: 0.9}}>Stage 5</div>
+              <div style={{fontSize: 'var(--font-size-xl)', fontWeight: '700', marginTop: 'var(--spacing-xs)'}}>Organizational Autonomy</div>
+              <div style={{fontSize: 'var(--font-size-xs)', marginTop: 'var(--spacing-xs)', fontWeight: '600'}}>→ FinACEverse</div>
+            </div>
+          </div>
+          <div style={{marginTop: 'var(--spacing-2xl)', textAlign: 'center', maxWidth: '800px', margin: 'var(--spacing-2xl) auto 0'}}>
+            <p style={{fontSize: 'var(--font-size-lg)', lineHeight: 1.7, opacity: 0.9}}>
+              Enterprises that can <strong>sense change</strong>, <strong>interpret it</strong>, <strong>decide on action</strong>, 
+              <strong>execute end-to-end</strong>, <strong>evaluate results</strong>, and <strong>improve</strong> — continuously, 
+              without depending on human orchestration. This is organizational autonomy.
+            </p>
+          </div>
+        </div>
+      </section>
+      <section className="futurus-multiverse" style={{background: 'linear-gradient(135deg, color-mix(in srgb, var(--color-primary) 15%, var(--color-background)) 0%, var(--color-background) 100%)', padding: 'var(--spacing-4xl) 0'}}>
+        <div className="container-wrapper">
+          <div className="section-header centered">
+            <h2 className="section-title">
+              <span>The Futurus </span>
+              <span className="home-thq-text-accent-elm2">Multiverse</span>
+            </h2>
+            <p className="section-subtitle" style={{maxWidth: '700px', margin: 'var(--spacing-md) auto 0', textAlign: 'center'}}>
+              Finance is only the first universe. The Cognitive OS replicates across domains.
+            </p>
+          </div>
+          <div className="bento-grid" style={{gap: 'var(--spacing-xl)', marginTop: 'var(--spacing-2xl)'}}>
+            <div className="bento-cell cell-wide" style={{background: 'linear-gradient(135deg, var(--color-primary), color-mix(in srgb, var(--color-accent) 70%, var(--color-primary)))', padding: 'var(--spacing-2xl)', borderRadius: 'var(--border-radius-lg)', color: 'white'}}>
+              <div className="cell-content" style={{textAlign: 'center'}}>
+                <h3 className="cell-title" style={{color: 'white', fontSize: 'var(--font-size-2xl)'}}>FinACEverse</h3>
+                <p style={{opacity: 0.95, fontSize: 'var(--font-size-lg)', maxWidth: '600px', margin: '0 auto'}}>
+                  The first universe. Finance is the proving ground because it is the most regulated, 
+                  numerical, interdependent, document-heavy, audit-bound domain in the enterprise. 
+                  <strong> If autonomy can be achieved here, it can be achieved anywhere.</strong>
+                </p>
+                <div style={{marginTop: 'var(--spacing-lg)', padding: 'var(--spacing-md)', background: 'rgba(255,255,255,0.15)', borderRadius: 'var(--border-radius-sm)', display: 'inline-block'}}>
+                  <span style={{fontWeight: '600'}}>🚀 Live Now</span>
+                </div>
+              </div>
+            </div>
+            <div className="bento-cell cell-narrow" style={{background: 'var(--color-surface-elevated)', padding: 'var(--spacing-xl)', borderRadius: 'var(--border-radius-lg)', opacity: 0.7}}>
+              <h3 className="cell-title">Marketing Universe</h3>
+              <p className="section-content">Autonomous marketing operations, campaign orchestration, and performance optimization.</p>
+              <span style={{fontSize: 'var(--font-size-sm)', opacity: 0.6}}>Coming Soon</span>
+            </div>
+            <div className="bento-cell cell-narrow" style={{background: 'var(--color-surface-elevated)', padding: 'var(--spacing-xl)', borderRadius: 'var(--border-radius-lg)', opacity: 0.7}}>
+              <h3 className="cell-title">Legal Universe</h3>
+              <p className="section-content">Contract intelligence, compliance automation, and legal workflow orchestration.</p>
+              <span style={{fontSize: 'var(--font-size-sm)', opacity: 0.6}}>Coming Soon</span>
+            </div>
+            <div className="bento-cell cell-narrow" style={{background: 'var(--color-surface-elevated)', padding: 'var(--spacing-xl)', borderRadius: 'var(--border-radius-lg)', opacity: 0.7}}>
+              <h3 className="cell-title">HR Universe</h3>
+              <p className="section-content">Talent intelligence, workforce planning, and people operations automation.</p>
+              <span style={{fontSize: 'var(--font-size-sm)', opacity: 0.6}}>Coming Soon</span>
+            </div>
+            <div className="bento-cell cell-narrow" style={{background: 'var(--color-surface-elevated)', padding: 'var(--spacing-xl)', borderRadius: 'var(--border-radius-lg)', opacity: 0.7}}>
+              <h3 className="cell-title">Supply Chain Universe</h3>
+              <p className="section-content">Procurement intelligence, logistics optimization, and supply network orchestration.</p>
+              <span style={{fontSize: 'var(--font-size-sm)', opacity: 0.6}}>Coming Soon</span>
+            </div>
+          </div>
+          <div style={{marginTop: 'var(--spacing-2xl)', textAlign: 'center', padding: 'var(--spacing-xl)', background: 'var(--color-surface-elevated)', borderRadius: 'var(--border-radius-lg)', maxWidth: '800px', margin: 'var(--spacing-2xl) auto 0'}}>
+            <p style={{fontSize: 'var(--font-size-xl)', fontStyle: 'italic', lineHeight: 1.6}}>
+              &quot;The goal is not to automate industries. It is to create ecosystems where organizations evolve themselves.&quot;
+            </p>
           </div>
         </div>
       </section>
@@ -384,192 +564,116 @@ const Home = (props) => {
               <span className="home-thq-text-accent-elm2">Modules</span>
             </h2>
             <p className="section-subtitle">
-              {showPhase2 ? 'Nine specialized engines working in harmony under one roof.' : 'Phase 1: Five powerful modules launching now.'}
+              {showPhase2 ? 'Tools do tasks. Operating systems run worlds.' : 'Phase 1: The foundation of the Cognitive OS.'}
             </p>
           </div>
           <div className="masonry-grid">
-            {/* PHASE 1 - Launching Now */}
-            <div className="masonry-item item-lg">
-              <a href="https://accute.io" target="_blank" rel="noopener noreferrer" style={{textDecoration: 'none', color: 'inherit'}}>
-                <div className="module-card" style={{cursor: 'pointer'}}>
-                  <div className="module-header">
-                    <span className="module-name">Accute</span>
-                    <div className="module-tag">
-                      <span>Workflow Orchestrator</span>
-                    </div>
-                  </div>
-                  <h3 className="module-benefit">Workflow Orchestration</h3>
-                  <p className="section-content">
-                    The master conductor of your financial workflows. Accute connects 
-                    every process, automates handoffs, and ensures nothing falls through 
-                    the cracks. Result: <strong>20+ hours saved per week</strong> on 
-                    coordination and reconciliation.
-                  </p>
-                  <img
-                    src="/images/Accute Transparent symbol.png"
-                    alt="Accute module"
-                    style={{maxWidth: '80px', margin: '20px auto', display: 'block', opacity: 0.9}}
-                  />
-                </div>
-              </a>
-            </div>
-            <div className="masonry-item item-sm">
-              <a href="https://askluca.io" target="_blank" rel="noopener noreferrer" style={{textDecoration: 'none', color: 'inherit'}}>
-                <div className="module-card" style={{cursor: 'pointer'}}>
-                  <span className="module-name">Luca</span>
-                  <h3 className="module-benefit">AI Domain Expert</h3>
-                  <p className="section-content">
-                    Your AI tax and accounting advisor with CPA-level expertise. Luca answers 
-                    complex technical questions instantly, suggests optimizations, and provides 
-                    scenario analysis. <strong>Cuts research time from hours to seconds</strong> - 
-                    like having a senior partner available 24/7.
-                  </p>
-                  <img
-                    src="/images/Luca Transparent symbol (2).png"
-                    alt="Luca"
-                    style={{maxWidth: '60px', margin: '15px auto', display: 'block', opacity: 0.9}}
-                  />
-                </div>
-              </a>
-            </div>
-            <div className="masonry-item item-sm">
-              <a href="https://finaidhub.io" target="_blank" rel="noopener noreferrer" style={{textDecoration: 'none', color: 'inherit'}}>
-                <div className="module-card" style={{cursor: 'pointer'}}>
-                  <span className="module-name">Finaid Hub</span>
-                  <h3 className="module-benefit">AI Workforce Multiplier for Accounting</h3>
-                  <p className="section-content">
-                    Your AI-powered accounting workforce. Handles bookkeeping, reconciliation, 
-                    and financial reporting at machine speed - enabling your team to 
-                    <strong>handle 10x more clients without new hires</strong>. Average 
-                    ROI: 400% in year one.
-                  </p>
-                  <img
-                    src="/images/Fin(Ai)d Studio Transparent symbol.png"
-                    alt="Finaid Hub"
-                    style={{maxWidth: '60px', margin: '15px auto', display: 'block', opacity: 0.9}}
-                  />
-                </div>
-              </a>
-            </div>
-            <div className="masonry-item item-sm">
-              <a href="https://epi-q.io" target="_blank" rel="noopener noreferrer" style={{textDecoration: 'none', color: 'inherit'}}>
-                <div className="module-card" style={{cursor: 'pointer'}}>
-                  <span className="module-name">EPI-Q</span>
-                  <h3 className="module-benefit">Enterprise Process Mining</h3>
-                  <p className="section-content">
-                    Enterprise process, task, and communication mining module. EPI-Q analyzes 
-                    how work really happens, identifies bottlenecks, and uncovers automation 
-                    opportunities - <strong>reduce process inefficiencies by 40%</strong> with 
-                    data-driven insights.
-                  </p>
-                  <img
-                    src="/images/EPI-Q Transparent symbol.png"
-                    alt="EPI-Q"
-                    style={{maxWidth: '60px', margin: '15px auto', display: 'block', opacity: 0.9}}
-                  />
-                </div>
-              </a>
-            </div>
-            
-            {/* PHASE 2 - Coming Soon (conditionally rendered) */}
-            {showPhase2 && (
+            {loading ? (
+              <div style={{textAlign: 'center', padding: 'var(--spacing-2xl)', width: '100%'}}>
+                <p>Loading modules...</p>
+              </div>
+            ) : (
               <>
-                <div className="masonry-item item-sm">
-                  <a href="https://vamn.io" target="_blank" rel="noopener noreferrer" style={{textDecoration: 'none', color: 'inherit'}}>
-                    <div className="module-card secondary" style={{cursor: 'pointer', position: 'relative'}}>
-                      <div style={{position: 'absolute', top: '10px', right: '10px', background: 'var(--color-accent)', color: 'white', padding: '4px 8px', borderRadius: '4px', fontSize: '10px', fontWeight: 'bold'}}>COMING SOON</div>
-                      <span className="module-name">VAMN</span>
-                      <div className="module-tag">
-                        <span>The Brain</span>
-                      </div>
-                      <h3 className="module-benefit">Financial LLM</h3>
-                      <p className="section-content">
-                        An LLM with a cool mind of its own - built specifically for numbers. 
-                        Unlike generic AI, VAMN thinks in financial logic, catches what others 
-                        miss, and delivers <strong>90% fewer audit findings</strong> with 
-                        mathematical precision that makes CPAs jealous.
-                      </p>
-                      <img
-                        src="/images/VAMN-7B Transparent logo.png"
-                        alt="VAMN"
-                        style={{maxWidth: '70px', margin: '15px auto', display: 'block', opacity: 0.9}}
-                      />
+                {/* PHASE 1 - Dynamic Product Cards */}
+                {phase1Products.map((product, index) => {
+                  const productImage = getProductImage(product);
+                  const isLarge = index === 0;
+                  const productUrl = product.website_url || `https://${product.slug}.io`;
+                  const hasExternalUrl = !!product.website_url;
+                  
+                  const CardContent = (
+                    <div className={`module-card${product.status === 'coming_soon' ? ' secondary' : ''}`} style={{cursor: hasExternalUrl ? 'pointer' : 'default', position: 'relative'}}>
+                      {product.status === 'coming_soon' && (
+                        <div style={{position: 'absolute', top: '10px', right: '10px', background: 'var(--color-accent)', color: 'white', padding: '4px 8px', borderRadius: '4px', fontSize: '10px', fontWeight: 'bold'}}>COMING SOON</div>
+                      )}
+                      {isLarge && product.tag ? (
+                        <div className="module-header">
+                          <span className="module-name">{product.name}</span>
+                          <div className="module-tag">
+                            <span>{product.tag}</span>
+                          </div>
+                        </div>
+                      ) : (
+                        <>
+                          <span className="module-name">{product.name}</span>
+                          {product.tag && (
+                            <div className="module-tag">
+                              <span>{product.tag}</span>
+                            </div>
+                          )}
+                        </>
+                      )}
+                      <h3 className="module-benefit">{product.tagline || product.short_description}</h3>
+                      <p className="section-content" dangerouslySetInnerHTML={{ __html: product.description }} />
+                      {productImage && (
+                        <img
+                          src={productImage}
+                          alt={product.name}
+                          style={{
+                            maxWidth: isLarge ? '80px' : '60px',
+                            margin: isLarge ? '20px auto' : '15px auto',
+                            display: 'block',
+                            opacity: product.status === 'coming_soon' ? 0.7 : 0.9
+                          }}
+                        />
+                      )}
                     </div>
-                  </a>
-                </div>
-                <div className="masonry-item item-sm">
-                  <a href="https://finory.io" target="_blank" rel="noopener noreferrer" style={{textDecoration: 'none', color: 'inherit'}}>
-                    <div className="module-card" style={{cursor: 'pointer', position: 'relative'}}>
-                      <div style={{position: 'absolute', top: '10px', right: '10px', background: 'var(--color-accent)', color: 'white', padding: '4px 8px', borderRadius: '4px', fontSize: '10px', fontWeight: 'bold'}}>COMING SOON</div>
-                      <span className="module-name">Finory</span>
-                      <h3 className="module-benefit">Self-Constructing ERP</h3>
-                      <p className="section-content">
-                        The AI-native ERP that builds itself. Finory adapts to your business processes 
-                        automatically - no consultants, no 18-month implementations. 
-                        <strong>Go live in weeks, not years</strong> with an ERP that evolves with you.
-                      </p>
-                      <img
-                        src="/images/Finory Transparent symbol.png"
-                        alt="Finory"
-                        style={{maxWidth: '60px', margin: '15px auto', display: 'block', opacity: 0.9}}
-                      />
+                  );
+                  
+                  return (
+                    <div key={product.id} className={`masonry-item ${isLarge ? 'item-lg' : 'item-sm'}`}>
+                      {hasExternalUrl ? (
+                        <a href={productUrl} target="_blank" rel="noopener noreferrer" style={{textDecoration: 'none', color: 'inherit'}}>
+                          {CardContent}
+                        </a>
+                      ) : (
+                        CardContent
+                      )}
                     </div>
-                  </a>
-                </div>
-                <div className="masonry-item item-sm">
-                  <div className="module-card" style={{position: 'relative'}}>
-                    <div style={{position: 'absolute', top: '10px', right: '10px', background: 'var(--color-accent)', color: 'white', padding: '4px 8px', borderRadius: '4px', fontSize: '10px', fontWeight: 'bold'}}>COMING SOON</div>
-                    <span className="module-name">TaxBlitz</span>
-                    <h3 className="module-benefit">AI Workforce Multiplier for Tax</h3>
-                    <p className="section-content">
-                      Your AI-powered tax workforce. Handles tax preparation, filing, 
-                      and compliance at machine speed. <strong>Process 100+ returns per day</strong> with 
-                      AI-powered accuracy and complete audit trails.
-                    </p>
-                    <img
-                      src="/images/Fin(Ai)d Studio Transparent symbol.png"
-                      alt="TaxBlitz"
-                      style={{maxWidth: '60px', margin: '15px auto', display: 'block', opacity: 0.7}}
-                    />
-                  </div>
-                </div>
-                <div className="masonry-item item-sm">
-                  <div className="module-card" style={{position: 'relative'}}>
-                    <div style={{position: 'absolute', top: '10px', right: '10px', background: 'var(--color-accent)', color: 'white', padding: '4px 8px', borderRadius: '4px', fontSize: '10px', fontWeight: 'bold'}}>COMING SOON</div>
-                    <span className="module-name">Audric</span>
-                    <h3 className="module-benefit">AI Workforce Multiplier for Audit</h3>
-                    <p className="section-content">
-                      Your AI-powered audit workforce. Handles audit procedures, evidence 
-                      gathering, and workpaper generation at machine speed. <strong>Cut audit time by 60%</strong> while 
-                      improving quality and consistency.
-                    </p>
-                    <img
-                      src="/images/Fin(Ai)d Studio Transparent symbol.png"
-                      alt="Audric"
-                      style={{maxWidth: '60px', margin: '15px auto', display: 'block', opacity: 0.7}}
-                    />
-                  </div>
-                </div>
-                <div className="masonry-item item-sm">
-                  <a href="https://sumbuddy.io" target="_blank" rel="noopener noreferrer" style={{textDecoration: 'none', color: 'inherit'}}>
-                    <div className="module-card" style={{cursor: 'pointer', position: 'relative'}}>
-                      <div style={{position: 'absolute', top: '10px', right: '10px', background: 'var(--color-accent)', color: 'white', padding: '4px 8px', borderRadius: '4px', fontSize: '10px', fontWeight: 'bold'}}>COMING SOON</div>
-                      <span className="module-name">Sumbuddy</span>
-                      <h3 className="module-benefit">Client Marketplace</h3>
-                      <p className="section-content">
-                        Your gateway to new business. Sumbuddy is the marketplace where 
-                        accounting and finance firms find qualified clients actively seeking 
-                        professional services. <strong>Get matched with clients</strong> looking 
-                        for your exact expertise.
-                      </p>
-                      <img
-                        src="/images/SumBuddy Transparent symbol.png"
-                        alt="Sumbuddy"
-                        style={{maxWidth: '60px', margin: '15px auto', display: 'block', opacity: 0.9}}
-                      />
+                  );
+                })}
+                
+                {/* PHASE 2 - Dynamic Coming Soon Cards */}
+                {showPhase2 && phase2Products.map((product) => {
+                  const productImage = getProductImage(product);
+                  const productUrl = product.website_url || `https://${product.slug}.io`;
+                  const hasExternalUrl = !!product.website_url;
+                  
+                  const CardContent = (
+                    <div className={`module-card${product.status === 'coming_soon' ? ' secondary' : ''}`} style={{cursor: hasExternalUrl ? 'pointer' : 'default', position: 'relative'}}>
+                      {product.status === 'coming_soon' && (
+                        <div style={{position: 'absolute', top: '10px', right: '10px', background: 'var(--color-accent)', color: 'white', padding: '4px 8px', borderRadius: '4px', fontSize: '10px', fontWeight: 'bold'}}>COMING SOON</div>
+                      )}
+                      <span className="module-name">{product.name}</span>
+                      {product.tag && (
+                        <div className="module-tag">
+                          <span>{product.tag}</span>
+                        </div>
+                      )}
+                      <h3 className="module-benefit">{product.tagline || product.short_description}</h3>
+                      <p className="section-content" dangerouslySetInnerHTML={{ __html: product.description }} />
+                      {productImage && (
+                        <img
+                          src={productImage}
+                          alt={product.name}
+                          style={{maxWidth: '60px', margin: '15px auto', display: 'block', opacity: product.status === 'coming_soon' ? 0.7 : 0.9}}
+                        />
+                      )}
                     </div>
-                  </a>
-                </div>
+                  );
+                  
+                  return (
+                    <div key={product.id} className="masonry-item item-sm">
+                      {hasExternalUrl ? (
+                        <a href={productUrl} target="_blank" rel="noopener noreferrer" style={{textDecoration: 'none', color: 'inherit'}}>
+                          {CardContent}
+                        </a>
+                      ) : (
+                        CardContent
+                      )}
+                    </div>
+                  );
+                })}
               </>
             )}
           </div>
@@ -579,11 +683,11 @@ const Home = (props) => {
         <div className="container-wrapper">
           <div style={{textAlign: 'center', maxWidth: '900px', margin: '0 auto var(--spacing-3xl)', width: '100%'}}>
             <h2 className="section-title" style={{textAlign: 'center', marginBottom: 'var(--spacing-md)'}}>
-              <span>The </span>
-              <span className="home-thq-text-gradient-elm2">Cognitive OS Architecture</span>
+              <span>Understanding → Execution → </span>
+              <span className="home-thq-text-gradient-elm2">Structure → Optimization</span>
             </h2>
             <p style={{opacity: 0.85, fontSize: 'var(--font-size-lg)', maxWidth: '700px', margin: '0 auto', textAlign: 'center', lineHeight: 1.6}}>
-              FinACEverse is a Cognitive Operating System. Each module serves a distinct purpose in the ecosystem.
+              This is the cognitive cycle of an autonomous enterprise. Each module serves a distinct purpose in the ecosystem.
             </p>
           </div>
           
@@ -937,18 +1041,17 @@ const Home = (props) => {
               <h2 className="section-title">
                 <span>
                   {' '}
-                  Ready to Join the
+                  What Becomes Possible When the Enterprise
                   <span
                     dangerouslySetInnerHTML={{
                       __html: ' ',
                     }}
                   />
                 </span>
-                <span className="home-thq-text-gradient-elm5">Revolution?</span>
+                <span className="home-thq-text-gradient-elm5">Becomes Intelligent?</span>
               </h2>
               <p className="section-subtitle">
-                Shape the future of your financial operations with the Cognitive
-                Operating System.
+                We are Futurus. We build the Cognitive Operating System for Autonomous Enterprises.
               </p>
               <div className="cta-form-wrapper">
                 <form

@@ -30,6 +30,7 @@
     "jsonwebtoken": "^9.0.3",
     "mailgun.js": "^9.2.0",
     "maxmind": "^5.0.3",
+    "multer": "^2.0.2",
     "node-fetch": "^2.7.0",
     "nodemailer": "^6.9.15",
     "pg": "^8.11.3",

@@ -170,11 +170,11 @@ const Modules = () => {
   return (
     <div className="modules-container1">
       <Helmet>
-        <title>FinACEverse Modules - AI-Powered Financial Solutions</title>
-        <meta name="description" content="Explore FinACEverse's specialized modules: cognitive intelligence, orchestration, verification, and more. Transform your financial operations." />
-        <meta name="keywords" content={products.map(p => p.name).join(', ') + ', financial modules, AI finance tools'} />
-        <meta property="og:title" content="FinACEverse Modules - AI-Powered Financial Solutions" />
-        <meta property="og:description" content="Specialized modules working in harmony to transform your financial operations." />
+        <title>FinACEverse Modules - Cognitive Operating System for Autonomous Enterprises</title>
+        <meta name="description" content="Explore the Cognitive OS architecture: Understanding, Execution, Structure, and Optimization layers. The four capabilities that enable organizational autonomy." />
+        <meta name="keywords" content={products.map(p => p.name).join(', ') + ', cognitive OS, autonomous enterprises, AI finance'} />
+        <meta property="og:title" content="FinACEverse Modules - Cognitive Operating System" />
+        <meta property="og:description" content="Tools do tasks. Operating systems run worlds. Explore the modules powering organizational autonomy." />
         <meta property="og:url" content="https://finaceverse.io/modules" />
         <link rel="canonical" href="https://finaceverse.io/modules" />
       </Helmet>
@@ -213,9 +213,9 @@ const Modules = () => {
         <div className="modules-hero-container">
           <div className="modules-hero-bento">
             <div className="modules-hero-main">
-              <h1 className="hero-title">{getContent('hero', 'title', 'Unified Cognitive Intelligence')}</h1>
+              <h1 className="hero-title">{getContent('hero', 'title', 'Understanding → Execution → Structure → Optimization')}</h1>
               <p className="hero-subtitle">
-                {getContent('hero', 'subtitle', 'Experience the future of finance with FinACEverse. Our integrated Cognitive Operating System harmonizes accounting, finance, and taxation into a single source of truth.')}
+                {getContent('hero', 'subtitle', 'The Cognitive OS perceives, acts, adapts, and improves — endlessly. Each module serves a distinct purpose in the cycle of organizational autonomy.')}
               </p>
               <div className="modules-hero-actions">
                 <a href="#capabilities">
@@ -244,12 +244,12 @@ const Modules = () => {
       {/* Capabilities Section - Dynamic */}
       <section id="capabilities" className="capabilities-grid">
         <div className="capabilities-header">
-          <h2 className="section-title">{getContent('capabilities', 'title', 'Modular Capabilities')}</h2>
+          <h2 className="section-title">{getContent('capabilities', 'title', 'The Four Capabilities')}</h2>
           <p className="section-content">
             {getContent('capabilities', 'subtitle', 
               products.length > 0 
-                ? `Our ${products.length} specialized modules work in perfect synchronicity to redefine your capacity.`
-                : 'Our specialized modules work in perfect synchronicity to redefine your capacity.'
+                ? `To enable organizational autonomy, four capabilities must converge. Our ${products.length} modules deliver all four.`
+                : 'To enable organizational autonomy, four capabilities must converge. We have built all four.'
             )}
           </p>
         </div>
@@ -269,9 +269,9 @@ const Modules = () => {
       {/* Integration Timeline */}
       <section id="integration" className="integration-section">
         <div className="integration-container">
-          <h2 className="section-title">{getContent('integration', 'title', 'Integration Journey')}</h2>
+          <h2 className="section-title">{getContent('integration', 'title', 'The Cognitive Cycle')}</h2>
           <p className="section-content integration-subtitle">
-            {getContent('integration', 'subtitle', 'A structured approach to transforming your financial operations')}
+            {getContent('integration', 'subtitle', 'Each step was deliberate. Each layer built upon the previous. This is not an assembled stack — it is an engineered organism.')}
           </p>
           <div className="modules-timeline">
             <div className="modules-timeline-item left">
@@ -324,10 +324,10 @@ const Modules = () => {
           <div className="cta-grid">
             <div className="cta-main">
               <h2 className="section-title">
-                {getContent('cta', 'title', 'Ready to Transform Your Operations?')}
+                {getContent('cta', 'title', 'What Becomes Possible When Your Enterprise Becomes Intelligent?')}
               </h2>
               <p className="section-content">
-                {getContent('cta', 'subtitle', "Join the pioneers of the Cognitive Operating System. Whether you're a professional firm or an enterprise department, FinACEverse is built for your scale.")}
+                {getContent('cta', 'subtitle', "The gap between enterprises with a Cognitive OS and those without will become unbridgeable. Just as the gap between companies with the internet and those without became terminal.")}
               </p>
               <div className="cta-buttons">
                 <a href="/tailored-pilots">

@@ -216,6 +216,139 @@ const burstLimiter = rateLimit({
 // Apply burst limiter globally (first line of defense)
 app.use(burstLimiter);
 
+// ============ LAYER 18: SEC-FETCH HEADER VALIDATION ============
+// Blocks non-browser requests to sensitive endpoints
+const secFetchValidation = (req, res, next) => {
+  // Skip for static files and public endpoints
+  const publicPaths = ['/api/track', '/api/health', '/api/csrf-token', '/'];
+  if (publicPaths.some(p => req.path === p || req.path.startsWith('/static'))) {
+    return next();
+  }
+  
+  // Skip for non-API requests (React app, etc.)
+  if (!req.path.startsWith('/api/')) {
+    return next();
+  }
+  
+  const secFetchSite = req.headers['sec-fetch-site'];
+  const secFetchMode = req.headers['sec-fetch-mode'];
+  const secFetchDest = req.headers['sec-fetch-dest'];
+  
+  // Allow requests without Sec-Fetch headers (older browsers, curl for testing)
+  // In strict mode, you could block these
+  if (!secFetchSite && !secFetchMode) {
+    // Log for monitoring but allow
+    return next();
+  }
+  
+  // Block cross-origin requests to sensitive endpoints
+  const sensitiveEndpoints = ['/api/admin', '/api/superadmin', '/api/auth'];
+  const isSensitive = sensitiveEndpoints.some(ep => req.path.startsWith(ep));
+  
+  if (isSensitive) {
+    // Only allow same-origin or same-site
+    if (secFetchSite && !['same-origin', 'same-site', 'none'].includes(secFetchSite)) {
+      console.warn(`⚠️ SEC-FETCH BLOCK: ${req.ip} tried cross-origin to ${req.path}`);
+      return res.status(403).json({ error: 'Cross-origin request blocked' });
+    }
+    
+    // Block if fetched as embed/object/etc (should be navigate or cors)
+    if (secFetchDest && ['embed', 'object', 'frame', 'iframe'].includes(secFetchDest)) {
+      console.warn(`⚠️ SEC-FETCH BLOCK: ${req.ip} tried embed access to ${req.path}`);
+      return res.status(403).json({ error: 'Invalid request destination' });
+    }
+  }
+  
+  next();
+};
+app.use(secFetchValidation);
+
+// ============ LAYER 19: REQUEST INTEGRITY VERIFICATION ============
+// Validates request hasn't been tampered with in transit
+const requestIntegrity = (req, res, next) => {
+  // Skip for GET/HEAD/OPTIONS
+  if (['GET', 'HEAD', 'OPTIONS'].includes(req.method)) {
+    return next();
+  }
+  
+  // Check for request signature (optional, for paranoid mode)
+  const signature = req.headers['x-request-signature'];
+  const timestamp = req.headers['x-request-timestamp'];
+  
+  if (signature && timestamp) {
+    // Validate timestamp is within 5 minutes
+    const requestTime = parseInt(timestamp, 10);
+    const now = Date.now();
+    if (Math.abs(now - requestTime) > 5 * 60 * 1000) {
+      return res.status(400).json({ error: 'Request expired' });
+    }
+    
+    // Validate signature (HMAC of method + path + timestamp + body)
+    const payload = `${req.method}:${req.path}:${timestamp}:${JSON.stringify(req.body || {})}`;
+    const expectedSig = require('crypto')
+      .createHmac('sha256', JWT_SECRET)
+      .update(payload)
+      .digest('hex');
+    
+    if (signature !== expectedSig) {
+      console.warn(`⚠️ REQUEST INTEGRITY FAIL: ${req.ip} - ${req.path}`);
+      return res.status(400).json({ error: 'Request signature invalid' });
+    }
+  }
+  
+  next();
+};
+app.use(requestIntegrity);
+
+// ============ LAYER 20: SENSITIVE DATA REDACTION ============
+// Ensure tokens/passwords are never logged
+const originalConsoleLog = console.log;
+const originalConsoleWarn = console.warn;
+const originalConsoleError = console.error;
+
+const redactSensitiveData = (args) => {
+  return args.map(arg => {
+    if (typeof arg === 'string') {
+      // Redact JWTs (eyJ...)
+      arg = arg.replace(/eyJ[A-Za-z0-9_-]+\.eyJ[A-Za-z0-9_-]+\.[A-Za-z0-9_-]+/g, '[REDACTED_JWT]');
+      // Redact Bearer tokens
+      arg = arg.replace(/Bearer\s+[A-Za-z0-9_.-]+/gi, 'Bearer [REDACTED]');
+      // Redact password fields
+      arg = arg.replace(/"password"\s*:\s*"[^"]+"/gi, '"password": "[REDACTED]"');
+      // Redact API keys
+      arg = arg.replace(/[A-Za-z0-9]{32,}/g, (match) => {
+        // Only redact if it looks like a token/key (not a hash or normal ID)
+        if (match.length > 40 && /[A-Z]/.test(match) && /[a-z]/.test(match)) {
+          return '[REDACTED_KEY]';
+        }
+        return match;
+      });
+    } else if (typeof arg === 'object' && arg !== null) {
+      // Deep clone and redact object properties
+      try {
+        const str = JSON.stringify(arg);
+        const redacted = str
+          .replace(/"password"\s*:\s*"[^"]+"/gi, '"password": "[REDACTED]"')
+          .replace(/"token"\s*:\s*"[^"]+"/gi, '"token": "[REDACTED]"')
+          .replace(/"accessToken"\s*:\s*"[^"]+"/gi, '"accessToken": "[REDACTED]"')
+          .replace(/"refreshToken"\s*:\s*"[^"]+"/gi, '"refreshToken": "[REDACTED]"')
+          .replace(/"secret"\s*:\s*"[^"]+"/gi, '"secret": "[REDACTED]"');
+        return JSON.parse(redacted);
+      } catch {
+        return arg;
+      }
+    }
+    return arg;
+  });
+};
+
+// Only apply in production to not interfere with debugging
+if (process.env.NODE_ENV === 'production') {
+  console.log = (...args) => originalConsoleLog.apply(console, redactSensitiveData(args));
+  console.warn = (...args) => originalConsoleWarn.apply(console, redactSensitiveData(args));
+  console.error = (...args) => originalConsoleError.apply(console, redactSensitiveData(args));
+}
+
 // Cookie parser for CSRF
 app.use(cookieParser());
 
@@ -438,6 +571,18 @@ async function initializeDatabase() {
       CREATE INDEX IF NOT EXISTS idx_products_display_order ON products(display_order);
       CREATE INDEX IF NOT EXISTS idx_page_content_page ON page_content(page);
     `);
+    
+    // Add missing columns to products table (migrations)
+    try {
+      await client.query(`
+        ALTER TABLE products ADD COLUMN IF NOT EXISTS phase INTEGER DEFAULT 1;
+        ALTER TABLE products ADD COLUMN IF NOT EXISTS tag VARCHAR(100);
+        ALTER TABLE products ADD COLUMN IF NOT EXISTS website_url VARCHAR(500);
+        ALTER TABLE products ADD COLUMN IF NOT EXISTS short_description VARCHAR(500);
+      `);
+    } catch (migrationErr) {
+      console.log('Note: Some columns may already exist');
+    }
     
     // Create superadmin user if not exists
     const SUPERADMIN_PASSWORD = process.env.SUPERADMIN_PASSWORD || 'FinACE@SuperAdmin2026!Secure';
@@ -2041,7 +2186,8 @@ app.get('/api/products', async (req, res) => {
     
     let query = `
       SELECT id, slug, name, tagline, description, status, icon_svg, image_url, 
-             external_url, display_order, features, cell_size, cell_tag, is_hero
+             external_url, display_order, features, cell_size, cell_tag, is_hero,
+             phase, tag, website_url, short_description
       FROM products 
     `;
     
@@ -2050,7 +2196,7 @@ app.get('/api/products', async (req, res) => {
     }
     // 'vision' or no filter shows all products
     
-    query += ` ORDER BY display_order ASC, created_at ASC`;
+    query += ` ORDER BY phase ASC, display_order ASC, created_at ASC`;
     
     const result = await pool.query(query);
     res.json({ products: result.rows });
@@ -2078,7 +2224,8 @@ app.post('/api/admin/products', authMiddleware, requireRole('superadmin'), async
   try {
     const { 
       slug, name, tagline, description, status, icon_svg, 
-      image_url, external_url, display_order, features, cell_size, cell_tag, is_hero 
+      image_url, external_url, display_order, features, cell_size, cell_tag, is_hero,
+      phase, tag, website_url, short_description
     } = req.body;
     
     if (!slug || !name) {
@@ -2086,10 +2233,10 @@ app.post('/api/admin/products', authMiddleware, requireRole('superadmin'), async
     }
     
     const result = await pool.query(`
-      INSERT INTO products (slug, name, tagline, description, status, icon_svg, image_url, external_url, display_order, features, cell_size, cell_tag, is_hero)
-      VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13)
+      INSERT INTO products (slug, name, tagline, description, status, icon_svg, image_url, external_url, display_order, features, cell_size, cell_tag, is_hero, phase, tag, website_url, short_description)
+      VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17)
       RETURNING *
-    `, [slug, name, tagline, description, status || 'planned', icon_svg, image_url, external_url, display_order || 0, JSON.stringify(features || []), cell_size || 'medium', cell_tag, is_hero || false]);
+    `, [slug, name, tagline, description, status || 'planned', icon_svg, image_url, external_url, display_order || 0, JSON.stringify(features || []), cell_size || 'medium', cell_tag, is_hero || false, phase || 1, tag, website_url, short_description]);
     
     res.json({ product: result.rows[0], message: 'Product created successfully' });
   } catch (error) {
@@ -2107,7 +2254,8 @@ app.put('/api/admin/products/:id', authMiddleware, requireRole('superadmin'), as
     const { id } = req.params;
     const { 
       slug, name, tagline, description, status, icon_svg, 
-      image_url, external_url, display_order, features, cell_size, cell_tag, is_hero 
+      image_url, external_url, display_order, features, cell_size, cell_tag, is_hero,
+      phase, tag, website_url, short_description
     } = req.body;
     
     const result = await pool.query(`
@@ -2125,10 +2273,14 @@ app.put('/api/admin/products/:id', authMiddleware, requireRole('superadmin'), as
         cell_size = COALESCE($11, cell_size),
         cell_tag = COALESCE($12, cell_tag),
         is_hero = COALESCE($13, is_hero),
+        phase = COALESCE($14, phase),
+        tag = COALESCE($15, tag),
+        website_url = COALESCE($16, website_url),
+        short_description = COALESCE($17, short_description),
         updated_at = CURRENT_TIMESTAMP
-      WHERE id = $14
+      WHERE id = $18
       RETURNING *
-    `, [slug, name, tagline, description, status, icon_svg, image_url, external_url, display_order, features ? JSON.stringify(features) : null, cell_size, cell_tag, is_hero, id]);
+    `, [slug, name, tagline, description, status, icon_svg, image_url, external_url, display_order, features ? JSON.stringify(features) : null, cell_size, cell_tag, is_hero, phase, tag, website_url, short_description, id]);
     
     if (result.rows.length === 0) {
       return res.status(404).json({ error: 'Product not found' });
@@ -2197,119 +2349,162 @@ app.post('/api/admin/products/seed', authMiddleware, requireRole('superadmin'), 
       {
         slug: 'accute',
         name: 'Accute',
-        tagline: 'Precision accounting orchestration at scale.',
-        description: 'The cognitive brain of FinACEverse. Accute orchestrates workflows across the financial ecosystem with unparalleled precision.',
+        tagline: 'Workflow Orchestration',
+        short_description: 'Workflow Orchestration',
+        description: 'The master conductor of your financial workflows. Accute connects every process, automates handoffs, and ensures nothing falls through the cracks. Result: <strong>20+ hours saved per week</strong> on coordination and reconciliation.',
         status: 'launched',
-        external_url: 'https://accute.io',
+        website_url: 'https://accute.io',
         display_order: 1,
-        cell_tag: 'Foundation',
+        tag: 'Workflow Orchestrator',
+        cell_tag: 'Workflow Orchestrator',
         cell_size: 'large',
         is_hero: true,
+        phase: 1,
         features: ['Workflow Automation', 'Multi-entity Support', 'Real-time Sync']
       },
       {
         slug: 'luca',
         name: 'Luca',
-        tagline: 'Domain intelligence for finance professionals.',
-        description: 'Domain intelligence that understands the nuances of accounting history and future taxation impacts.',
+        tagline: 'AI Domain Expert',
+        short_description: 'AI Domain Expert',
+        description: 'Your AI tax and accounting advisor with CPA-level expertise. Luca answers complex technical questions instantly, suggests optimizations, and provides scenario analysis. <strong>Cuts research time from hours to seconds</strong> - like having a senior partner available 24/7.',
         status: 'launched',
-        external_url: null,
+        website_url: 'https://askluca.io',
         display_order: 2,
+        tag: 'Intelligence',
         cell_tag: 'Intelligence',
         cell_size: 'medium',
         is_hero: false,
+        phase: 1,
         features: ['Tax Intelligence', 'Historical Analysis', 'Predictive Insights']
+      },
+      {
+        slug: 'finaid-hub',
+        name: 'Finaid Hub',
+        tagline: 'AI Workforce Multiplier for Accounting',
+        short_description: 'AI Workforce Multiplier for Accounting',
+        description: 'Your AI-powered accounting workforce. Handles bookkeeping, reconciliation, and financial reporting at machine speed - enabling your team to <strong>handle 10x more clients without new hires</strong>. Average ROI: 400% in year one.',
+        status: 'launched',
+        website_url: 'https://finaidhub.io',
+        display_order: 3,
+        tag: 'Scale',
+        cell_tag: 'Scale',
+        cell_size: 'medium',
+        is_hero: false,
+        phase: 1,
+        features: ['AI Agents', 'Task Automation', 'Resource Optimization']
       },
       {
         slug: 'epi-q',
         name: 'EPI-Q',
-        tagline: 'Enterprise Performance Intelligence.',
-        description: 'Advanced reporting and predictive analytics for modern enterprise operations.',
+        tagline: 'Enterprise Process Mining',
+        short_description: 'Enterprise Process Mining',
+        description: 'Enterprise process, task, and communication mining module. EPI-Q analyzes how work really happens, identifies bottlenecks, and uncovers automation opportunities - <strong>reduce process inefficiencies by 40%</strong> with data-driven insights.',
         status: 'launched',
-        external_url: null,
-        display_order: 3,
+        website_url: 'https://epi-q.io',
+        display_order: 4,
+        tag: 'Insights',
         cell_tag: 'Insights',
         cell_size: 'medium',
         is_hero: false,
+        phase: 1,
         features: ['Performance Dashboards', 'Predictive Analytics', 'Custom Reports']
-      },
-      {
-        slug: 'finaid-hub',
-        name: 'Fin(Ai)d Hub',
-        tagline: 'Execution at scale without increasing headcount.',
-        description: 'The central hub for AI-powered financial operations, enabling teams to scale efficiently.',
-        status: 'launching',
-        external_url: null,
-        display_order: 4,
-        cell_tag: 'Scale',
-        cell_size: 'small',
-        is_hero: false,
-        features: ['AI Agents', 'Task Automation', 'Resource Optimization']
-      },
-      {
-        slug: 'sumbuddy',
-        name: 'SumBuddy',
-        tagline: 'Smart collaboration and unified communication.',
-        description: 'Smart collaboration and unified communication layer for financial teams.',
-        status: 'coming_soon',
-        external_url: null,
-        display_order: 5,
-        cell_tag: 'Communication',
-        cell_size: 'small',
-        is_hero: false,
-        features: ['Team Chat', 'Document Sharing', 'Workflow Comments']
       },
       {
         slug: 'vamn',
         name: 'VAMN',
-        tagline: 'Verifiable Arithmetic Multi-Stream Network.',
-        description: 'VAMN provides the core intelligence through specialized cognitive streams for financial calculations.',
-        status: 'planned',
-        external_url: 'https://vamn.io',
-        display_order: 6,
-        cell_tag: 'Foundation',
-        cell_size: 'large',
+        tagline: 'Financial LLM',
+        short_description: 'Financial LLM',
+        description: 'An LLM with a cool mind of its own - built specifically for numbers. Unlike generic AI, VAMN thinks in financial logic, catches what others miss, and delivers <strong>90% fewer audit findings</strong> with mathematical precision that makes CPAs jealous.',
+        status: 'coming_soon',
+        website_url: 'https://vamn.io',
+        display_order: 5,
+        tag: 'The Brain',
+        cell_tag: 'The Brain',
+        cell_size: 'medium',
         is_hero: true,
+        phase: 2,
         features: ['Cognitive Streams', 'Regulatory Compliance', 'Shared Ontology']
       },
       {
-        slug: 'cyloid',
-        name: 'Cyloid',
-        tagline: 'Mathematical verification for every entry.',
-        description: 'Transforming documents into indisputable mathematical facts. Ensuring verification for every financial entry.',
-        status: 'planned',
-        external_url: 'https://cyloid.io',
-        display_order: 7,
-        cell_tag: 'Verification',
+        slug: 'finory',
+        name: 'Finory',
+        tagline: 'Self-Constructing ERP',
+        short_description: 'Self-Constructing ERP',
+        description: 'The AI-native ERP that builds itself. Finory adapts to your business processes automatically - no consultants, no 18-month implementations. <strong>Go live in weeks, not years</strong> with an ERP that evolves with you.',
+        status: 'coming_soon',
+        website_url: 'https://finory.io',
+        display_order: 6,
+        tag: 'ERP',
+        cell_tag: 'ERP',
         cell_size: 'medium',
-        is_hero: true,
-        features: ['Document Verification', 'Audit Trail', 'Compliance Proof']
+        is_hero: false,
+        phase: 2,
+        features: ['Self-Constructing', 'Business Process Adaptation', 'No-code Setup']
       },
       {
         slug: 'taxblitz',
         name: 'TaxBlitz',
-        tagline: 'Automated tax compliance at lightning speed.',
-        description: 'Lightning-fast tax calculations and compliance automation across jurisdictions.',
-        status: 'planned',
-        external_url: null,
-        display_order: 8,
+        tagline: 'AI Workforce Multiplier for Tax',
+        short_description: 'AI Workforce Multiplier for Tax',
+        description: 'Your AI-powered tax workforce. Handles tax preparation, filing, and compliance at machine speed. <strong>Process 100+ returns per day</strong> with AI-powered accuracy and complete audit trails.',
+        status: 'coming_soon',
+        website_url: null,
+        display_order: 7,
+        tag: 'Tax',
         cell_tag: 'Tax',
         cell_size: 'medium',
         is_hero: false,
+        phase: 2,
         features: ['Multi-jurisdiction', 'Auto Filing', 'Deadline Tracking']
       },
       {
         slug: 'audric',
         name: 'Audric',
-        tagline: 'AI-powered audit preparation and execution.',
-        description: 'Continuous auditing enabled by AI, reducing seasonal spikes and ensuring 100% audit readiness.',
-        status: 'planned',
-        external_url: null,
-        display_order: 9,
+        tagline: 'AI Workforce Multiplier for Audit',
+        short_description: 'AI Workforce Multiplier for Audit',
+        description: 'Your AI-powered audit workforce. Handles audit procedures, evidence gathering, and workpaper generation at machine speed. <strong>Cut audit time by 60%</strong> while improving quality and consistency.',
+        status: 'coming_soon',
+        website_url: null,
+        display_order: 8,
+        tag: 'Audit',
         cell_tag: 'Audit',
         cell_size: 'medium',
         is_hero: false,
+        phase: 2,
         features: ['Continuous Auditing', 'Risk Detection', 'Audit Scheduling']
+      },
+      {
+        slug: 'sumbuddy',
+        name: 'Sumbuddy',
+        tagline: 'Client Marketplace',
+        short_description: 'Client Marketplace',
+        description: 'Your gateway to new business. Sumbuddy is the marketplace where accounting and finance firms find qualified clients actively seeking professional services. <strong>Get matched with clients</strong> looking for your exact expertise.',
+        status: 'coming_soon',
+        website_url: 'https://sumbuddy.io',
+        display_order: 9,
+        tag: 'Marketplace',
+        cell_tag: 'Marketplace',
+        cell_size: 'medium',
+        is_hero: false,
+        phase: 2,
+        features: ['Team Chat', 'Document Sharing', 'Workflow Comments']
+      },
+      {
+        slug: 'cyloid',
+        name: 'Cyloid',
+        tagline: 'AI-Powered Compliance',
+        short_description: 'AI-Powered Compliance',
+        description: 'Your compliance guardian. Cyloid monitors regulatory changes, validates compliance status, and prevents violations before they happen. <strong>Zero compliance penalties</strong> with proactive AI monitoring.',
+        status: 'coming_soon',
+        website_url: 'https://cyloid.io',
+        display_order: 10,
+        tag: 'Compliance',
+        cell_tag: 'Verification',
+        cell_size: 'medium',
+        is_hero: false,
+        phase: 2,
+        features: ['Document Verification', 'Audit Trail', 'Compliance Proof']
       }
     ];
     
@@ -2326,20 +2521,23 @@ app.post('/api/admin/products/seed', authMiddleware, requireRole('superadmin'), 
           await client.query(`
             UPDATE products SET 
               name = $1, tagline = $2, description = $3, status = $4, 
-              external_url = $5, display_order = $6, cell_tag = $7, 
-              cell_size = $8, is_hero = $9, features = $10, updated_at = CURRENT_TIMESTAMP
-            WHERE slug = $11
+              website_url = $5, display_order = $6, cell_tag = $7, 
+              cell_size = $8, is_hero = $9, features = $10, phase = $11, 
+              tag = $12, short_description = $13, updated_at = CURRENT_TIMESTAMP
+            WHERE slug = $14
           `, [product.name, product.tagline, product.description, product.status, 
-              product.external_url, product.display_order, product.cell_tag, 
-              product.cell_size, product.is_hero, JSON.stringify(product.features), product.slug]);
+              product.website_url, product.display_order, product.cell_tag, 
+              product.cell_size, product.is_hero, JSON.stringify(product.features), product.phase,
+              product.tag, product.short_description, product.slug]);
           updated++;
         } else {
           await client.query(`
-            INSERT INTO products (slug, name, tagline, description, status, external_url, display_order, cell_tag, cell_size, is_hero, features)
-            VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11)
+            INSERT INTO products (slug, name, tagline, description, status, website_url, display_order, cell_tag, cell_size, is_hero, features, phase, tag, short_description)
+            VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14)
           `, [product.slug, product.name, product.tagline, product.description, product.status, 
-              product.external_url, product.display_order, product.cell_tag, 
-              product.cell_size, product.is_hero, JSON.stringify(product.features)]);
+              product.website_url, product.display_order, product.cell_tag, 
+              product.cell_size, product.is_hero, JSON.stringify(product.features), product.phase,
+              product.tag, product.short_description]);
           created++;
         }
       }
@@ -2356,6 +2554,263 @@ app.post('/api/admin/products/seed', authMiddleware, requireRole('superadmin'), 
     console.error('Seed products error:', error);
     res.status(500).json({ error: 'Failed to seed products' });
   }
+});
+
+// =====================================================================
+// AI CONTENT GENERATION ENGINE
+// =====================================================================
+
+// Azure OpenAI Configuration
+const AZURE_OPENAI_CONFIG = {
+  endpoint: process.env.AZURE_OPENAI_ENDPOINT, // e.g., https://your-resource.openai.azure.com
+  apiKey: process.env.AZURE_OPENAI_API_KEY,
+  deploymentName: process.env.AZURE_OPENAI_DEPLOYMENT || 'gpt-4o-mini',
+  apiVersion: process.env.AZURE_OPENAI_API_VERSION || '2024-02-15-preview',
+  getUrl: function() {
+    return `${this.endpoint}/openai/deployments/${this.deploymentName}/chat/completions?api-version=${this.apiVersion}`;
+  },
+  getHeaders: () => ({
+    'Content-Type': 'application/json',
+    'api-key': process.env.AZURE_OPENAI_API_KEY
+  }),
+  isConfigured: () => !!(process.env.AZURE_OPENAI_ENDPOINT && process.env.AZURE_OPENAI_API_KEY)
+};
+
+// Content generation templates for different UI element types
+const CONTENT_TEMPLATES = {
+  module_cards: {
+    systemPrompt: `You are a fintech marketing expert creating compelling product descriptions for FinACEverse, a Cognitive Operating System for Finance. Write engaging, benefit-focused content that highlights:
+- Clear value propositions
+- Quantifiable benefits (use <strong>bold</strong> for key stats)
+- Professional yet approachable tone
+- Action-oriented language`,
+    fields: {
+      name: 'Product/module name (1-3 words)',
+      tagline: 'Short catchy tagline (5-10 words)',
+      short_description: 'Brief description for cards (10-15 words)',
+      description: 'Full description with benefits, include one <strong>bold stat</strong> (40-60 words)',
+      tag: 'Category tag (1-2 words like "Automation", "Intelligence", "Compliance")'
+    }
+  },
+  hero: {
+    systemPrompt: `You are a fintech marketing expert creating hero section copy for FinACEverse landing page. Write compelling, attention-grabbing content that:
+- Creates urgency and excitement
+- Highlights transformation/benefits
+- Uses power words
+- Keeps it concise and punchy`,
+    fields: {
+      badge_text: 'Badge/label text (5-8 words)',
+      title_line1: 'Main headline first part (3-5 words)',
+      title_highlight: 'Highlighted keyword to emphasize (1-2 words)',
+      subtitle: 'Supporting description (20-30 words)',
+      cta_primary_text: 'Primary CTA button text (2-4 words)',
+      cta_secondary_text: 'Secondary CTA button text (2-4 words)'
+    }
+  },
+  crisis_cards: {
+    systemPrompt: `You are a fintech expert creating problem/crisis cards for FinACEverse. These cards highlight pain points that FinACEverse solves. Write content that:
+- Clearly articulates the problem
+- Uses relatable scenarios
+- Includes compelling statistics
+- Creates emotional resonance`,
+    fields: {
+      title: 'Problem title (3-6 words)',
+      description: 'Problem description explaining the pain point (30-50 words)',
+      stat_value: 'Statistic value (e.g., "85%", "$2.3M", "40hrs")',
+      stat_label: 'What the stat represents (e.g., "time wasted monthly")'
+    }
+  },
+  persona_cards: {
+    systemPrompt: `You are a fintech marketing expert creating persona cards for FinACEverse. These describe target customer segments. Write content that:
+- Clearly identifies the persona
+- Describes their specific pain points
+- Shows how FinACEverse solves their problems
+- Uses relatable language`,
+    fields: {
+      title: 'Persona title/role (e.g., "CFO", "Tax Partner")',
+      subtitle: 'Persona description (5-10 words)',
+      pain_point: 'Their main pain point (20-30 words)',
+      solution: 'How FinACEverse helps them (20-30 words)',
+      benefit: 'Key benefit they receive (10-15 words)'
+    }
+  },
+  testimonials: {
+    systemPrompt: `You are creating realistic-sounding customer testimonials for FinACEverse. Write authentic testimonials that:
+- Sound natural and genuine
+- Include specific benefits/results
+- Match the persona's role
+- Use conversational language`,
+    fields: {
+      quote: 'Customer quote about their experience (40-60 words)',
+      author_name: 'Full name (realistic)',
+      author_title: 'Job title',
+      author_company: 'Company name (realistic industry company)'
+    }
+  },
+  cta_section: {
+    systemPrompt: `You are a conversion optimization expert creating CTA section copy. Write compelling calls-to-action that:
+- Create urgency
+- Highlight value
+- Reduce friction
+- Encourage action`,
+    fields: {
+      title: 'CTA headline (5-10 words)',
+      subtitle: 'Supporting text (20-30 words)',
+      primary_btn_text: 'Primary button (2-4 words)',
+      secondary_btn_text: 'Secondary button (2-4 words)'
+    }
+  }
+};
+
+// Generate content using Azure OpenAI
+async function generateWithAI(prompt, systemPrompt) {
+  if (!AZURE_OPENAI_CONFIG.isConfigured()) {
+    throw new Error('Azure OpenAI is not configured. Set AZURE_OPENAI_ENDPOINT and AZURE_OPENAI_API_KEY.');
+  }
+  
+  try {
+    const body = JSON.stringify({
+      messages: [
+        { role: 'system', content: systemPrompt },
+        { role: 'user', content: prompt }
+      ],
+      temperature: 0.7,
+      max_tokens: 1000
+    });
+    
+    const response = await fetch(AZURE_OPENAI_CONFIG.getUrl(), {
+      method: 'POST',
+      headers: AZURE_OPENAI_CONFIG.getHeaders(),
+      body
+    });
+    
+    if (!response.ok) {
+      const errorData = await response.json().catch(() => ({}));
+      throw new Error(errorData.error?.message || `Azure OpenAI API error: ${response.status}`);
+    }
+    
+    const data = await response.json();
+    return data.choices?.[0]?.message?.content;
+  } catch (error) {
+    console.error('Azure OpenAI generation error:', error);
+    throw error;
+  }
+}
+
+// API: Generate content for a specific field
+app.post('/api/admin/ai/generate', authMiddleware, requireRole('superadmin'), async (req, res) => {
+  try {
+    const { sectionType, fieldName, userPrompt, context } = req.body;
+    
+    if (!userPrompt) {
+      return res.status(400).json({ error: 'User prompt is required' });
+    }
+    
+    // Get template for this section type
+    const template = CONTENT_TEMPLATES[sectionType] || {
+      systemPrompt: 'You are a professional content writer for a fintech company called FinACEverse. Write clear, compelling, professional content.',
+      fields: {}
+    };
+    
+    // Build the prompt
+    const fieldInstruction = template.fields[fieldName] 
+      ? `Generate ${template.fields[fieldName]}` 
+      : `Generate content for the "${fieldName}" field`;
+    
+    const fullPrompt = `${fieldInstruction}
+
+User Request: ${userPrompt}
+
+${context ? `Context: ${JSON.stringify(context)}` : ''}
+
+Respond with ONLY the content, no explanations or formatting markers.`;
+    
+    const generatedContent = await generateWithAI(fullPrompt, template.systemPrompt);
+    
+    res.json({ 
+      success: true, 
+      content: generatedContent.trim(),
+      provider: 'azure-openai'
+    });
+  } catch (error) {
+    console.error('AI generation endpoint error:', error);
+    res.status(500).json({ error: error.message || 'Failed to generate content' });
+  }
+});
+
+// API: Generate complete card/item
+app.post('/api/admin/ai/generate-item', authMiddleware, requireRole('superadmin'), async (req, res) => {
+  try {
+    const { sectionType, userPrompt, existingItems = [] } = req.body;
+    
+    if (!userPrompt) {
+      return res.status(400).json({ error: 'User prompt is required' });
+    }
+    
+    const template = CONTENT_TEMPLATES[sectionType];
+    if (!template) {
+      return res.status(400).json({ error: `No template for section type: ${sectionType}` });
+    }
+    
+    // Build prompt for complete item generation
+    const fieldList = Object.entries(template.fields)
+      .map(([key, desc]) => `- ${key}: ${desc}`)
+      .join('\n');
+    
+    const fullPrompt = `Generate a complete ${sectionType.replace('_', ' ')} item based on this request:
+
+User Request: ${userPrompt}
+
+${existingItems.length > 0 ? `Existing items (for context, don't duplicate): ${existingItems.map(i => i.name || i.title).join(', ')}` : ''}
+
+Generate content for these fields:
+${fieldList}
+
+Respond in valid JSON format with the field names as keys. Example:
+{
+  "name": "Example Name",
+  "tagline": "Example tagline"
+}`;
+    
+    const generatedContent = await generateWithAI(fullPrompt, template.systemPrompt);
+    
+    // Parse the JSON response
+    let parsedContent;
+    try {
+      // Extract JSON from response (handle markdown code blocks)
+      const jsonMatch = generatedContent.match(/\{[\s\S]*\}/);
+      if (jsonMatch) {
+        parsedContent = JSON.parse(jsonMatch[0]);
+      } else {
+        throw new Error('No valid JSON in response');
+      }
+    } catch (parseError) {
+      console.error('Failed to parse AI response:', generatedContent);
+      return res.status(500).json({ error: 'Failed to parse AI response' });
+    }
+    
+    res.json({ 
+      success: true, 
+      item: parsedContent,
+      provider: 'azure-openai'
+    });
+  } catch (error) {
+    console.error('AI item generation error:', error);
+    res.status(500).json({ error: error.message || 'Failed to generate item' });
+  }
+});
+
+// API: Check AI configuration status
+app.get('/api/admin/ai/status', authMiddleware, requireRole('superadmin'), async (req, res) => {
+  const isConfigured = AZURE_OPENAI_CONFIG.isConfigured();
+  
+  res.json({
+    configured: isConfigured,
+    provider: 'azure-openai',
+    deployment: process.env.AZURE_OPENAI_DEPLOYMENT || 'gpt-4o-mini',
+    endpoint: process.env.AZURE_OPENAI_ENDPOINT ? '✓ Configured' : '✗ Missing',
+    availableTemplates: Object.keys(CONTENT_TEMPLATES)
+  });
 });
 
 // =====================================================================
@@ -2397,6 +2852,256 @@ app.get('/api/admin/content', authMiddleware, requireRole('superadmin'), async (
     res.status(500).json({ error: 'Failed to fetch content' });
   }
 });
+
+// ============ COMPREHENSIVE CMS CONTENT API ============
+
+// Get all content structured for CMS editor
+app.get('/api/admin/content/all', authMiddleware, requireRole('superadmin'), async (req, res) => {
+  try {
+    // Get page content
+    const pageContent = await pool.query(
+      'SELECT * FROM page_content ORDER BY page, section, content_key'
+    );
+    
+    // Get products (module_cards)
+    const products = await pool.query(
+      'SELECT * FROM products ORDER BY display_order NULLS LAST, created_at'
+    );
+    
+    // Transform page content into structured format
+    const content = {};
+    
+    for (const row of pageContent.rows) {
+      const sectionKey = row.section;
+      
+      if (!content[sectionKey]) {
+        content[sectionKey] = {};
+      }
+      
+      // Store value with metadata
+      content[sectionKey][row.content_key] = row.content_value;
+    }
+    
+    // Map products to module_cards format
+    content.module_cards = products.rows.map((p, idx) => ({
+      id: p.id,
+      name: p.name,
+      slug: p.slug,
+      tagline: p.tagline,
+      short_description: p.short_description || '',
+      description: p.description,
+      tag: p.tag || p.cell_tag || '',
+      tag_label: p.cell_tag || '',
+      icon_svg: p.icon_svg || '',
+      image_url: p.image_url || '',
+      website_url: p.website_url || p.external_url || '',
+      external_url: p.external_url || '',
+      category: p.category || 'core_automation',
+      features: p.features || [],
+      status: p.status || 'active',
+      phase: p.phase || 1,
+      is_featured: p.is_featured || p.is_hero || false,
+      card_size: p.cell_size || 'medium',
+      display_order: p.display_order || idx
+    }));
+    
+    res.json({ 
+      success: true, 
+      content,
+      lastUpdated: new Date().toISOString()
+    });
+  } catch (error) {
+    console.error('CMS get all content error:', error);
+    res.status(500).json({ error: 'Failed to fetch content' });
+  }
+});
+
+// Save all content from CMS editor
+app.put('/api/admin/content/all', authMiddleware, requireRole('superadmin'), async (req, res) => {
+  const client = await pool.connect();
+  
+  try {
+    const { content } = req.body;
+    
+    if (!content || typeof content !== 'object') {
+      return res.status(400).json({ error: 'Invalid content format' });
+    }
+    
+    await client.query('BEGIN');
+    
+    let pageContentUpdates = 0;
+    let productUpdates = 0;
+    
+    for (const [sectionKey, sectionData] of Object.entries(content)) {
+      
+      // Handle module_cards separately (products table)
+      if (sectionKey === 'module_cards' && Array.isArray(sectionData)) {
+        // Sync products
+        const existingProducts = await client.query('SELECT id FROM products');
+        const existingIds = new Set(existingProducts.rows.map(p => p.id));
+        const incomingIds = new Set(sectionData.filter(p => p.id).map(p => p.id));
+        
+        // Delete products that are no longer in the list
+        for (const existingId of existingIds) {
+          if (!incomingIds.has(existingId)) {
+            await client.query('DELETE FROM products WHERE id = $1', [existingId]);
+          }
+        }
+        
+        // Update or insert products
+        for (let i = 0; i < sectionData.length; i++) {
+          const product = sectionData[i];
+          
+          if (product.id && existingIds.has(product.id)) {
+            // Update existing product
+            await client.query(`
+              UPDATE products SET 
+                name = $1, slug = $2, tagline = $3, description = $4,
+                icon_svg = $5, image_url = $6, cell_tag = $7, 
+                features = $8, status = $9, phase = $10,
+                is_hero = $11, display_order = $12, 
+                short_description = $13, tag = $14, website_url = $15, cell_size = $16,
+                updated_at = CURRENT_TIMESTAMP
+              WHERE id = $17
+            `, [
+              product.name, product.slug || product.name.toLowerCase().replace(/\s+/g, '-'),
+              product.tagline, product.description,
+              product.icon_svg || '', product.image_url || '', product.tag_label || product.tag || '',
+              JSON.stringify(product.features || []), product.status || 'active', product.phase || 1,
+              product.is_featured || false, i,
+              product.short_description || '', product.tag || '', product.website_url || product.external_url || '',
+              product.card_size || 'medium', product.id
+            ]);
+          } else {
+            // Insert new product
+            await client.query(`
+              INSERT INTO products (name, slug, tagline, description, icon_svg, image_url, cell_tag, features, status, phase, is_hero, display_order, short_description, tag, website_url, cell_size)
+              VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16)
+            `, [
+              product.name, product.slug || product.name.toLowerCase().replace(/\s+/g, '-'),
+              product.tagline || '', product.description || '',
+              product.icon_svg || '', product.image_url || '', product.tag_label || product.tag || '',
+              JSON.stringify(product.features || []), product.status || 'active', product.phase || 1,
+              product.is_featured || false, i,
+              product.short_description || '', product.tag || '', product.website_url || product.external_url || '',
+              product.card_size || 'medium'
+            ]);
+          }
+          productUpdates++;
+        }
+        continue;
+      }
+      
+      // Handle single section (non-array)
+      if (typeof sectionData === 'object' && !Array.isArray(sectionData)) {
+        for (const [key, value] of Object.entries(sectionData)) {
+          // Skip if value is undefined/null or is a complex object
+          if (value === undefined || value === null) continue;
+          
+          const stringValue = typeof value === 'object' ? JSON.stringify(value) : String(value);
+          
+          await client.query(`
+            INSERT INTO page_content (page, section, content_key, content_value, content_type)
+            VALUES ('global', $1, $2, $3, 'text')
+            ON CONFLICT (page, section, content_key) 
+            DO UPDATE SET content_value = EXCLUDED.content_value, updated_at = CURRENT_TIMESTAMP
+          `, [sectionKey, key, stringValue]);
+          
+          pageContentUpdates++;
+        }
+      }
+      
+      // Handle array sections (like testimonials, crisis_cards, etc.)
+      if (Array.isArray(sectionData)) {
+        // Clear existing array items for this section
+        await client.query(
+          "DELETE FROM page_content WHERE section = $1 AND content_key LIKE 'item_%'",
+          [sectionKey]
+        );
+        
+        // Insert each item as JSON
+        for (let i = 0; i < sectionData.length; i++) {
+          await client.query(`
+            INSERT INTO page_content (page, section, content_key, content_value, content_type)
+            VALUES ('global', $1, $2, $3, 'json')
+          `, [sectionKey, `item_${i}`, JSON.stringify(sectionData[i])]);
+          pageContentUpdates++;
+        }
+      }
+    }
+    
+    await client.query('COMMIT');
+    
+    res.json({ 
+      success: true, 
+      message: `Content saved: ${pageContentUpdates} page content items, ${productUpdates} products`,
+      timestamp: new Date().toISOString()
+    });
+  } catch (error) {
+    await client.query('ROLLBACK');
+    console.error('CMS save content error:', error);
+    res.status(500).json({ error: 'Failed to save content' });
+  } finally {
+    client.release();
+  }
+});
+
+// Admin - Image upload for CMS
+const multer = require('multer');
+const { v4: uuidv4 } = require('uuid');
+
+const storage = multer.diskStorage({
+  destination: function (req, file, cb) {
+    const uploadDir = path.join(__dirname, 'public', 'uploads');
+    // Ensure directory exists
+    const fs = require('fs');
+    if (!fs.existsSync(uploadDir)) {
+      fs.mkdirSync(uploadDir, { recursive: true });
+    }
+    cb(null, uploadDir);
+  },
+  filename: function (req, file, cb) {
+    const ext = path.extname(file.originalname);
+    cb(null, `${uuidv4()}${ext}`);
+  }
+});
+
+const upload = multer({ 
+  storage: storage,
+  limits: { fileSize: 5 * 1024 * 1024 }, // 5MB limit
+  fileFilter: function (req, file, cb) {
+    const allowedTypes = ['image/jpeg', 'image/png', 'image/gif', 'image/webp', 'image/svg+xml'];
+    if (allowedTypes.includes(file.mimetype)) {
+      cb(null, true);
+    } else {
+      cb(new Error('Invalid file type. Only JPEG, PNG, GIF, WebP, and SVG are allowed.'));
+    }
+  }
+});
+
+app.post('/api/admin/upload', authMiddleware, requireRole('superadmin'), upload.single('image'), (req, res) => {
+  try {
+    if (!req.file) {
+      return res.status(400).json({ error: 'No file uploaded' });
+    }
+    
+    const url = `/uploads/${req.file.filename}`;
+    res.json({ 
+      success: true, 
+      url: url,
+      filename: req.file.filename,
+      size: req.file.size
+    });
+  } catch (error) {
+    console.error('Upload error:', error);
+    res.status(500).json({ error: 'Upload failed' });
+  }
+});
+
+// Serve uploaded files
+app.use('/uploads', express.static(path.join(__dirname, 'public', 'uploads')));
+
+// ============ END CMS CONTENT API ============
 
 // Admin - Update or create content
 app.post('/api/admin/content', authMiddleware, requireRole('superadmin'), async (req, res) => {
