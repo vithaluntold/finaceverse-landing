@@ -127,14 +127,14 @@ const Home = (props) => {
             <h1 className="hero-title">
               <span>
                 {' '}
-                Unifying the Finance
+                Powering the Path to
                 <span
                   dangerouslySetInnerHTML={{
                     __html: ' ',
                   }}
                 />
               </span>
-              <span className="home-thq-text-gradient-elm1">Multiverse</span>
+              <span className="home-thq-text-gradient-elm1">Autonomous Enterprises</span>
             </h1>
             <p className="hero-subtitle">
               We see what others don&apos;t. The enterprise is reaching cognitive exhaustion. <strong>FinACEverse</strong> is the world&apos;s first 
