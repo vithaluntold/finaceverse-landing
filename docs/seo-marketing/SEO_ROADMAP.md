@@ -81,7 +81,7 @@ Transform FinACEverse into the #1 search result for "cognitive finance," "AI acc
 - [x] Create Google Business Profile
 - [x] Set up LinkedIn Company Page with SEO-optimized description
 - [x] Create Twitter/X profile with consistent branding
-- [ ] Submit to B2B software directories (G2, Capterra, etc.)
+- [x] Submit to B2B software directories (G2, Capterra, etc.)
 
 ### Phase 1 KPIs
 
