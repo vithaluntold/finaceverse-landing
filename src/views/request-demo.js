@@ -3,6 +3,7 @@ import { Helmet } from 'react-helmet'
 import Navigation from '../components/navigation'
 import Footer from '../components/footer'
 import Breadcrumb from '../components/breadcrumb'
+import RelatedLinks from '../components/related-links'
 import './request-demo.css'
 
 const RequestDemo = (props) => {
@@ -199,6 +200,8 @@ const RequestDemo = (props) => {
           </div>
         </div>
       </section>
+
+      <RelatedLinks category="demo" title="Continue Exploring" />
 
       <Footer></Footer>
       <a href="/request-demo">

@@ -145,7 +145,7 @@ const Home = (props) => {
           {isMobile ? (
             <img 
               src="https://images.pexels.com/videos/34127955/pictures/preview-0.jpg"
-              alt="FinACEverse Cognitive OS background"
+              alt="FinACEverse Cognitive Operating System - AI-powered autonomous enterprise platform"
               className="hero-poster-img"
               fetchpriority="high"
               loading="eager"
@@ -275,7 +275,7 @@ const Home = (props) => {
                 <div className="cell-image-overlay">
                   <img
                     src="https://images.pexels.com/photos/30547572/pexels-photo-30547572.jpeg?auto=compress&amp;cs=tinysrgb&amp;w=1500"
-                    alt="Data fragmentation visual"
+                    alt="Enterprise data fragmentation - disconnected financial systems visualization"
                   />
                 </div>
               </div>
@@ -769,7 +769,7 @@ const Home = (props) => {
               <div className="cell-content">
                 <picture>
                   <source srcSet="/images/Accute Transparent symbol.webp" type="image/webp" />
-                  <img src="/images/Accute Transparent symbol.png" alt="Accute" width="40" height="40" loading="lazy" decoding="async" style={{height: '40px', width: '40px', marginBottom: 'var(--spacing-md)', opacity: 0.9}} />
+                  <img src="/images/Accute Transparent symbol.png" alt="Accute - AI workflow orchestration for accounting automation" width="40" height="40" loading="lazy" decoding="async" style={{height: '40px', width: '40px', marginBottom: 'var(--spacing-md)', opacity: 0.9}} />
                 </picture>
                 <h3 className="cell-title" style={{color: 'var(--color-primary)'}}>The Orchestrator: Accute</h3>
                 <p className="section-content">
@@ -784,7 +784,7 @@ const Home = (props) => {
               <div className="cell-content">
                 <picture>
                   <source srcSet="/images/Luca Transparent symbol (2).webp" type="image/webp" />
-                  <img src="/images/Luca Transparent symbol (2).png" alt="Luca" width="35" height="35" loading="lazy" decoding="async" style={{height: '35px', width: '35px', marginBottom: 'var(--spacing-sm)', opacity: 0.9}} />
+                  <img src="/images/Luca Transparent symbol (2).png" alt="Luca - CPA-level AI assistant for financial expertise" width="35" height="35" loading="lazy" decoding="async" style={{height: '35px', width: '35px', marginBottom: 'var(--spacing-sm)', opacity: 0.9}} />
                 </picture>
                 <h3 className="cell-title">Expert Layer: Luca</h3>
                 <p className="section-content">
@@ -798,7 +798,7 @@ const Home = (props) => {
               <div className="cell-content">
                 <picture>
                   <source srcSet="/images/Fin(Ai)d Studio Transparent symbol.webp" type="image/webp" />
-                  <img src="/images/Fin(Ai)d Studio Transparent symbol.png" alt="Finaid Hub" width="35" height="35" loading="lazy" decoding="async" style={{height: '35px', width: '35px', marginBottom: 'var(--spacing-sm)', opacity: 0.9}} />
+                  <img src="/images/Fin(Ai)d Studio Transparent symbol.png" alt="Fin(Ai)d Hub - AI workforce multiplier for financial services" width="35" height="35" loading="lazy" decoding="async" style={{height: '35px', width: '35px', marginBottom: 'var(--spacing-sm)', opacity: 0.9}} />
                 </picture>
                 <h3 className="cell-title">Execution Layer: Finaid Hub</h3>
                 <p className="section-content">
@@ -812,7 +812,7 @@ const Home = (props) => {
               <div className="cell-content">
                 <picture>
                   <source srcSet="/images/EPI-Q Transparent symbol.webp" type="image/webp" />
-                  <img src="/images/EPI-Q Transparent symbol.png" alt="EPI-Q" width="35" height="35" loading="lazy" decoding="async" style={{height: '35px', width: '35px', marginBottom: 'var(--spacing-sm)', opacity: 0.9}} />
+                  <img src="/images/EPI-Q Transparent symbol.png" alt="EPI-Q - Process mining and analytics for financial operations" width="35" height="35" loading="lazy" decoding="async" style={{height: '35px', width: '35px', marginBottom: 'var(--spacing-sm)', opacity: 0.9}} />
                 </picture>
                 <h3 className="cell-title">Discovery Layer: EPI-Q</h3>
                 <p className="section-content">
@@ -829,7 +829,7 @@ const Home = (props) => {
                   <div className="cell-content">
                     <picture>
                       <source srcSet="/images/Cyloid.webp" type="image/webp" />
-                      <img src="/images/Cyloid.png" alt="Cyloid" width="35" height="35" loading="lazy" decoding="async" style={{height: '35px', width: '35px', marginBottom: 'var(--spacing-sm)', opacity: 0.9}} />
+                      <img src="/images/Cyloid.png" alt="Cyloid - AI document verification and extraction engine" width="35" height="35" loading="lazy" decoding="async" style={{height: '35px', width: '35px', marginBottom: 'var(--spacing-sm)', opacity: 0.9}} />
                     </picture>
                     <h3 className="cell-title">Input Layer: Cyloid</h3>
                     <p className="section-content">
@@ -843,7 +843,7 @@ const Home = (props) => {
                   <div className="cell-content">
                     <picture>
                       <source srcSet="/images/VAMN-7B Transparent logo.webp" type="image/webp" />
-                      <img src="/images/VAMN-7B Transparent logo.png" alt="VAMN" width="53" height="35" loading="lazy" decoding="async" style={{height: '35px', width: '53px', marginBottom: 'var(--spacing-sm)', opacity: 0.9}} />
+                      <img src="/images/VAMN-7B Transparent logo.png" alt="VAMN-70B - Financial AI language model for cognitive finance" width="53" height="35" loading="lazy" decoding="async" style={{height: '35px', width: '53px', marginBottom: 'var(--spacing-sm)', opacity: 0.9}} />
                     </picture>
                     <h3 className="cell-title">The Brain: VAMN</h3>
                     <p className="section-content">
@@ -857,7 +857,7 @@ const Home = (props) => {
                   <div className="cell-content">
                     <picture>
                       <source srcSet="/images/Finory Transparent symbol.webp" type="image/webp" />
-                      <img src="/images/Finory Transparent symbol.png" alt="Finory" width="35" height="35" loading="lazy" decoding="async" style={{height: '35px', width: '35px', marginBottom: 'var(--spacing-sm)', opacity: 0.9}} />
+                      <img src="/images/Finory Transparent symbol.png" alt="Finory - AI-native self-constructing ERP system" width="35" height="35" loading="lazy" decoding="async" style={{height: '35px', width: '35px', marginBottom: 'var(--spacing-sm)', opacity: 0.9}} />
                     </picture>
                     <h3 className="cell-title">Systems Layer: Finory</h3>
                     <p className="section-content">
@@ -871,7 +871,7 @@ const Home = (props) => {
                   <div className="cell-content">
                     <picture>
                       <source srcSet="/images/SumBuddy Transparent symbol.webp" type="image/webp" />
-                      <img src="/images/SumBuddy Transparent symbol.png" alt="Sumbuddy" width="35" height="35" loading="lazy" decoding="async" style={{height: '35px', width: '35px', marginBottom: 'var(--spacing-sm)', opacity: 0.9}} />
+                      <img src="/images/SumBuddy Transparent symbol.png" alt="SumBuddy - Client acquisition marketplace for accounting firms" width="35" height="35" loading="lazy" decoding="async" style={{height: '35px', width: '35px', marginBottom: 'var(--spacing-sm)', opacity: 0.9}} />
                     </picture>
                     <h3 className="cell-title">Growth Layer: Sumbuddy</h3>
                     <p className="section-content">
@@ -903,7 +903,7 @@ const Home = (props) => {
               <div className="stats-visual">
                 <img
                   src="https://images.pexels.com/photos/30547577/pexels-photo-30547577.jpeg?auto=compress&amp;cs=tinysrgb&amp;w=1500"
-                  alt="Growth visualization"
+                  alt="AI accounting automation business impact - productivity and ROI metrics"
                 />
                 <div className="stats-overlay-content">
                   <h2 className="section-title">
@@ -1003,7 +1003,7 @@ const Home = (props) => {
               <div className="service-bg">
                 <img
                   src="https://images.pexels.com/photos/30547606/pexels-photo-30547606.jpeg?auto=compress&amp;cs=tinysrgb&amp;w=1500"
-                  alt="Accounting firm tech"
+                  alt="Accounting firm technology transformation with AI automation"
                 />
               </div>
             </div>

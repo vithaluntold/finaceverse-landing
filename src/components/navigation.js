@@ -34,7 +34,7 @@ const Navigation = (props) => {
           <a href="/">
             <div aria-label="FinACEverse Homepage" className="navigation-brand">
               <div className="navigation-logo-icon">
-                <img src="/logo.svg" alt="FinACEverse Logo" style={{width: '100%', height: '100%'}} />
+                <img src="/logo.svg" alt="FinACEverse - Cognitive Operating System for Autonomous Enterprises" style={{width: '100%', height: '100%'}} />
               </div>
               <span className="navigation-brand-text section-title">
                 FinACEverse
@@ -173,7 +173,7 @@ const Navigation = (props) => {
           <a href="/">
             <div className="navigation-brand">
               <div className="navigation-logo-icon">
-                <img src="/logo.svg" alt="FinACEverse Logo" style={{width: '100%', height: '100%'}} />
+                <img src="/logo.svg" alt="FinACEverse - AI-powered financial automation" style={{width: '100%', height: '100%'}} />
               </div>
               <span className="navigation-brand-text section-title">
                 FinACEverse

@@ -1,0 +1,99 @@
+/* Related Links Section Styles */
+.related-links-section {
+  padding: var(--spacing-4xl) 0;
+  background: var(--color-surface);
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.related-links-title {
+  text-align: center;
+  margin-bottom: var(--spacing-2xl);
+}
+
+.related-links-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: var(--spacing-lg);
+  max-width: 1000px;
+  margin: 0 auto;
+}
+
+.related-link-card {
+  display: block;
+  padding: var(--spacing-xl);
+  background: var(--color-surface-elevated);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: var(--border-radius-lg);
+  text-decoration: none;
+  color: inherit;
+  transition: all 0.3s ease;
+  position: relative;
+}
+
+.related-link-card:hover {
+  border-color: var(--color-primary);
+  transform: translateY(-4px);
+  box-shadow: 0 8px 24px rgba(0, 212, 255, 0.1);
+}
+
+.related-link-card:focus-visible {
+  outline: 2px solid var(--color-primary);
+  outline-offset: 2px;
+}
+
+.related-link-title {
+  font-size: var(--font-size-lg);
+  font-weight: 600;
+  color: var(--color-primary);
+  margin-bottom: var(--spacing-sm);
+}
+
+.related-link-description {
+  font-size: var(--font-size-sm);
+  color: var(--color-text-secondary);
+  line-height: 1.6;
+  margin: 0;
+}
+
+.related-link-arrow {
+  position: absolute;
+  top: 50%;
+  right: var(--spacing-lg);
+  transform: translateY(-50%);
+  color: var(--color-primary);
+  opacity: 0;
+  transition: opacity 0.3s ease, transform 0.3s ease;
+}
+
+.related-link-card:hover .related-link-arrow {
+  opacity: 1;
+  transform: translateY(-50%) translateX(4px);
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .related-links-section {
+    padding: var(--spacing-3xl) 0;
+  }
+  
+  .related-links-grid {
+    grid-template-columns: 1fr;
+    gap: var(--spacing-md);
+  }
+  
+  .related-link-card {
+    padding: var(--spacing-lg);
+  }
+  
+  .related-link-arrow {
+    opacity: 1;
+    position: static;
+    display: inline-block;
+    margin-top: var(--spacing-sm);
+    transform: none;
+  }
+  
+  .related-link-card:hover .related-link-arrow {
+    transform: translateX(4px);
+  }
+}

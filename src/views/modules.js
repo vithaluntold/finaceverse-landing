@@ -6,6 +6,7 @@ import { Helmet } from 'react-helmet'
 import Navigation from '../components/navigation'
 import Footer from '../components/footer'
 import Breadcrumb from '../components/breadcrumb'
+import RelatedLinks from '../components/related-links'
 import './modules.css'
 
 // Default SVG icons for products without custom icons
@@ -377,6 +378,8 @@ const Modules = () => {
           ></Script>
         </div>
       </div>
+
+      <RelatedLinks category="modules" title="Next Steps" />
       
       <Footer />
       

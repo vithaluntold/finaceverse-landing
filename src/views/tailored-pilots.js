@@ -3,6 +3,7 @@ import { Helmet } from 'react-helmet'
 import Navigation from '../components/navigation'
 import Footer from '../components/footer'
 import Breadcrumb from '../components/breadcrumb'
+import RelatedLinks from '../components/related-links'
 import './tailored-pilots.css'
 
 const TailoredPilots = (props) => {
@@ -196,6 +197,8 @@ const TailoredPilots = (props) => {
           </form>
         </div>
       </section>
+
+      <RelatedLinks category="pilots" title="Learn More" />
 
       <Footer></Footer>
       <a href="/request-demo">
