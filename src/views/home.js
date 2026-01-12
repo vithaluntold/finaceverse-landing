@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, useRef } from 'react'
 
 import Script from 'dangerous-html/react'
 import { Helmet } from 'react-helmet'
@@ -6,6 +6,13 @@ import { Helmet } from 'react-helmet'
 import Navigation from '../components/navigation'
 import Footer from '../components/footer'
 import './home.css'
+
+// Check if device is mobile (for performance optimization)
+const isMobileDevice = () => {
+  if (typeof window === 'undefined') return false;
+  return window.innerWidth < 768 || 
+    /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+};
 
 // Default SVG icons for products
 const DEFAULT_ICONS = {
@@ -39,6 +46,30 @@ const Home = (props) => {
   const [products, setProducts] = useState([]);
   const [pageContent, setPageContent] = useState({});
   const [loading, setLoading] = useState(true);
+  const [isMobile, setIsMobile] = useState(false);
+  const videoRef = useRef(null);
+  
+  // Check mobile on mount and resize
+  useEffect(() => {
+    const checkMobile = () => setIsMobile(isMobileDevice());
+    checkMobile();
+    window.addEventListener('resize', checkMobile);
+    return () => window.removeEventListener('resize', checkMobile);
+  }, []);
+  
+  // Lazy load video on desktop only (after page load)
+  useEffect(() => {
+    if (!isMobile && videoRef.current) {
+      // Delay video loading to prioritize LCP
+      const timer = setTimeout(() => {
+        if (videoRef.current) {
+          videoRef.current.src = 'https://videos.pexels.com/video-files/34127955/14471454_640_360_30fps.mp4';
+          videoRef.current.load();
+        }
+      }, 2000);
+      return () => clearTimeout(timer);
+    }
+  }, [isMobile]);
   
   // Fetch products and content on mount
   useEffect(() => {
@@ -108,14 +139,28 @@ const Home = (props) => {
       <Navigation></Navigation>
       <section className="hero-split-diagonal">
         <div className="hero-bg-media">
-          <video
-            autoPlay="true"
-            muted="true"
-            loop="true"
-            playsInline="true"
-            poster="https://images.pexels.com/videos/34127955/pictures/preview-0.jpg"
-            src="https://videos.pexels.com/video-files/34127955/14471454_640_360_30fps.mp4"
-          ></video>
+          {/* Mobile: Static poster image only for faster LCP */}
+          {/* Desktop: Delayed video load for better performance */}
+          {isMobile ? (
+            <img 
+              src="https://images.pexels.com/videos/34127955/pictures/preview-0.jpg"
+              alt="FinACEverse Cognitive OS background"
+              className="hero-poster-img"
+              fetchpriority="high"
+              loading="eager"
+              decoding="async"
+            />
+          ) : (
+            <video
+              ref={videoRef}
+              autoPlay
+              muted
+              loop
+              playsInline
+              poster="https://images.pexels.com/videos/34127955/pictures/preview-0.jpg"
+              preload="none"
+            ></video>
+          )}
           <div className="hero-overlay"></div>
         </div>
         <div className="hero-diagonal-container">

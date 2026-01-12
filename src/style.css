@@ -1842,6 +1842,14 @@
   opacity: 0.4;
   object-fit: cover;
 }
+
+/* Hero poster image for mobile (faster LCP) */
+.hero-bg-media .hero-poster-img {
+  width: 100%;
+  height: 100%;
+  opacity: 0.4;
+  object-fit: cover;
+}
  
 .bento-cell:hover {
   transform: translateY(-5px);

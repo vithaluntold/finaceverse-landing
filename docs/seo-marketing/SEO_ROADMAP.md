@@ -1,4 +1,5 @@
 # FinACEverse SEO Optimization Roadmap
+
 ## 30/60/90 Day Plan for Search Dominance
 
 **Last Updated:** January 12, 2026  
@@ -15,6 +16,7 @@ Transform FinACEverse into the #1 search result for "cognitive finance," "AI acc
 ## Current State Assessment
 
 ### What We Have (COMPLETED)
+
 - [x] **Robots.txt:** Optimized for all major crawlers (Google, Bing, Yahoo, Baidu, Yandex)
 - [x] **Sitemap.xml:** Comprehensive with all pages + image sitemap + blog sitemap
 - [x] **Structured Data:** Organization, WebSite, SoftwareApplication, FAQPage, BreadcrumbList, BlogPosting
@@ -31,6 +33,7 @@ Transform FinACEverse into the #1 search result for "cognitive finance," "AI acc
 - [x] **Accessibility Fixes:** Landmarks, descriptive links, touch targets, reduced-motion
 
 ### What Needs Work
+
 - [ ] Content depth (expand blog to 20+ articles)
 - [ ] Backlink profile (currently minimal)
 - [ ] Long-tail keyword coverage
@@ -41,6 +44,7 @@ Transform FinACEverse into the #1 search result for "cognitive finance," "AI acc
 ## Phase 1: Foundation (Days 1-30)
 
 ### Week 1: Technical SEO
+
 - [x] Optimize robots.txt with specific bot rules
 - [x] Create comprehensive sitemap.xml with image sitemap
 - [x] Create separate blog-sitemap.xml with news schema
@@ -53,6 +57,7 @@ Transform FinACEverse into the #1 search result for "cognitive finance," "AI acc
 - [ ] Verify site in Google Search Console
 
 ### Week 2: On-Page Optimization
+
 - [x] Audit all page titles (50-60 characters, keyword-rich)
 - [x] Optimize meta descriptions (150-160 characters, CTAs)
 - [x] Add robots meta tag to all indexable pages
@@ -63,6 +68,7 @@ Transform FinACEverse into the #1 search result for "cognitive finance," "AI acc
 - [x] Ensure mobile responsiveness across all pages
 
 ### Week 3: Content Foundation
+
 - [ ] Publish 2 new blog articles:
   - "What is a Cognitive Operating System? Complete Guide"
   - "5 Signs Your Accounting Firm Needs AI Automation"
@@ -71,14 +77,16 @@ Transform FinACEverse into the #1 search result for "cognitive finance," "AI acc
 - [ ] Update product pages with comprehensive descriptions
 
 ### Week 4: Local & Social Signals
+
 - [ ] Create Google Business Profile
 - [ ] Set up LinkedIn Company Page with SEO-optimized description
 - [ ] Create Twitter/X profile with consistent branding
 - [ ] Submit to B2B software directories (G2, Capterra, etc.)
 
 ### Phase 1 KPIs
+
 | Metric | Target | Current |
-|--------|--------|---------|
+| ------ | ------ | ------- |
 | Indexed Pages | 15+ | TBD |
 | Core Web Vitals | All Green | Optimized |
 | Mobile Performance | 85+ | Improved |

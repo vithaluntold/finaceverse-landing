@@ -11,15 +11,27 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link rel="preconnect" href="https://www.googletagmanager.com" />
     <link rel="preconnect" href="https://www.google-analytics.com" />
+    <link rel="preconnect" href="https://images.pexels.com" />
     <link rel="dns-prefetch" href="https://unpkg.com" />
     
-    <!-- Google Analytics (GA4) - async and deferred -->
-    <script async src="https://www.googletagmanager.com/gtag/js?id=G-BNY3XNL6KD"></script>
+    <!-- Preload LCP image for faster mobile rendering -->
+    <link rel="preload" as="image" href="https://images.pexels.com/videos/34127955/pictures/preview-0.jpg" fetchpriority="high" />
+    
+    <!-- Google Analytics (GA4) - deferred to not block rendering -->
     <script>
-      window.dataLayer = window.dataLayer || [];
-      function gtag(){dataLayer.push(arguments);}
-      gtag('js', new Date());
-      gtag('config', 'G-BNY3XNL6KD');
+      // Defer GA4 loading until after page interactive
+      window.addEventListener('load', function() {
+        var script = document.createElement('script');
+        script.src = 'https://www.googletagmanager.com/gtag/js?id=G-BNY3XNL6KD';
+        script.async = true;
+        document.head.appendChild(script);
+        
+        window.dataLayer = window.dataLayer || [];
+        function gtag(){dataLayer.push(arguments);}
+        window.gtag = gtag;
+        gtag('js', new Date());
+        gtag('config', 'G-BNY3XNL6KD', { send_page_view: true });
+      });
     </script>
     
     <!-- Mobile & Cross-browser optimization -->
@@ -230,14 +242,24 @@
     
     <!-- Critical CSS inlined for above-the-fold content -->
     <style data-tag="critical-css">
-      :root{--color-surface:#0a0a0a;--color-on-surface:#ffffff;--color-primary:#00d4ff;--color-secondary:#7b2cbf}
+      :root{--color-surface:#0a0a0a;--color-on-surface:#ffffff;--color-primary:#00d4ff;--color-secondary:#7b2cbf;--color-scrim:rgba(10,10,15,0.85);--spacing-xl:2rem;--spacing-4xl:4rem}
       body{margin:0;background:#0a0a0a;color:#fff;font-family:system-ui,-apple-system,sans-serif}
       .home-container1{min-height:100vh}
       #app{min-height:100vh}
+      /* Hero critical styles for faster LCP */
+      .hero-split-diagonal{position:relative;min-height:100vh;overflow:hidden}
+      .hero-bg-media{position:absolute;top:0;left:0;width:100%;height:100%;z-index:1}
+      .hero-bg-media img,.hero-bg-media video{width:100%;height:100%;object-fit:cover;opacity:0.4}
+      .hero-overlay{position:absolute;top:0;left:0;width:100%;height:100%;z-index:2;background:linear-gradient(135deg,rgba(10,10,15,0.9) 0%,rgba(20,20,40,0.7) 100%)}
+      .hero-diagonal-container{display:flex;padding:4rem 2rem;z-index:3;position:relative;background:var(--color-scrim);min-height:80vh;align-items:center;-webkit-backdrop-filter:blur(10px);backdrop-filter:blur(10px)}
+      .hero-title{font-size:clamp(2rem,5vw,3.5rem);font-weight:700;line-height:1.1;margin-bottom:1rem}
+      .hero-subtitle{font-size:1.1rem;line-height:1.6;opacity:0.9;max-width:600px}
+      /* Navigation placeholder */
+      nav{height:70px}
     </style>
     
     <style data-tag="reset-style-sheet">
-      html {  line-height: 1.15;}body {  margin: 0;}* {  box-sizing: border-box;  border-width: 0;  border-style: solid;  -webkit-font-smoothing: antialiased;}p,li,ul,pre,div,h1,h2,h3,h4,h5,h6,figure,blockquote,figcaption {  margin: 0;  padding: 0;}button {  background-color: transparent;}button,input,optgroup,select,textarea {  font-family: inherit;  font-size: 100%;  line-height: 1.15;  margin: 0;}button,select {  text-transform: none;}button,[type="button"],[type="reset"],[type="submit"] {  appearance: button;  -webkit-appearance: button;  color: inherit;}button::-moz-focus-inner,[type="button"]::-moz-focus-inner,[type="reset"]::-moz-focus-inner,[type="submit"]::-moz-focus-inner {  border-style: none;  padding: 0;}button:-moz-focus,[type="button"]:-moz-focus,[type="reset"]:-moz-focus,[type="submit"]:-moz-focus {  outline: 1px dotted ButtonText;}a {  color: inherit;  text-decoration: inherit;}pre {  white-space: normal;}input {  padding: 2px 4px;}img {  display: block;}details {  display: block;  margin: 0;  padding: 0;}summary::-webkit-details-marker {  display: none;}[data-thq="accordion"] [data-thq="accordion-content"] {  max-height: 0;  overflow: hidden;  transition: max-height 0.3s ease-in-out;  padding: 0;}[data-thq="accordion"] details[data-thq="accordion-trigger"][open] + [data-thq="accordion-content"] {  max-height: 1000vh;}details[data-thq="accordion-trigger"][open] summary [data-thq="accordion-icon"] {  transform: rotate(180deg);}
+      html {  line-height: 1.15;}body {  margin: 0;}* {  box-sizing: border-box;  border-width: 0;  border-style: solid;  -webkit-font-smoothing: antialiased;}p,li,ul,pre,div,h1,h2,h3,h4,h5,h6,figure,blockquote,figcaption {  margin: 0;  padding: 0;}button {  background-color: transparent;}button,input,optgroup,select,textarea {  font-family: inherit;  font-size: 100%;  line-height: 1.15;  margin: 0;}button,select {  text-transform: none;}button,[type="button"],[type="reset"],[type="submit"] {  -webkit-appearance: button;  appearance: button;  color: inherit;}button::-moz-focus-inner,[type="button"]::-moz-focus-inner,[type="reset"]::-moz-focus-inner,[type="submit"]::-moz-focus-inner {  border-style: none;  padding: 0;}button:-moz-focus,[type="button"]:-moz-focus,[type="reset"]:-moz-focus,[type="submit"]:-moz-focus {  outline: 1px dotted ButtonText;}a {  color: inherit;  text-decoration: inherit;}pre {  white-space: normal;}input {  padding: 2px 4px;}img {  display: block;}details {  display: block;  margin: 0;  padding: 0;}summary::-webkit-details-marker {  display: none;}[data-thq="accordion"] [data-thq="accordion-content"] {  max-height: 0;  overflow: hidden;  transition: max-height 0.3s ease-in-out;  padding: 0;}[data-thq="accordion"] details[data-thq="accordion-trigger"][open] + [data-thq="accordion-content"] {  max-height: 1000vh;}details[data-thq="accordion-trigger"][open] summary [data-thq="accordion-icon"] {  transform: rotate(180deg);}
     </style>
     <style data-tag="default-style-sheet">
       html {
