@@ -12,10 +12,12 @@
     <link rel="preconnect" href="https://www.googletagmanager.com" />
     <link rel="preconnect" href="https://www.google-analytics.com" />
     <link rel="preconnect" href="https://images.pexels.com" />
+    <link rel="preconnect" href="https://videos.pexels.com" />
     <link rel="dns-prefetch" href="https://unpkg.com" />
     
     <!-- Preload LCP image for faster mobile rendering -->
-    <link rel="preload" as="image" href="https://images.pexels.com/videos/34127955/pictures/preview-0.jpg" fetchpriority="high" />
+    <link rel="preload" as="image" href="https://images.pexels.com/videos/34127955/pictures/preview-0.jpg?auto=compress&cs=tinysrgb&w=800&h=600&fit=crop" fetchpriority="high" media="(max-width: 768px)" />
+    <link rel="preload" as="image" href="https://images.pexels.com/videos/34127955/pictures/preview-0.jpg?auto=compress&cs=tinysrgb&w=1920&h=1080&fit=crop" fetchpriority="high" media="(min-width: 769px)" />
     
     <!-- Google Analytics (GA4) - deferred to not block rendering -->
     <script>

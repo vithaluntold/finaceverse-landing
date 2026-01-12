@@ -144,12 +144,14 @@ const Home = (props) => {
           {/* Desktop: Delayed video load for better performance */}
           {isMobile ? (
             <img 
-              src="https://images.pexels.com/videos/34127955/pictures/preview-0.jpg"
+              src="https://images.pexels.com/videos/34127955/pictures/preview-0.jpg?auto=compress&cs=tinysrgb&w=800&h=600&fit=crop"
               alt="FinACEverse Cognitive Operating System - AI-powered autonomous enterprise platform"
               className="hero-poster-img"
               fetchpriority="high"
               loading="eager"
               decoding="async"
+              width="800"
+              height="600"
             />
           ) : (
             <video
@@ -158,7 +160,7 @@ const Home = (props) => {
               muted
               loop
               playsInline
-              poster="https://images.pexels.com/videos/34127955/pictures/preview-0.jpg"
+              poster="https://images.pexels.com/videos/34127955/pictures/preview-0.jpg?auto=compress&cs=tinysrgb&w=1920&h=1080&fit=crop"
               preload="none"
             ></video>
           )}
@@ -274,7 +276,7 @@ const Home = (props) => {
                 </p>
                 <div className="cell-image-overlay">
                   <img
-                    src="https://images.pexels.com/photos/30547572/pexels-photo-30547572.jpeg?auto=compress&amp;cs=tinysrgb&amp;w=1500"
+                    src="https://images.pexels.com/photos/30547572/pexels-photo-30547572.jpeg?auto=compress&amp;cs=tinysrgb&amp;w=800"
                     alt="Enterprise data fragmentation - disconnected financial systems visualization"
                   />
                 </div>
@@ -902,7 +904,7 @@ const Home = (props) => {
             <div className="bento-cell-stats cell-wide-stats">
               <div className="stats-visual">
                 <img
-                  src="https://images.pexels.com/photos/30547577/pexels-photo-30547577.jpeg?auto=compress&amp;cs=tinysrgb&amp;w=1500"
+                  src="https://images.pexels.com/photos/30547577/pexels-photo-30547577.jpeg?auto=compress&amp;cs=tinysrgb&amp;w=800"
                   alt="AI accounting automation business impact - productivity and ROI metrics"
                 />
                 <div className="stats-overlay-content">
@@ -1002,7 +1004,7 @@ const Home = (props) => {
               </div>
               <div className="service-bg">
                 <img
-                  src="https://images.pexels.com/photos/30547606/pexels-photo-30547606.jpeg?auto=compress&amp;cs=tinysrgb&amp;w=1500"
+                  src="https://images.pexels.com/photos/30547606/pexels-photo-30547606.jpeg?auto=compress&amp;cs=tinysrgb&amp;w=800"
                   alt="Accounting firm technology transformation with AI automation"
                 />
               </div>
