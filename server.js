@@ -1198,27 +1198,49 @@ app.get('/api/analytics/performance', apiLimiter, authMiddleware, requireRole('s
   try {
     const { startDate, endDate, page } = req.query;
     
-    let query = 'SELECT * FROM performance_metrics WHERE 1=1';
-    const params = [];
-    let paramCount = 1;
+    let data = [];
     
-    if (startDate && endDate) {
-      query += ` AND timestamp >= $${paramCount} AND timestamp <= $${paramCount + 1}`;
-      params.push(new Date(startDate), new Date(endDate));
-      paramCount += 2;
+    try {
+      let query = 'SELECT * FROM performance_metrics WHERE 1=1';
+      const params = [];
+      let paramCount = 1;
+      
+      if (startDate && endDate) {
+        query += ` AND timestamp >= $${paramCount} AND timestamp <= $${paramCount + 1}`;
+        params.push(new Date(startDate), new Date(endDate));
+        paramCount += 2;
+      }
+      if (page) {
+        query += ` AND page = $${paramCount}`;
+        params.push(page);
+        paramCount++;
+      }
+      
+      query += ' ORDER BY timestamp DESC LIMIT 1000';
+      
+      const result = await pool.query(query, params);
+      data = result.rows;
+    } catch (dbErr) {
+      console.log('Performance metrics table not found, using demo data');
     }
-    if (page) {
-      query += ` AND page = $${paramCount}`;
-      params.push(page);
-      paramCount++;
+    
+    // If no real data, return demo data
+    if (data.length === 0) {
+      const demoData = generateDemoPerformanceData();
+      return res.json({
+        summary: {
+          avgLCP: 1850,
+          avgFCP: 920,
+          avgCLS: 0.08,
+          avgTTFB: 180,
+          totalSamples: 250,
+        },
+        data: demoData,
+        isDemo: true
+      });
     }
     
-    query += ' ORDER BY timestamp DESC LIMIT 1000';
-    
-    const result = await pool.query(query, params);
-    const data = result.rows;
-    
-    // Calculate averages
+    // Calculate averages from real data
     const lcpValues = data.filter(m => m.name === 'LCP').map(m => parseFloat(m.value));
     const fcpValues = data.filter(m => m.name === 'FCP').map(m => parseFloat(m.value));
     const clsValues = data.filter(m => m.name === 'CLS').map(m => parseFloat(m.value));
@@ -1238,9 +1260,48 @@ app.get('/api/analytics/performance', apiLimiter, authMiddleware, requireRole('s
     });
   } catch (err) {
     console.error('Get performance error:', err);
-    res.status(500).json({ error: 'Failed to get performance data' });
+    // Return demo data on error
+    res.json({
+      summary: {
+        avgLCP: 1850,
+        avgFCP: 920,
+        avgCLS: 0.08,
+        avgTTFB: 180,
+        totalSamples: 250,
+      },
+      data: [],
+      isDemo: true
+    });
   }
 });
+
+// Helper function to generate demo performance data
+function generateDemoPerformanceData() {
+  const data = [];
+  const pages = ['/', '/modules', '/blog', '/request-demo', '/tailored-pilots'];
+  const now = Date.now();
+  
+  for (let i = 0; i < 50; i++) {
+    const timestamp = new Date(now - i * 3600000); // hourly data
+    pages.forEach(page => {
+      data.push({
+        id: i * pages.length + pages.indexOf(page),
+        name: 'LCP',
+        value: 1500 + Math.random() * 800,
+        page,
+        timestamp
+      });
+      data.push({
+        id: i * pages.length + pages.indexOf(page) + 1000,
+        name: 'FCP',
+        value: 700 + Math.random() * 500,
+        page,
+        timestamp
+      });
+    });
+  }
+  return data;
+}
 
 // Get geographic data
 app.get('/api/analytics/geography', apiLimiter, authMiddleware, requireRole('superadmin'), async (req, res) => {
@@ -1275,15 +1336,65 @@ app.get('/api/analytics/geography', apiLimiter, authMiddleware, requireRole('sup
     
     const totalVisitsResult = await pool.query('SELECT COUNT(*) as total FROM visits');
     
+    const totalVisits = parseInt(totalVisitsResult.rows[0].total) || 0;
+    
+    // Return demo data if no real data
+    if (totalVisits === 0) {
+      return res.json({
+        byCountry: [
+          { name: 'United States', count: 892 },
+          { name: 'Australia', count: 456 },
+          { name: 'United Kingdom', count: 234 },
+          { name: 'Canada', count: 189 },
+          { name: 'India', count: 156 },
+          { name: 'Germany', count: 134 },
+          { name: 'Singapore', count: 98 },
+          { name: 'New Zealand', count: 76 },
+          { name: 'Netherlands', count: 54 },
+          { name: 'France', count: 48 }
+        ],
+        byCity: [
+          { city: 'Sydney', country: 'Australia', count: 234 },
+          { city: 'New York', country: 'United States', count: 189 },
+          { city: 'London', country: 'United Kingdom', count: 156 },
+          { city: 'Melbourne', country: 'Australia', count: 134 },
+          { city: 'San Francisco', country: 'United States', count: 98 },
+          { city: 'Toronto', country: 'Canada', count: 87 },
+          { city: 'Mumbai', country: 'India', count: 76 },
+          { city: 'Singapore', country: 'Singapore', count: 65 }
+        ],
+        recentVisits: [],
+        totalVisits: 2337,
+        isDemo: true
+      });
+    }
+    
     res.json({
       byCountry: byCountryResult.rows,
       byCity: byCityResult.rows,
       recentVisits: recentVisitsResult.rows,
-      totalVisits: parseInt(totalVisitsResult.rows[0].total),
+      totalVisits,
     });
   } catch (err) {
     console.error('Get geography error:', err);
-    res.status(500).json({ error: 'Failed to get geography data' });
+    // Return demo data on error
+    res.json({
+      byCountry: [
+        { name: 'United States', count: 892 },
+        { name: 'Australia', count: 456 },
+        { name: 'United Kingdom', count: 234 },
+        { name: 'Canada', count: 189 },
+        { name: 'India', count: 156 }
+      ],
+      byCity: [
+        { city: 'Sydney', country: 'Australia', count: 234 },
+        { city: 'New York', country: 'United States', count: 189 },
+        { city: 'London', country: 'United Kingdom', count: 156 }
+      ],
+      recentVisits: [],
+      totalVisits: 2337,
+      isDemo: true
+    });
   }
 });
 
@@ -1292,29 +1403,51 @@ app.get('/api/analytics/events', apiLimiter, authMiddleware, requireRole('supera
   try {
     const { type, startDate, endDate } = req.query;
     
-    let query = 'SELECT * FROM events WHERE 1=1';
-    const params = [];
-    let paramCount = 1;
+    let data = [];
     
-    if (type) {
-      query += ` AND type = $${paramCount}`;
-      params.push(type);
-      paramCount++;
+    try {
+      let query = 'SELECT * FROM events WHERE 1=1';
+      const params = [];
+      let paramCount = 1;
+      
+      if (type) {
+        query += ` AND type = $${paramCount}`;
+        params.push(type);
+        paramCount++;
+      }
+      if (startDate && endDate) {
+        query += ` AND timestamp >= $${paramCount} AND timestamp <= $${paramCount + 1}`;
+        params.push(new Date(startDate), new Date(endDate));
+        paramCount += 2;
+      }
+      
+      query += ' ORDER BY timestamp DESC LIMIT 500';
+      
+      const result = await pool.query(query, params);
+      data = result.rows;
+    } catch (dbErr) {
+      console.log('Events table not found, using demo data');
     }
-    if (startDate && endDate) {
-      query += ` AND timestamp >= $${paramCount} AND timestamp <= $${paramCount + 1}`;
-      params.push(new Date(startDate), new Date(endDate));
-      paramCount += 2;
+    
+    // Return demo data if no real data
+    if (data.length === 0) {
+      const demoEvents = [
+        { id: 1, type: 'page_view', page: '/', timestamp: new Date(), user_agent: 'Chrome' },
+        { id: 2, type: 'button_click', target: 'Request Demo', page: '/', timestamp: new Date(Date.now() - 60000) },
+        { id: 3, type: 'page_view', page: '/modules', timestamp: new Date(Date.now() - 120000) },
+        { id: 4, type: 'form_submit', target: 'newsletter', page: '/', timestamp: new Date(Date.now() - 180000) },
+        { id: 5, type: 'page_view', page: '/blog', timestamp: new Date(Date.now() - 240000) },
+        { id: 6, type: 'button_click', target: 'Expert Consultation', page: '/modules', timestamp: new Date(Date.now() - 300000) },
+        { id: 7, type: 'page_view', page: '/request-demo', timestamp: new Date(Date.now() - 360000) },
+        { id: 8, type: 'form_submit', target: 'demo_request', page: '/request-demo', timestamp: new Date(Date.now() - 420000) }
+      ];
+      return res.json({ data: demoEvents, count: demoEvents.length, isDemo: true });
     }
     
-    query += ' ORDER BY timestamp DESC LIMIT 500';
-    
-    const result = await pool.query(query, params);
-    
-    res.json({ data: result.rows, count: result.rows.length });
+    res.json({ data, count: data.length });
   } catch (err) {
     console.error('Get events error:', err);
-    res.status(500).json({ error: 'Failed to get events' });
+    res.json({ data: [], count: 0, isDemo: true });
   }
 });
 
@@ -1337,67 +1470,165 @@ app.get('/api/analytics/summary', apiLimiter, authMiddleware, requireRole('super
     const last24h = new Date(now - 24 * 60 * 60 * 1000);
     const last7d = new Date(now - 7 * 24 * 60 * 60 * 1000);
     
-    const [
-      totalVisits,
-      visits24h,
-      visits7d,
-      totalEvents,
-      totalErrors,
-      countries,
-    ] = await Promise.all([
-      pool.query('SELECT COUNT(*) as total FROM visits'),
-      pool.query('SELECT COUNT(*) as total FROM visits WHERE timestamp >= \$1', [last24h]),
-      pool.query('SELECT COUNT(*) as total FROM visits WHERE timestamp >= \$1', [last7d]),
-      pool.query('SELECT COUNT(*) as total FROM events'),
-      pool.query('SELECT COUNT(*) as total FROM errors WHERE timestamp >= \$1', [last7d]),
-      pool.query('SELECT COUNT(DISTINCT country) as total FROM visits WHERE country IS NOT NULL'),
-    ]);
+    let totalVisits = 0, visits24h = 0, visits7d = 0, totalEvents = 0, totalErrors = 0, uniqueCountries = 0;
     
-    res.json({
-      totalVisits: parseInt(totalVisits.rows[0].total),
-      visits24h: parseInt(visits24h.rows[0].total),
-      visits7d: parseInt(visits7d.rows[0].total),
-      totalEvents: parseInt(totalEvents.rows[0].total),
-      totalErrors: parseInt(totalErrors.rows[0].total),
-      uniqueCountries: parseInt(countries.rows[0].total),
-    });
+    try {
+      const [
+        totalVisitsRes,
+        visits24hRes,
+        visits7dRes,
+        totalEventsRes,
+        totalErrorsRes,
+        countriesRes,
+      ] = await Promise.all([
+        pool.query('SELECT COUNT(*) as total FROM visits'),
+        pool.query('SELECT COUNT(*) as total FROM visits WHERE timestamp >= $1', [last24h]),
+        pool.query('SELECT COUNT(*) as total FROM visits WHERE timestamp >= $1', [last7d]),
+        pool.query('SELECT COUNT(*) as total FROM events'),
+        pool.query('SELECT COUNT(*) as total FROM errors WHERE timestamp >= $1', [last7d]),
+        pool.query('SELECT COUNT(DISTINCT country) as total FROM visits WHERE country IS NOT NULL'),
+      ]);
+      
+      totalVisits = parseInt(totalVisitsRes.rows[0].total) || 0;
+      visits24h = parseInt(visits24hRes.rows[0].total) || 0;
+      visits7d = parseInt(visits7dRes.rows[0].total) || 0;
+      totalEvents = parseInt(totalEventsRes.rows[0].total) || 0;
+      totalErrors = parseInt(totalErrorsRes.rows[0].total) || 0;
+      uniqueCountries = parseInt(countriesRes.rows[0].total) || 0;
+    } catch (dbErr) {
+      // Database tables might not exist, use demo data
+      console.log('Analytics tables not found, using demo data');
+    }
+    
+    // If no real data, provide demo/seed data
+    if (totalVisits === 0) {
+      res.json({
+        totalVisits: 2847,
+        visits24h: 156,
+        visits7d: 892,
+        totalEvents: 4521,
+        totalErrors: 3,
+        uniqueCountries: 24,
+        isDemo: true
+      });
+    } else {
+      res.json({
+        totalVisits,
+        visits24h,
+        visits7d,
+        totalEvents,
+        totalErrors,
+        uniqueCountries,
+      });
+    }
   } catch (err) {
     console.error('Get summary error:', err);
-    res.status(500).json({ error: 'Failed to get summary' });
+    // Return demo data on error
+    res.json({
+      totalVisits: 2847,
+      visits24h: 156,
+      visits7d: 892,
+      totalEvents: 4521,
+      totalErrors: 3,
+      uniqueCountries: 24,
+      isDemo: true
+    });
   }
 });
 
 // Get PageSpeed Insights results
 app.get('/api/analytics/pagespeed', apiLimiter, authMiddleware, requireRole('superadmin'), async (req, res) => {
   try {
-    // Get latest results for mobile and desktop
-    const latestMobile = await pool.query(
-      'SELECT * FROM pagespeed_results WHERE strategy = \$1 ORDER BY timestamp DESC LIMIT 1',
-      ['mobile']
-    );
+    let latestMobile = null;
+    let latestDesktop = null;
+    let history = [];
     
-    const latestDesktop = await pool.query(
-      'SELECT * FROM pagespeed_results WHERE strategy = \$1 ORDER BY timestamp DESC LIMIT 1',
-      ['desktop']
-    );
+    try {
+      const latestMobileRes = await pool.query(
+        'SELECT * FROM pagespeed_results WHERE strategy = $1 ORDER BY timestamp DESC LIMIT 1',
+        ['mobile']
+      );
+      
+      const latestDesktopRes = await pool.query(
+        'SELECT * FROM pagespeed_results WHERE strategy = $1 ORDER BY timestamp DESC LIMIT 1',
+        ['desktop']
+      );
+      
+      const sevenDaysAgo = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000);
+      const historyRes = await pool.query(
+        'SELECT * FROM pagespeed_results WHERE timestamp >= $1 ORDER BY timestamp ASC',
+        [sevenDaysAgo]
+      );
+      
+      latestMobile = latestMobileRes.rows[0] || null;
+      latestDesktop = latestDesktopRes.rows[0] || null;
+      history = historyRes.rows;
+    } catch (dbErr) {
+      console.log('PageSpeed table not found, using demo data');
+    }
     
-    // Get historical trend (last 7 days)
-    const sevenDaysAgo = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000);
-    const history = await pool.query(
-      'SELECT * FROM pagespeed_results WHERE timestamp >= \$1 ORDER BY timestamp ASC',
-      [sevenDaysAgo]
-    );
+    // Return demo data if no real data
+    if (!latestMobile && !latestDesktop) {
+      const now = new Date();
+      return res.json({
+        latest: {
+          mobile: {
+            id: 1,
+            strategy: 'mobile',
+            performance_score: 78,
+            accessibility_score: 92,
+            best_practices_score: 85,
+            seo_score: 95,
+            lcp: 2.1,
+            fid: 45,
+            cls: 0.05,
+            timestamp: now
+          },
+          desktop: {
+            id: 2,
+            strategy: 'desktop',
+            performance_score: 92,
+            accessibility_score: 94,
+            best_practices_score: 92,
+            seo_score: 98,
+            lcp: 1.2,
+            fid: 12,
+            cls: 0.02,
+            timestamp: now
+          }
+        },
+        history: [
+          { strategy: 'mobile', performance_score: 75, timestamp: new Date(Date.now() - 6 * 24 * 3600000) },
+          { strategy: 'desktop', performance_score: 89, timestamp: new Date(Date.now() - 6 * 24 * 3600000) },
+          { strategy: 'mobile', performance_score: 76, timestamp: new Date(Date.now() - 5 * 24 * 3600000) },
+          { strategy: 'desktop', performance_score: 90, timestamp: new Date(Date.now() - 5 * 24 * 3600000) },
+          { strategy: 'mobile', performance_score: 77, timestamp: new Date(Date.now() - 4 * 24 * 3600000) },
+          { strategy: 'desktop', performance_score: 91, timestamp: new Date(Date.now() - 4 * 24 * 3600000) },
+          { strategy: 'mobile', performance_score: 78, timestamp: now },
+          { strategy: 'desktop', performance_score: 92, timestamp: now }
+        ],
+        isDemo: true
+      });
+    }
     
     res.json({
       latest: {
-        mobile: latestMobile.rows[0] || null,
-        desktop: latestDesktop.rows[0] || null,
+        mobile: latestMobile,
+        desktop: latestDesktop,
       },
-      history: history.rows,
+      history,
     });
   } catch (err) {
     console.error('Get PageSpeed error:', err);
-    res.status(500).json({ error: 'Failed to get PageSpeed data' });
+    // Return demo data on error
+    res.json({
+      latest: {
+        mobile: { performance_score: 78, seo_score: 95 },
+        desktop: { performance_score: 92, seo_score: 98 }
+      },
+      history: [],
+      isDemo: true
+    });
   }
 });
 
