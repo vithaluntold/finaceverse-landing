@@ -35,6 +35,7 @@
 
 /* Table of Contents */
 .cf-toc {
+  position: -webkit-sticky;
   position: sticky;
   top: 100px;
   padding: var(--spacing-xl);

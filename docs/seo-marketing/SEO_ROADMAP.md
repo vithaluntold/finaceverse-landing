@@ -97,13 +97,16 @@ Transform FinACEverse into the #1 search result for "cognitive finance," "AI acc
 ## Phase 2: Authority Building (Days 31-60)
 
 ### Week 5-6: Content Expansion
+
 Publish 4 new blog articles targeting high-intent keywords:
+
 1. "How AI is Transforming Accounting Firms in 2026"
 2. "Process Mining for Financial Services: A Practical Guide"
 3. "The CFO's Guide to Autonomous Enterprise"
 4. "Comparing Traditional ERPs vs Cognitive Operating Systems"
 
 ### Week 7-8: Link Building
+
 - [ ] Guest post outreach to 10 finance/accounting publications
 - [ ] Submit to HARO (Help a Reporter Out) for expert quotes
 - [ ] Create linkable assets (infographics, reports)
@@ -111,8 +114,9 @@ Publish 4 new blog articles targeting high-intent keywords:
 - [ ] Submit to podcast directories for interviews
 
 ### Content Types to Create
+
 | Content Type | Target Keywords | Priority |
-|--------------|-----------------|----------|
+| ------------ | --------------- | -------- |
 | Ultimate Guide | cognitive operating system | High |
 | Comparison Post | AI accounting vs traditional | High |
 | Case Study | accounting firm automation | High |
@@ -120,8 +124,9 @@ Publish 4 new blog articles targeting high-intent keywords:
 | How-To | implement financial automation | Medium |
 
 ### Phase 2 KPIs
+
 | Metric | Target |
-|--------|--------|
+| ------ | ------ |
 | Blog Articles | 8+ total |
 | Referring Domains | 15+ |
 | Organic Traffic | 500+ monthly |
@@ -132,26 +137,30 @@ Publish 4 new blog articles targeting high-intent keywords:
 ## Phase 3: Scale & Dominate (Days 61-90)
 
 ### Week 9-10: Advanced Content
+
 - [ ] Create interactive ROI calculator (linkable asset)
 - [ ] Publish comprehensive industry report
 - [ ] Launch video content for YouTube SEO
 - [ ] Create comparison pages (FinACEverse vs [Competitor])
 
 ### Week 11-12: Conversion Optimization
+
 - [ ] A/B test landing page headlines
 - [ ] Optimize CTA placements based on heatmap data
 - [x] Improve page load speed (under 2 seconds)
 - [ ] Implement exit-intent popups with value offers
 
 ### Advanced SEO Tactics
+
 - [ ] Implement dynamic XML sitemap generation
 - [ ] Add hreflang tags for international targeting (future)
 - [ ] Create topic clusters around core keywords
 - [ ] Build internal linking automation
 
 ### Phase 3 KPIs
+
 | Metric | Target |
-|--------|--------|
+| ------ | ------ |
 | Blog Articles | 12+ total |
 | Referring Domains | 30+ |
 | Organic Traffic | 2,000+ monthly |
@@ -163,8 +172,9 @@ Publish 4 new blog articles targeting high-intent keywords:
 ## Target Keywords
 
 ### Primary Keywords (High Priority)
+
 | Keyword | Search Volume | Difficulty | Current Rank |
-|---------|--------------|------------|--------------|
+| ------- | ------------ | ---------- | ------------ |
 | cognitive operating system | 1,200 | Medium | Not ranked |
 | AI accounting automation | 2,400 | High | Not ranked |
 | autonomous enterprise | 890 | Low | Not ranked |
@@ -172,8 +182,9 @@ Publish 4 new blog articles targeting high-intent keywords:
 | cognitive finance | 720 | Low | Not ranked |
 
 ### Secondary Keywords (Medium Priority)
+
 | Keyword | Search Volume | Difficulty |
-|---------|--------------|------------|
+| ------- | ------------ | ---------- |
 | AI workforce multiplier | 320 | Low |
 | accounting firm automation | 1,800 | Medium |
 | process mining financial services | 590 | Low |
@@ -181,6 +192,7 @@ Publish 4 new blog articles targeting high-intent keywords:
 | CPA practice automation | 720 | Low |
 
 ### Long-Tail Keywords (Quick Wins)
+
 - "how to automate accounting workflows"
 - "AI for small accounting firms"
 - "cognitive operating system for finance"
@@ -194,7 +206,7 @@ Publish 4 new blog articles targeting high-intent keywords:
 ### Platform Strategy
 
 | Platform | Audience | Content Style | Posting Frequency |
-|----------|----------|---------------|-------------------|
+| -------- | -------- | ------------- | ----------------- |
 | **LinkedIn** | CFOs, CPAs, Accounting Firms | Professional, thought leadership | 3x per week |
 | **X (Twitter)** | Tech enthusiasts, Startups | Concise, engaging, trends | 5x per week |
 | **YouTube** | Visual learners, Researchers | Demos, tutorials, explainers | 2x per month |
@@ -208,7 +220,7 @@ Publish 4 new blog articles targeting high-intent keywords:
 #### Week 3 (Jan 13-19)
 
 | Date | Platform | Time (AEST) | Content Type | Topic | Hashtags |
-|------|----------|-------------|--------------|-------|----------|
+| ---- | -------- | ----------- | ------------ | ----- | -------- |
 | Mon Jan 13 | LinkedIn | 9:00 AM | Thought Leadership | "Why Cognitive OS is the future of finance" | #AI #Finance #Automation |
 | Mon Jan 13 | X | 12:00 PM | Thread | 5 problems with traditional accounting software | #AccountingAI #FinTech |
 | Tue Jan 14 | Instagram | 6:00 PM | Carousel | Meet the FinACEverse modules (visual intro) | #AIStartup #Innovation |
@@ -225,7 +237,7 @@ Publish 4 new blog articles targeting high-intent keywords:
 #### Week 4 (Jan 20-26)
 
 | Date | Platform | Time (AEST) | Content Type | Topic | Hashtags |
-|------|----------|-------------|--------------|-------|----------|
+| ---- | -------- | ----------- | ------------ | ----- | -------- |
 | Mon Jan 20 | LinkedIn | 9:00 AM | Product Spotlight | Introducing Accute: The Orchestrator | #ProductLaunch #AI |
 | Mon Jan 20 | X | 1:00 PM | Visual | Infographic: Cognitive OS layers | #DataViz #FinTech |
 | Tue Jan 21 | Instagram | 6:00 PM | Post | Luca AI: Your CPA-level expert | #AIAssistant |
@@ -246,7 +258,7 @@ Publish 4 new blog articles targeting high-intent keywords:
 #### Week 1 (Jan 27 - Feb 2)
 
 | Date | Platform | Time (AEST) | Content Type | Topic | Hashtags |
-|------|----------|-------------|--------------|-------|----------|
+| ---- | -------- | ----------- | ------------ | ----- | -------- |
 | Mon Jan 27 | LinkedIn | 9:00 AM | Thought Leadership | "The Autonomous Enterprise vision" | #FutureOfWork |
 | Mon Jan 27 | X | 1:00 PM | Engagement | Quick tip on process mining | #ProcessMining |
 | Tue Jan 28 | Instagram | 6:00 PM | Reel | Day in the life: AI accounting | #WorkLife |
@@ -260,7 +272,7 @@ Publish 4 new blog articles targeting high-intent keywords:
 #### Week 2 (Feb 3-9)
 
 | Date | Platform | Time (AEST) | Content Type | Topic | Hashtags |
-|------|----------|-------------|--------------|-------|----------|
+| ---- | -------- | ----------- | ------------ | ----- | -------- |
 | Mon Feb 3 | LinkedIn | 9:00 AM | Product Deep Dive | Fin(Ai)d Hub: AI Workforce | #AIWorkforce |
 | Tue Feb 4 | X | 12:00 PM | Poll | Best AI feature for accountants? | #AccountingPoll |
 | Wed Feb 5 | Instagram | 6:00 PM | Carousel | Module comparison guide | #Comparison |
@@ -276,7 +288,7 @@ Publish 4 new blog articles targeting high-intent keywords:
 #### Week 1 (Mar 2-8)
 
 | Date | Platform | Time (AEST) | Content Type | Topic | Hashtags |
-|------|----------|-------------|--------------|-------|----------|
+| ---- | -------- | ----------- | ------------ | ----- | -------- |
 | Mon Mar 2 | LinkedIn | 9:00 AM | Announcement | ROI Calculator launch | #Tool #Launch |
 | Tue Mar 3 | X | 1:00 PM | Thread | How to calculate AI ROI | #ROI |
 | Wed Mar 4 | Instagram | 6:00 PM | Reel | Calculator demo (15 sec) | #Demo |
@@ -290,7 +302,7 @@ Publish 4 new blog articles targeting high-intent keywords:
 ### Content Themes by Month
 
 | Month | Primary Theme | Secondary Theme | Campaign |
-|-------|---------------|-----------------|----------|
+| ----- | ------------- | --------------- | -------- |
 | January | Platform Launch | Cognitive OS Education | Awareness |
 | February | Product Deep Dives | Case Studies | Consideration |
 | March | ROI & Value | Comparisons | Conversion |
@@ -303,7 +315,8 @@ Publish 4 new blog articles targeting high-intent keywords:
 ### Content Templates
 
 #### LinkedIn Post Template
-```
+
+```text
 [Hook - Problem Statement]
 
 [3-4 key points with bullet points]
@@ -317,7 +330,8 @@ Publish 4 new blog articles targeting high-intent keywords:
 ```
 
 #### X Thread Template
-```
+
+```text
 1/ [Strong opening hook]
 
 2/ [Problem elaboration]
@@ -332,6 +346,7 @@ Publish 4 new blog articles targeting high-intent keywords:
 ```
 
 #### YouTube Video Structure
+
 1. Hook (0-15 sec)
 2. Intro (15-30 sec)
 3. Main Content (1-5 min)
@@ -343,23 +358,26 @@ Publish 4 new blog articles targeting high-intent keywords:
 ## Blog Content Calendar
 
 ### January 2026 (Blog)
+
 | Date | Content | Target Keyword | Type |
-|------|---------|----------------|------|
+| ---- | ------- | -------------- | ---- |
 | Jan 15 | What is a Cognitive OS? | cognitive operating system | Pillar |
 | Jan 22 | AI Automation for CPAs | accounting firm automation | Guide |
 | Jan 29 | Weekly SEO Newsletter | - | Engagement |
 
 ### February 2026 (Blog)
+
 | Date | Content | Target Keyword | Type |
-|------|---------|----------------|------|
+| ---- | ------- | -------------- | ---- |
 | Feb 5 | Process Mining Explained | process mining financial services | Guide |
 | Feb 12 | Case Study: 2.5x Capacity | AI workforce multiplier | Case Study |
 | Feb 19 | CFO's Guide to Autonomy | autonomous enterprise | Pillar |
 | Feb 26 | Industry Trends Report | - | Linkable Asset |
 
 ### March 2026 (Blog)
+
 | Date | Content | Target Keyword | Type |
-|------|---------|----------------|------|
+| ---- | ------- | -------------- | ---- |
 | Mar 5 | ROI Calculator Launch | - | Tool |
 | Mar 12 | Video: Platform Demo | - | Video SEO |
 | Mar 19 | Comparison: vs Traditional ERPs | intelligent ERP system | Comparison |
@@ -370,6 +388,7 @@ Publish 4 new blog articles targeting high-intent keywords:
 ## Technical Checklist
 
 ### On-Site SEO
+
 - [x] robots.txt optimized
 - [x] XML sitemap created
 - [x] Blog sitemap with news schema
@@ -384,6 +403,7 @@ Publish 4 new blog articles targeting high-intent keywords:
 - [x] Lazy loading images
 
 ### Off-Site SEO
+
 - [ ] Google Search Console setup
 - [ ] Bing Webmaster Tools setup
 - [ ] Google Business Profile
@@ -393,6 +413,7 @@ Publish 4 new blog articles targeting high-intent keywords:
 - [ ] HARO participation
 
 ### Analytics & Monitoring
+
 - [x] Google Analytics 4 setup (G-BNY3XNL6KD)
 - [x] PageSpeed monitoring cron (weekly)
 - [x] AI-powered insights generation
@@ -408,27 +429,32 @@ Publish 4 new blog articles targeting high-intent keywords:
 The SEO Dashboard now includes:
 
 ### 1. Target Keyword Manager
+
 - Add/remove keywords to track
 - Priority-based organization
 - Performance tracking
 
 ### 2. AI Keyword Suggestions
+
 - Industry-specific recommendations
 - Search volume indicators
 - Difficulty scoring
 - Trend analysis
 
 ### 3. Page Optimization Tips
+
 - Page-by-page recommendations
 - Impact scoring (High/Medium/Low)
 - Actionable improvement items
 
 ### 4. Automated Monitoring
+
 - Daily page scanning
 - Issue detection
 - Auto-fix recommendations
 
 ### 5. PageSpeed Insights (NEW)
+
 - Automated weekly scans
 - Mobile & Desktop scores
 - AI-generated improvement recommendations
@@ -439,8 +465,9 @@ The SEO Dashboard now includes:
 ## Success Metrics Dashboard
 
 ### Monthly Tracking
+
 | Metric | Jan | Feb | Mar | Goal |
-|--------|-----|-----|-----|------|
+| ------ | --- | --- | --- | ---- |
 | Organic Sessions | - | - | - | 2,000 |
 | Organic Leads | - | - | - | 10 |
 | Indexed Pages | - | - | - | 25 |
@@ -449,8 +476,9 @@ The SEO Dashboard now includes:
 | Domain Authority | - | - | - | 30 |
 
 ### Social Media Tracking
+
 | Platform | Followers | Engagement Rate | Goal |
-|----------|-----------|-----------------|------|
+| -------- | --------- | --------------- | ---- |
 | LinkedIn | - | - | 1,000 |
 | X | - | - | 500 |
 | Instagram | - | - | 500 |
@@ -458,6 +486,7 @@ The SEO Dashboard now includes:
 | Facebook | - | - | 300 |
 
 ### Weekly Tracking
+
 - New content published
 - Keywords ranking changes
 - Technical issues found/fixed
@@ -479,6 +508,7 @@ The SEO Dashboard now includes:
 ## Resources
 
 ### Tools We Use
+
 - Google Search Console (free)
 - Google Analytics 4 (free) - G-BNY3XNL6KD
 - PageSpeed Insights (free) - automated weekly
@@ -486,15 +516,17 @@ The SEO Dashboard now includes:
 - Ahrefs/SEMrush (keyword research)
 
 ### Social Media Tools
+
 - Buffer / Hootsuite (scheduling)
 - Canva (graphics)
 - CapCut (video editing)
 - Later (Instagram planning)
 
 ### Documentation
-- Google SEO Starter Guide: https://developers.google.com/search/docs/fundamentals/seo-starter-guide
-- Schema.org Documentation: https://schema.org/
-- Core Web Vitals: https://web.dev/vitals/
+
+- [Google SEO Starter Guide](https://developers.google.com/search/docs/fundamentals/seo-starter-guide)
+- [Schema.org Documentation](https://schema.org/)
+- [Core Web Vitals](https://web.dev/vitals/)
 
 ---
 
