@@ -39,9 +39,9 @@ const AnalyticsDashboard = () => {
   };
 
   useEffect(() => {
-    const token = localStorage.getItem('analytics_token');
+    const token = localStorage.getItem('superadmin_token');
     if (!token) {
-      history.push('/analytics/login');
+      history.push('/vault-e9232b8eefbaa45e');
       return;
     }
 
@@ -94,7 +94,7 @@ const AnalyticsDashboard = () => {
   }, [history, API_URL]);
 
   const fetchData = async () => {
-    const token = localStorage.getItem('analytics_token');
+    const token = localStorage.getItem('superadmin_token');
     const headers = {
       'Authorization': `Bearer ${token}`,
       'Content-Type': 'application/json',
@@ -119,8 +119,8 @@ const AnalyticsDashboard = () => {
     } catch (err) {
       console.error('Fetch error:', err);
       if (err.message === 'Unauthorized') {
-        localStorage.removeItem('analytics_token');
-        history.push('/analytics/login');
+        localStorage.removeItem('superadmin_token');
+        history.push('/vault-e9232b8eefbaa45e');
       }
     } finally {
       setLoading(false);
@@ -128,13 +128,13 @@ const AnalyticsDashboard = () => {
   };
 
   const handleLogout = () => {
-    localStorage.removeItem('analytics_token');
-    localStorage.removeItem('analytics_user');
-    history.push('/analytics/login');
+    localStorage.removeItem('superadmin_token');
+    localStorage.removeItem('superadmin_refresh');
+    history.push('/vault-e9232b8eefbaa45e');
   };
 
   const fetchExperiments = async () => {
-    const token = localStorage.getItem('analytics_token');
+    const token = localStorage.getItem('superadmin_token');
     const headers = {
       'Authorization': `Bearer ${token}`,
       'Content-Type': 'application/json',
@@ -152,7 +152,7 @@ const AnalyticsDashboard = () => {
   };
 
   const createExperiment = async () => {
-    const token = localStorage.getItem('analytics_token');
+    const token = localStorage.getItem('superadmin_token');
     const headers = {
       'Authorization': `Bearer ${token}`,
       'Content-Type': 'application/json',
@@ -175,7 +175,7 @@ const AnalyticsDashboard = () => {
   };
 
   const endExperiment = async (id) => {
-    const token = localStorage.getItem('analytics_token');
+    const token = localStorage.getItem('superadmin_token');
     const headers = {
       'Authorization': `Bearer ${token}`,
       'Content-Type': 'application/json',
