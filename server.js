@@ -3819,9 +3819,78 @@ app.post('/api/security/decrypt', authMiddleware, requireRole('admin'),
   }
 );
 
-// Catch-all route - serve React app for any non-API routes (Express 5 compatible)
+// Catch-all route - serve React app with dynamic meta tags for SEO
+const SEO_META = {
+  '/': {
+    title: 'FinACEverse - Cognitive Operating System for Autonomous Enterprises | Futurus',
+    description: 'We see what others don\'t. FinACEverse is the world\'s first Cognitive Operating System for Autonomous Enterprises — enabling organizational autonomy through understanding, execution, structure, and optimization.',
+    canonical: 'https://finaceverse.io/'
+  },
+  '/modules': {
+    title: 'FinACEverse Modules - Cognitive Operating System for Autonomous Enterprises',
+    description: 'Explore the Cognitive OS architecture: Understanding, Execution, Structure, and Optimization layers. The four capabilities that enable organizational autonomy.',
+    canonical: 'https://finaceverse.io/modules'
+  },
+  '/request-demo': {
+    title: 'Request Demo - FinACEverse | See Cognitive Finance in Action',
+    description: 'Schedule a personalized demo of FinACEverse. See how VAMN, Accute, and Cyloid transform financial operations with AI-powered automation and verification.',
+    canonical: 'https://finaceverse.io/request-demo'
+  },
+  '/tailored-pilots': {
+    title: 'Tailored Pilots - FinACEverse | Customized AI Finance Implementation',
+    description: 'Experience FinACEverse with a customized pilot program. We tailor our cognitive finance platform to your specific needs and workflows.',
+    canonical: 'https://finaceverse.io/tailored-pilots'
+  },
+  '/blog': {
+    title: 'FinACEverse Blog - Insights on Cognitive Finance & AI Automation',
+    description: 'Stay updated with the latest insights on cognitive finance, AI-powered accounting, tax automation, and financial intelligence from FinACEverse experts.',
+    canonical: 'https://finaceverse.io/blog'
+  }
+};
+
 app.use((req, res) => {
-  res.sendFile(path.join(__dirname, 'build', 'index.html'));
+  const indexPath = path.join(__dirname, 'build', 'index.html');
+  const seo = SEO_META[req.path];
+  
+  if (seo) {
+    // Inject SEO meta tags for crawlers
+    const fs = require('fs');
+    let html = fs.readFileSync(indexPath, 'utf8');
+    
+    // Replace default title
+    html = html.replace(
+      /<title>.*?<\/title>/,
+      `<title>${seo.title}</title>`
+    );
+    
+    // Replace default description
+    html = html.replace(
+      /<meta name="description" content="[^"]*"/,
+      `<meta name="description" content="${seo.description}"`
+    );
+    
+    // Replace default canonical
+    html = html.replace(
+      /<link rel="canonical" href="[^"]*"/,
+      `<link rel="canonical" href="${seo.canonical}"`
+    );
+    
+    // Replace OG URL
+    html = html.replace(
+      /<meta property="og:url" content="[^"]*"/,
+      `<meta property="og:url" content="${seo.canonical}"`
+    );
+    
+    // Replace OG title
+    html = html.replace(
+      /<meta property="og:title" content="[^"]*"/,
+      `<meta property="og:title" content="${seo.title.split(' - ')[0]}"`
+    );
+    
+    res.send(html);
+  } else {
+    res.sendFile(indexPath);
+  }
 });
 
 // Create HTTP server and attach Socket.IO
