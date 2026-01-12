@@ -1,4 +1,5 @@
 const webpack = require('webpack');
+const purgecss = require('@fullhuman/postcss-purgecss');
 
 module.exports = {
   reactScriptsVersion: "react-scripts",
@@ -8,6 +9,53 @@ module.exports = {
         return {
           url: false,
         };
+      },
+    },
+    postcss: {
+      mode: 'extends',
+      loaderOptions: (options, { env }) => {
+        if (env === 'production') {
+          options.postcssOptions.plugins.push(
+            purgecss({
+              content: [
+                './src/**/*.js',
+                './src/**/*.jsx',
+                './public/index.html'
+              ],
+              defaultExtractor: content => content.match(/[\w-/:]+(?<!:)/g) || [],
+              safelist: {
+                standard: [
+                  /^html$/,
+                  /^body$/,
+                  /^root$/,
+                  /^App$/,
+                  // Keep all dynamically generated classes
+                  /^(is|has|js|no|can)-/,
+                  // Animation classes
+                  /^animate/,
+                  /^fade/,
+                  // State classes
+                  /^active/,
+                  /^loading/,
+                  /^visible/,
+                  /^hidden/,
+                  // Component state classes
+                  /^bento-/,
+                  /^cell-/,
+                  /^card-/,
+                  /^modal-/,
+                  /^menu-/,
+                  /^nav-/,
+                  /^hero-/,
+                  /^section-/,
+                ],
+                deep: [/^theme-/, /^dark-mode/, /^light-mode/],
+                greedy: [/data-/, /aria-/]
+              }
+            })
+          );
+        }
+        return options;
       },
     },
   },

@@ -720,7 +720,10 @@ const Home = (props) => {
           <div className="bento-grid" style={{gap: 'var(--spacing-xl)'}}>
             <div className="bento-cell cell-wide" style={{background: 'color-mix(in srgb, var(--color-primary) 10%, var(--color-surface))', padding: 'var(--spacing-2xl)', borderRadius: 'var(--border-radius-lg)'}}>
               <div className="cell-content">
-                <img src="/images/Accute Transparent symbol.png" alt="Accute" style={{height: '40px', marginBottom: 'var(--spacing-md)', opacity: 0.9}} />
+                <picture>
+                  <source srcSet="/images/Accute Transparent symbol.webp" type="image/webp" />
+                  <img src="/images/Accute Transparent symbol.png" alt="Accute" width="40" height="40" loading="lazy" decoding="async" style={{height: '40px', width: '40px', marginBottom: 'var(--spacing-md)', opacity: 0.9}} />
+                </picture>
                 <h3 className="cell-title" style={{color: 'var(--color-primary)'}}>The Orchestrator: Accute</h3>
                 <p className="section-content">
                   <strong>Start here.</strong> Accute is the workflow orchestrator that connects every process. 
@@ -732,7 +735,10 @@ const Home = (props) => {
             
             <div className="bento-cell cell-narrow" style={{background: 'var(--color-surface-elevated)', padding: 'var(--spacing-xl)', borderRadius: 'var(--border-radius-lg)'}}>
               <div className="cell-content">
-                <img src="/images/Luca Transparent symbol (2).png" alt="Luca" style={{height: '35px', marginBottom: 'var(--spacing-sm)', opacity: 0.9}} />
+                <picture>
+                  <source srcSet="/images/Luca Transparent symbol (2).webp" type="image/webp" />
+                  <img src="/images/Luca Transparent symbol (2).png" alt="Luca" width="35" height="35" loading="lazy" decoding="async" style={{height: '35px', width: '35px', marginBottom: 'var(--spacing-sm)', opacity: 0.9}} />
+                </picture>
                 <h3 className="cell-title">Expert Layer: Luca</h3>
                 <p className="section-content">
                   AI domain expert with CPA-level knowledge. Answers complex tax and 
@@ -743,7 +749,10 @@ const Home = (props) => {
             
             <div className="bento-cell cell-narrow" style={{background: 'var(--color-surface-elevated)', padding: 'var(--spacing-xl)', borderRadius: 'var(--border-radius-lg)'}}>
               <div className="cell-content">
-                <img src="/images/Fin(Ai)d Studio Transparent symbol.png" alt="Finaid Hub" style={{height: '35px', marginBottom: 'var(--spacing-sm)', opacity: 0.9}} />
+                <picture>
+                  <source srcSet="/images/Fin(Ai)d Studio Transparent symbol.webp" type="image/webp" />
+                  <img src="/images/Fin(Ai)d Studio Transparent symbol.png" alt="Finaid Hub" width="35" height="35" loading="lazy" decoding="async" style={{height: '35px', width: '35px', marginBottom: 'var(--spacing-sm)', opacity: 0.9}} />
+                </picture>
                 <h3 className="cell-title">Execution Layer: Finaid Hub</h3>
                 <p className="section-content">
                   AI workforce multiplier. Handles routine tasks at machine speed, 
@@ -754,7 +763,10 @@ const Home = (props) => {
             
             <div className="bento-cell cell-narrow" style={{background: 'var(--color-surface-elevated)', padding: 'var(--spacing-xl)', borderRadius: 'var(--border-radius-lg)'}}>
               <div className="cell-content">
-                <img src="/images/EPI-Q Transparent symbol.png" alt="EPI-Q" style={{height: '35px', marginBottom: 'var(--spacing-sm)', opacity: 0.9}} />
+                <picture>
+                  <source srcSet="/images/EPI-Q Transparent symbol.webp" type="image/webp" />
+                  <img src="/images/EPI-Q Transparent symbol.png" alt="EPI-Q" width="35" height="35" loading="lazy" decoding="async" style={{height: '35px', width: '35px', marginBottom: 'var(--spacing-sm)', opacity: 0.9}} />
+                </picture>
                 <h3 className="cell-title">Discovery Layer: EPI-Q</h3>
                 <p className="section-content">
                   Enterprise process, task, and communication mining. Maps your actual 
@@ -768,7 +780,10 @@ const Home = (props) => {
                 <div className="bento-cell cell-narrow" style={{background: 'var(--color-surface-elevated)', padding: 'var(--spacing-xl)', borderRadius: 'var(--border-radius-lg)', position: 'relative'}}>
                   <div style={{position: 'absolute', top: '10px', right: '10px', background: 'var(--color-accent)', color: 'white', padding: '4px 8px', borderRadius: '4px', fontSize: '10px', fontWeight: 'bold'}}>PHASE 2</div>
                   <div className="cell-content">
-                    <img src="/images/Cyloid.png" alt="Cyloid" style={{height: '35px', marginBottom: 'var(--spacing-sm)', opacity: 0.9}} />
+                    <picture>
+                      <source srcSet="/images/Cyloid.webp" type="image/webp" />
+                      <img src="/images/Cyloid.png" alt="Cyloid" width="35" height="35" loading="lazy" decoding="async" style={{height: '35px', width: '35px', marginBottom: 'var(--spacing-sm)', opacity: 0.9}} />
+                    </picture>
                     <h3 className="cell-title">Input Layer: Cyloid</h3>
                     <p className="section-content">
                       AI verification engine for document processing. Reads, extracts, and 
@@ -779,7 +794,10 @@ const Home = (props) => {
                 <div className="bento-cell cell-narrow" style={{background: 'var(--color-surface-elevated)', padding: 'var(--spacing-xl)', borderRadius: 'var(--border-radius-lg)', position: 'relative'}}>
                   <div style={{position: 'absolute', top: '10px', right: '10px', background: 'var(--color-accent)', color: 'white', padding: '4px 8px', borderRadius: '4px', fontSize: '10px', fontWeight: 'bold'}}>PHASE 2</div>
                   <div className="cell-content">
-                    <img src="/images/VAMN-7B Transparent logo.png" alt="VAMN" style={{height: '35px', marginBottom: 'var(--spacing-sm)', opacity: 0.9}} />
+                    <picture>
+                      <source srcSet="/images/VAMN-7B Transparent logo.webp" type="image/webp" />
+                      <img src="/images/VAMN-7B Transparent logo.png" alt="VAMN" width="53" height="35" loading="lazy" decoding="async" style={{height: '35px', width: '53px', marginBottom: 'var(--spacing-sm)', opacity: 0.9}} />
+                    </picture>
                     <h3 className="cell-title">The Brain: VAMN</h3>
                     <p className="section-content">
                       Financial LLM with a cool mind of its own. Unlike generic AI, 
@@ -790,7 +808,10 @@ const Home = (props) => {
                 <div className="bento-cell cell-narrow" style={{background: 'var(--color-surface-elevated)', padding: 'var(--spacing-xl)', borderRadius: 'var(--border-radius-lg)', position: 'relative'}}>
                   <div style={{position: 'absolute', top: '10px', right: '10px', background: 'var(--color-accent)', color: 'white', padding: '4px 8px', borderRadius: '4px', fontSize: '10px', fontWeight: 'bold'}}>PHASE 2</div>
                   <div className="cell-content">
-                    <img src="/images/Finory Transparent symbol.png" alt="Finory" style={{height: '35px', marginBottom: 'var(--spacing-sm)', opacity: 0.9}} />
+                    <picture>
+                      <source srcSet="/images/Finory Transparent symbol.webp" type="image/webp" />
+                      <img src="/images/Finory Transparent symbol.png" alt="Finory" width="35" height="35" loading="lazy" decoding="async" style={{height: '35px', width: '35px', marginBottom: 'var(--spacing-sm)', opacity: 0.9}} />
+                    </picture>
                     <h3 className="cell-title">Systems Layer: Finory</h3>
                     <p className="section-content">
                       Self-constructing AI-native ERP. Adapts to your business 
@@ -801,7 +822,10 @@ const Home = (props) => {
                 <div className="bento-cell cell-narrow" style={{background: 'var(--color-surface-elevated)', padding: 'var(--spacing-xl)', borderRadius: 'var(--border-radius-lg)', position: 'relative'}}>
                   <div style={{position: 'absolute', top: '10px', right: '10px', background: 'var(--color-accent)', color: 'white', padding: '4px 8px', borderRadius: '4px', fontSize: '10px', fontWeight: 'bold'}}>PHASE 2</div>
                   <div className="cell-content">
-                    <img src="/images/SumBuddy Transparent symbol.png" alt="Sumbuddy" style={{height: '35px', marginBottom: 'var(--spacing-sm)', opacity: 0.9}} />
+                    <picture>
+                      <source srcSet="/images/SumBuddy Transparent symbol.webp" type="image/webp" />
+                      <img src="/images/SumBuddy Transparent symbol.png" alt="Sumbuddy" width="35" height="35" loading="lazy" decoding="async" style={{height: '35px', width: '35px', marginBottom: 'var(--spacing-sm)', opacity: 0.9}} />
+                    </picture>
                     <h3 className="cell-title">Growth Layer: Sumbuddy</h3>
                     <p className="section-content">
                       Client acquisition marketplace. Get matched with qualified 
