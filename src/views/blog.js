@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react'
 import { Helmet } from 'react-helmet'
 import Navigation from '../components/navigation'
 import Footer from '../components/footer'
+import Breadcrumb from '../components/breadcrumb'
 import './blog.css'
 
 // Default/fallback posts (used if API fails or during initial load)
@@ -156,6 +157,10 @@ const Blog = () => {
       </Helmet>
       
       <Navigation />
+      
+      <div className="container-wrapper" style={{paddingTop: 'var(--spacing-lg)'}}>
+        <Breadcrumb />
+      </div>
       
       <section className="blog-hero">
         <div className="container-wrapper">

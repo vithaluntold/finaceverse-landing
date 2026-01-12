@@ -2,6 +2,7 @@ import React from 'react'
 import { Helmet } from 'react-helmet'
 import Navigation from '../components/navigation'
 import Footer from '../components/footer'
+import Breadcrumb from '../components/breadcrumb'
 import './tailored-pilots.css'
 
 const TailoredPilots = (props) => {
@@ -17,6 +18,10 @@ const TailoredPilots = (props) => {
         <link rel="canonical" href="https://finaceverse.io/tailored-pilots" />
       </Helmet>
       <Navigation></Navigation>
+      
+      <div className="container-wrapper" style={{paddingTop: 'var(--spacing-lg)'}}>
+        <Breadcrumb />
+      </div>
       
       <section className="pilots-hero">
         <div className="pilots-hero-bg">

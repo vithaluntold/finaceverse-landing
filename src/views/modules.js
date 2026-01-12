@@ -5,6 +5,7 @@ import { Helmet } from 'react-helmet'
 
 import Navigation from '../components/navigation'
 import Footer from '../components/footer'
+import Breadcrumb from '../components/breadcrumb'
 import './modules.css'
 
 // Default SVG icons for products without custom icons
@@ -181,6 +182,10 @@ const Modules = () => {
       </Helmet>
       
       <Navigation />
+      
+      <div className="container-wrapper" style={{paddingTop: 'var(--spacing-lg)'}}>
+        <Breadcrumb />
+      </div>
       
       {/* View Mode Toggle */}
       <div className="view-mode-toggle">

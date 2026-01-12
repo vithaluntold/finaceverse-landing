@@ -5,6 +5,7 @@ import { Helmet } from 'react-helmet'
 
 import Navigation from '../components/navigation'
 import Footer from '../components/footer'
+import FAQSection from '../components/faq-section'
 import './home.css'
 
 // Check if device is mobile (for performance optimization)
@@ -1130,6 +1131,9 @@ const Home = (props) => {
           </div>
         </div>
       </section>
+      <FAQSection 
+        subtitle="Everything you need to know about FinACEverse and the Cognitive Operating System"
+      />
       <section className="final-cta">
         <div className="full-width-inner">
           <div className="cta-split-container">

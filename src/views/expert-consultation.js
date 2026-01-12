@@ -2,6 +2,7 @@ import React from 'react'
 import { Helmet } from 'react-helmet'
 import Navigation from '../components/navigation'
 import Footer from '../components/footer'
+import Breadcrumb from '../components/breadcrumb'
 import './expert-consultation.css'
 
 const ExpertConsultation = (props) => {
@@ -17,6 +18,10 @@ const ExpertConsultation = (props) => {
         <link rel="canonical" href="https://finaceverse.io/expert-consultation" />
       </Helmet>
       <Navigation></Navigation>
+      
+      <div className="container-wrapper" style={{paddingTop: 'var(--spacing-lg)'}}>
+        <Breadcrumb />
+      </div>
       
       <section className="consultation-hero">
         <div className="consultation-hero-bg">

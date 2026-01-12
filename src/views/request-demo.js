@@ -2,6 +2,7 @@ import React from 'react'
 import { Helmet } from 'react-helmet'
 import Navigation from '../components/navigation'
 import Footer from '../components/footer'
+import Breadcrumb from '../components/breadcrumb'
 import './request-demo.css'
 
 const RequestDemo = (props) => {
@@ -18,6 +19,10 @@ const RequestDemo = (props) => {
         <link rel="canonical" href="https://finaceverse.io/request-demo" />
       </Helmet>
       <Navigation></Navigation>
+      
+      <div className="container-wrapper" style={{paddingTop: 'var(--spacing-lg)'}}>
+        <Breadcrumb />
+      </div>
       
       <section className="demo-hero">
         <div className="demo-hero-bg">
