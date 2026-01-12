@@ -1,57 +1,94 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import { Helmet } from 'react-helmet'
 import Navigation from '../components/navigation'
 import Footer from '../components/footer'
 import './blog.css'
 
+// Default/fallback posts (used if API fails or during initial load)
+const defaultPosts = [
+  {
+    id: 1,
+    title: 'Why Cognitive Operating Systems Are the Future of Finance',
+    excerpt: 'Traditional accounting software was built for record-keeping. The future demands intelligent systems that think, learn, and act.',
+    category: 'Industry Insights',
+    published_at: '2026-01-05',
+    author: 'Vithal Valluri',
+    image_url: 'https://images.pexels.com/photos/30547577/pexels-photo-30547577.jpeg?auto=compress&cs=tinysrgb&w=1500',
+    slug: 'why-cognitive-operating-systems-are-future'
+  },
+  {
+    id: 2,
+    title: 'The AI Workforce Multiplier: What It Is and Why It Matters',
+    excerpt: 'Understanding how AI can make one accountant as productive as ten—without replacing a single human.',
+    category: 'Technology',
+    published_at: '2026-01-03',
+    author: 'FinACEverse Team',
+    image_url: 'https://images.pexels.com/photos/30547598/pexels-photo-30547598.jpeg?auto=compress&cs=tinysrgb&w=1500',
+    slug: 'ai-workforce-multiplier-explained'
+  },
+  {
+    id: 3,
+    title: 'Pilot Program Results: 2.5x Capacity Uplift Without New Hires',
+    excerpt: 'Early adopters share their experience implementing FinACEverse and the results they\'ve achieved.',
+    category: 'Case Studies',
+    published_at: '2025-12-28',
+    author: 'FinACEverse Research',
+    image_url: 'https://images.pexels.com/photos/30547606/pexels-photo-30547606.jpeg?auto=compress&cs=tinysrgb&w=1500',
+    slug: 'pilot-program-results-2-5x-capacity'
+  },
+  {
+    id: 4,
+    title: 'Process Mining for Accounting Firms: Finding Hidden Inefficiencies',
+    excerpt: 'How EPI-Q reveals the actual workflows in your firm—and why they\'re probably different from what you think.',
+    category: 'Technology',
+    published_at: '2025-12-20',
+    author: 'FinACEverse Team',
+    image_url: 'https://images.pexels.com/photos/30547577/pexels-photo-30547577.jpeg?auto=compress&cs=tinysrgb&w=1500',
+    slug: 'process-mining-accounting-firms'
+  }
+]
+
+// Format date for display
+const formatDate = (dateStr) => {
+  if (!dateStr) return ''
+  const date = new Date(dateStr)
+  return date.toLocaleDateString('en-US', { 
+    year: 'numeric', 
+    month: 'long', 
+    day: 'numeric' 
+  })
+}
+
 const Blog = () => {
   const [selectedCategory, setSelectedCategory] = useState('all')
+  const [blogPosts, setBlogPosts] = useState(defaultPosts)
+  const [categories, setCategories] = useState(['all', 'Technology', 'Industry Insights', 'Case Studies', 'Compliance'])
+  const [loading, setLoading] = useState(true)
   
-  // Blog posts with actual content
-  const blogPosts = [
-    {
-      id: 1,
-      title: 'Why Cognitive Operating Systems Are the Future of Finance',
-      excerpt: 'Traditional accounting software was built for record-keeping. The future demands intelligent systems that think, learn, and act.',
-      category: 'Industry Insights',
-      date: 'January 5, 2026',
-      author: 'Vithal Valluri',
-      image: 'https://images.pexels.com/photos/30547577/pexels-photo-30547577.jpeg?auto=compress&cs=tinysrgb&w=1500',
-      slug: 'why-cognitive-operating-systems-are-future'
-    },
-    {
-      id: 2,
-      title: 'The AI Workforce Multiplier: What It Is and Why It Matters',
-      excerpt: 'Understanding how AI can make one accountant as productive as ten—without replacing a single human.',
-      category: 'Technology',
-      date: 'January 3, 2026',
-      author: 'FinACEverse Team',
-      image: 'https://images.pexels.com/photos/30547598/pexels-photo-30547598.jpeg?auto=compress&cs=tinysrgb&w=1500',
-      slug: 'ai-workforce-multiplier-explained'
-    },
-    {
-      id: 3,
-      title: 'Pilot Program Results: 2.5x Capacity Uplift Without New Hires',
-      excerpt: 'Early adopters share their experience implementing FinACEverse and the results they\'ve achieved.',
-      category: 'Case Studies',
-      date: 'December 28, 2025',
-      author: 'FinACEverse Research',
-      image: 'https://images.pexels.com/photos/30547606/pexels-photo-30547606.jpeg?auto=compress&cs=tinysrgb&w=1500',
-      slug: 'pilot-program-results-2-5x-capacity'
-    },
-    {
-      id: 4,
-      title: 'Process Mining for Accounting Firms: Finding Hidden Inefficiencies',
-      excerpt: 'How EPI-Q reveals the actual workflows in your firm—and why they\'re probably different from what you think.',
-      category: 'Technology',
-      date: 'December 20, 2025',
-      author: 'FinACEverse Team',
-      image: 'https://images.pexels.com/photos/30547577/pexels-photo-30547577.jpeg?auto=compress&cs=tinysrgb&w=1500',
-      slug: 'process-mining-accounting-firms'
+  // Fetch posts from API
+  useEffect(() => {
+    const fetchPosts = async () => {
+      try {
+        const res = await fetch('/api/blog/posts')
+        if (res.ok) {
+          const data = await res.json()
+          if (data.posts && data.posts.length > 0) {
+            setBlogPosts(data.posts)
+            // Build categories from posts
+            if (data.categories && data.categories.length > 0) {
+              const cats = ['all', ...data.categories.map(c => c.category)]
+              setCategories([...new Set(cats)])
+            }
+          }
+        }
+      } catch (err) {
+        console.warn('Using fallback blog posts:', err.message)
+      } finally {
+        setLoading(false)
+      }
     }
-  ]
-  
-  const categories = ['all', 'Technology', 'Industry Insights', 'Case Studies', 'Compliance']
+    fetchPosts()
+  }, [])
   
   const filteredPosts = selectedCategory === 'all' 
     ? blogPosts 
@@ -77,12 +114,12 @@ const Blog = () => {
       "@type": "BlogPosting",
       "headline": post.title,
       "description": post.excerpt,
-      "datePublished": post.date,
+      "datePublished": post.published_at || post.date,
       "author": {
         "@type": "Person",
         "name": post.author
       },
-      "image": post.image,
+      "image": post.image_url || post.image,
       "url": `https://www.finaceverse.io/blog/${post.slug}`,
       "keywords": post.category
     }))
@@ -148,15 +185,21 @@ const Blog = () => {
           </div>
           
           <div className="blog-grid">
-            {filteredPosts.map(post => (
+            {loading ? (
+              <div className="blog-loading">
+                <div className="loading-spinner"></div>
+                <p>Loading posts...</p>
+              </div>
+            ) : filteredPosts.map(post => (
               <article key={post.id} className="blog-card">
                 <div className="blog-card-image">
-                  <img src={post.image} alt={post.title} />
+                  <img src={post.image_url || post.image} alt={post.title} loading="lazy" />
                   <span className="blog-category-badge">{post.category}</span>
+                  {post.featured && <span className="blog-featured-badge">⭐ Featured</span>}
                 </div>
                 <div className="blog-card-content">
                   <div className="blog-meta">
-                    <span className="blog-date">{post.date}</span>
+                    <span className="blog-date">{formatDate(post.published_at) || post.date}</span>
                     <span className="blog-author">By {post.author}</span>
                   </div>
                   <h3 className="blog-card-title">{post.title}</h3>

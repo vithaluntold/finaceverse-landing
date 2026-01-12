@@ -3492,6 +3492,328 @@ app.use('/uploads', express.static(path.join(__dirname, 'public', 'uploads')));
 
 // ============ END CMS CONTENT API ============
 
+// =====================================================================
+// BLOG POSTS API - Full CMS for blog management
+// =====================================================================
+
+// Public - Get all published blog posts
+app.get('/api/blog/posts', async (req, res) => {
+  try {
+    const { category, limit = 20, offset = 0 } = req.query;
+    
+    let query = `
+      SELECT id, slug, title, excerpt, category, author, image_url, 
+             published_at, view_count, featured
+      FROM blog_posts 
+      WHERE status = 'published'
+    `;
+    const params = [];
+    
+    if (category && category !== 'all') {
+      params.push(category);
+      query += ` AND category = $${params.length}`;
+    }
+    
+    query += ` ORDER BY featured DESC, published_at DESC`;
+    params.push(parseInt(limit));
+    query += ` LIMIT $${params.length}`;
+    params.push(parseInt(offset));
+    query += ` OFFSET $${params.length}`;
+    
+    const result = await pool.query(query, params);
+    
+    // Get categories with counts
+    const categoriesResult = await pool.query(`
+      SELECT category, COUNT(*) as count 
+      FROM blog_posts 
+      WHERE status = 'published' 
+      GROUP BY category
+    `);
+    
+    res.json({ 
+      posts: result.rows,
+      categories: categoriesResult.rows,
+      total: result.rowCount
+    });
+  } catch (error) {
+    console.error('Get blog posts error:', error);
+    res.status(500).json({ error: 'Failed to fetch posts' });
+  }
+});
+
+// Public - Get single blog post by slug
+app.get('/api/blog/posts/:slug', async (req, res) => {
+  try {
+    const { slug } = req.params;
+    
+    const result = await pool.query(
+      `SELECT * FROM blog_posts WHERE slug = $1 AND status = 'published'`,
+      [slug]
+    );
+    
+    if (result.rows.length === 0) {
+      return res.status(404).json({ error: 'Post not found' });
+    }
+    
+    // Increment view count
+    await pool.query(
+      'UPDATE blog_posts SET view_count = view_count + 1 WHERE slug = $1',
+      [slug]
+    );
+    
+    res.json({ post: result.rows[0] });
+  } catch (error) {
+    console.error('Get blog post error:', error);
+    res.status(500).json({ error: 'Failed to fetch post' });
+  }
+});
+
+// Admin - Get all blog posts (including drafts)
+app.get('/api/admin/blog/posts', authMiddleware, requireRole('superadmin'), async (req, res) => {
+  try {
+    const result = await pool.query(`
+      SELECT * FROM blog_posts 
+      ORDER BY 
+        CASE status WHEN 'draft' THEN 0 WHEN 'published' THEN 1 ELSE 2 END,
+        updated_at DESC
+    `);
+    
+    res.json({ posts: result.rows });
+  } catch (error) {
+    console.error('Admin get blog posts error:', error);
+    res.status(500).json({ error: 'Failed to fetch posts' });
+  }
+});
+
+// Admin - Get single blog post for editing
+app.get('/api/admin/blog/posts/:id', authMiddleware, requireRole('superadmin'), async (req, res) => {
+  try {
+    const { id } = req.params;
+    const result = await pool.query('SELECT * FROM blog_posts WHERE id = $1', [id]);
+    
+    if (result.rows.length === 0) {
+      return res.status(404).json({ error: 'Post not found' });
+    }
+    
+    res.json({ post: result.rows[0] });
+  } catch (error) {
+    console.error('Admin get blog post error:', error);
+    res.status(500).json({ error: 'Failed to fetch post' });
+  }
+});
+
+// Admin - Create new blog post
+app.post('/api/admin/blog/posts', authMiddleware, requireRole('superadmin'), async (req, res) => {
+  try {
+    const { 
+      title, slug, excerpt, content, category, author, 
+      image_url, meta_title, meta_description, meta_keywords,
+      status, featured 
+    } = req.body;
+    
+    if (!title || !slug) {
+      return res.status(400).json({ error: 'Title and slug are required' });
+    }
+    
+    // Check if slug already exists
+    const existing = await pool.query('SELECT id FROM blog_posts WHERE slug = $1', [slug]);
+    if (existing.rows.length > 0) {
+      return res.status(400).json({ error: 'A post with this slug already exists' });
+    }
+    
+    const result = await pool.query(`
+      INSERT INTO blog_posts (
+        title, slug, excerpt, content, category, author, 
+        image_url, meta_title, meta_description, meta_keywords,
+        status, featured, published_at, created_by
+      ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14)
+      RETURNING *
+    `, [
+      title, slug, excerpt || '', content || '', 
+      category || 'Technology', author || 'FinACEverse Team',
+      image_url || '', meta_title || title.substring(0, 70), 
+      meta_description || excerpt?.substring(0, 160) || '',
+      meta_keywords || '',
+      status || 'draft', featured || false,
+      status === 'published' ? new Date() : null,
+      req.username || 'superadmin'
+    ]);
+    
+    res.json({ success: true, post: result.rows[0] });
+  } catch (error) {
+    console.error('Create blog post error:', error);
+    res.status(500).json({ error: 'Failed to create post' });
+  }
+});
+
+// Admin - Update blog post
+app.put('/api/admin/blog/posts/:id', authMiddleware, requireRole('superadmin'), async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { 
+      title, slug, excerpt, content, category, author, 
+      image_url, meta_title, meta_description, meta_keywords,
+      status, featured 
+    } = req.body;
+    
+    // Get current post to check status change
+    const current = await pool.query('SELECT status FROM blog_posts WHERE id = $1', [id]);
+    if (current.rows.length === 0) {
+      return res.status(404).json({ error: 'Post not found' });
+    }
+    
+    // Check if slug is unique (excluding current post)
+    if (slug) {
+      const existing = await pool.query(
+        'SELECT id FROM blog_posts WHERE slug = $1 AND id != $2', 
+        [slug, id]
+      );
+      if (existing.rows.length > 0) {
+        return res.status(400).json({ error: 'A post with this slug already exists' });
+      }
+    }
+    
+    // Set published_at if publishing for first time
+    const wasPublished = current.rows[0].status === 'published';
+    const isPublishing = status === 'published' && !wasPublished;
+    
+    const result = await pool.query(`
+      UPDATE blog_posts SET
+        title = COALESCE($1, title),
+        slug = COALESCE($2, slug),
+        excerpt = COALESCE($3, excerpt),
+        content = COALESCE($4, content),
+        category = COALESCE($5, category),
+        author = COALESCE($6, author),
+        image_url = COALESCE($7, image_url),
+        meta_title = COALESCE($8, meta_title),
+        meta_description = COALESCE($9, meta_description),
+        meta_keywords = COALESCE($10, meta_keywords),
+        status = COALESCE($11, status),
+        featured = COALESCE($12, featured),
+        published_at = CASE 
+          WHEN $13 = true THEN NOW() 
+          ELSE published_at 
+        END,
+        updated_by = $14
+      WHERE id = $15
+      RETURNING *
+    `, [
+      title, slug, excerpt, content, category, author,
+      image_url, meta_title, meta_description, meta_keywords,
+      status, featured, isPublishing, req.username || 'superadmin', id
+    ]);
+    
+    res.json({ success: true, post: result.rows[0] });
+  } catch (error) {
+    console.error('Update blog post error:', error);
+    res.status(500).json({ error: 'Failed to update post' });
+  }
+});
+
+// Admin - Delete blog post
+app.delete('/api/admin/blog/posts/:id', authMiddleware, requireRole('superadmin'), async (req, res) => {
+  try {
+    const { id } = req.params;
+    
+    const result = await pool.query('DELETE FROM blog_posts WHERE id = $1 RETURNING id, title', [id]);
+    
+    if (result.rows.length === 0) {
+      return res.status(404).json({ error: 'Post not found' });
+    }
+    
+    res.json({ success: true, deleted: result.rows[0] });
+  } catch (error) {
+    console.error('Delete blog post error:', error);
+    res.status(500).json({ error: 'Failed to delete post' });
+  }
+});
+
+// Admin - Get blog categories
+app.get('/api/admin/blog/categories', authMiddleware, requireRole('superadmin'), async (req, res) => {
+  try {
+    const result = await pool.query('SELECT * FROM blog_categories ORDER BY name');
+    res.json({ categories: result.rows });
+  } catch (error) {
+    console.error('Get categories error:', error);
+    // Return default categories if table doesn't exist
+    res.json({ 
+      categories: [
+        { name: 'Technology', slug: 'technology', color: '#00d4ff' },
+        { name: 'Industry Insights', slug: 'industry-insights', color: '#8b5cf6' },
+        { name: 'Case Studies', slug: 'case-studies', color: '#10b981' },
+        { name: 'Compliance', slug: 'compliance', color: '#f59e0b' },
+        { name: 'Product Updates', slug: 'product-updates', color: '#ec4899' }
+      ]
+    });
+  }
+});
+
+// Admin - AI Generate blog content
+app.post('/api/admin/blog/ai-generate', authMiddleware, requireRole('superadmin'), async (req, res) => {
+  try {
+    const { prompt, type } = req.body; // type: 'title', 'excerpt', 'content', 'full'
+    
+    const endpoint = process.env.AZURE_OPENAI_ENDPOINT;
+    const apiKey = process.env.AZURE_OPENAI_KEY;
+    const deployment = process.env.AZURE_OPENAI_DEPLOYMENT || 'gpt-4';
+    
+    if (!endpoint || !apiKey) {
+      return res.status(400).json({ error: 'Azure OpenAI not configured' });
+    }
+    
+    let systemPrompt = 'You are a professional content writer for FinACEverse, a cognitive finance platform.';
+    let userPrompt = prompt;
+    
+    if (type === 'title') {
+      systemPrompt += ' Generate 5 compelling blog post titles.';
+      userPrompt = `Generate 5 blog post titles about: ${prompt}. Return only the titles, one per line.`;
+    } else if (type === 'excerpt') {
+      systemPrompt += ' Write a compelling 1-2 sentence excerpt.';
+      userPrompt = `Write a compelling excerpt for a blog post titled: "${prompt}". Keep it under 160 characters.`;
+    } else if (type === 'content') {
+      systemPrompt += ' Write professional, engaging blog content with proper HTML formatting.';
+      userPrompt = `Write a full blog post about: ${prompt}. Use HTML formatting with <h2>, <h3>, <p>, <ul>, <li> tags. Include an introduction, 3-4 main sections, and a conclusion.`;
+    } else if (type === 'full') {
+      systemPrompt += ' Generate a complete blog post with title, excerpt, and content.';
+      userPrompt = `Generate a complete blog post about: ${prompt}. Return as JSON with keys: title, excerpt, content (HTML formatted), category, keywords.`;
+    }
+    
+    const response = await fetch(`${endpoint}/openai/deployments/${deployment}/chat/completions?api-version=2024-02-01`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'api-key': apiKey
+      },
+      body: JSON.stringify({
+        messages: [
+          { role: 'system', content: systemPrompt },
+          { role: 'user', content: userPrompt }
+        ],
+        temperature: 0.7,
+        max_tokens: type === 'content' || type === 'full' ? 2000 : 500
+      })
+    });
+    
+    if (!response.ok) {
+      const error = await response.json();
+      throw new Error(error.error?.message || 'AI generation failed');
+    }
+    
+    const data = await response.json();
+    const generated = data.choices[0].message.content;
+    
+    res.json({ success: true, generated, type });
+  } catch (error) {
+    console.error('AI generate error:', error);
+    res.status(500).json({ error: error.message || 'AI generation failed' });
+  }
+});
+
+// =====================================================================
+// END BLOG POSTS API
+// =====================================================================
+
 // Admin - Update or create content
 app.post('/api/admin/content', authMiddleware, requireRole('superadmin'), async (req, res) => {
   try {

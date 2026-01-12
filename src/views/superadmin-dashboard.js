@@ -189,6 +189,32 @@ const SuperAdminDashboard = () => {
           <button className="card-btn">Edit Content →</button>
         </div>
 
+        {/* Blog Editor Card */}
+        <div 
+          className="dashboard-card blog"
+          onClick={() => history.push('/vault-e9232b8eefbaa45e/blog')}
+        >
+          <div className="card-header">
+            <div className="card-icon">
+              <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M4 22h16a2 2 0 0 0 2-2V4a2 2 0 0 0-2-2H8a2 2 0 0 0-2 2v16a2 2 0 0 1-2 2Zm0 0a2 2 0 0 1-2-2v-9c0-1.1.9-2 2-2h2"/>
+                <path d="M18 14h-8"/>
+                <path d="M15 18h-5"/>
+                <path d="M10 6h8v4h-8V6Z"/>
+              </svg>
+            </div>
+            <h2>Blog Editor</h2>
+          </div>
+          <p>Create, edit, and publish blog posts with AI-powered content generation</p>
+          <div className="card-features">
+            <span>• Create Posts</span>
+            <span>• AI Writing</span>
+            <span>• Draft/Publish</span>
+            <span>• SEO Fields</span>
+          </div>
+          <button className="card-btn">Manage Blog →</button>
+        </div>
+
         {/* PageSpeed Insights Card */}
         <div className="dashboard-card pagespeed">
           <div className="card-header">

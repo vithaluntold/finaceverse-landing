@@ -30,6 +30,7 @@ const SuperAdminLogin = lazy(() => import('./views/superadmin-login'))
 const SuperAdminDashboard = lazy(() => import('./views/superadmin-dashboard'))
 const ProductManager = lazy(() => import('./views/product-manager'))
 const ContentEditor = lazy(() => import('./views/content-editor'))
+const BlogEditor = lazy(() => import('./views/blog-editor'))
 const NotFound = lazy(() => import('./views/not-found'))
 
 import { initGA, trackPageView } from './utils/analytics'
@@ -105,6 +106,7 @@ const App = () => {
           <Route component={SuperAdminDashboard} exact path="/vault-e9232b8eefbaa45e/dashboard" />
           <Route component={ProductManager} exact path="/vault-e9232b8eefbaa45e/products" />
           <Route component={ContentEditor} exact path="/vault-e9232b8eefbaa45e/content" />
+          <Route component={BlogEditor} exact path="/vault-e9232b8eefbaa45e/blog" />
           <Route component={NotFound} path="**" />
           <Redirect to="**" />
         </Switch>

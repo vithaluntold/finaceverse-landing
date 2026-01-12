@@ -96,6 +96,10 @@
   border-top: 3px solid #f59e0b;
 }
 
+.dashboard-card.blog {
+  border-top: 3px solid #8b5cf6;
+}
+
 .dashboard-card.pagespeed {
   border-top: 3px solid #00d4ff;
 }

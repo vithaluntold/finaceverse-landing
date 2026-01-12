@@ -3,14 +3,14 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>FinACEverse SuperAdmin E2E Test Guide</title>
+  <title>FinACEverse SuperAdmin E2E Test Guide v2.0</title>
   <style>
     * { box-sizing: border-box; margin: 0; padding: 0; }
     body {
       font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
       line-height: 1.6;
       color: #1a1a2e;
-      max-width: 800px;
+      max-width: 850px;
       margin: 0 auto;
       padding: 40px 20px;
       background: #fff;
@@ -38,6 +38,16 @@
       margin-bottom: 10px;
     }
     p { margin-bottom: 10px; }
+    .version-badge {
+      display: inline-block;
+      background: #10b981;
+      color: white;
+      padding: 4px 12px;
+      border-radius: 12px;
+      font-size: 12px;
+      font-weight: 600;
+      margin-left: 10px;
+    }
     .credentials {
       background: #0f172a;
       color: #e2e8f0;
@@ -52,7 +62,7 @@
       padding: 8px 12px;
       border-radius: 4px;
       margin: 8px 0;
-      font-family: 'SF Mono', Monaco, monospace;
+      font-family: 'SF Mono', Monaco, Consolas, monospace;
       font-size: 13px;
       color: #f8fafc;
       word-break: break-all;
@@ -73,6 +83,15 @@
     .verify {
       color: #10b981;
       font-weight: 500;
+    }
+    .new-feature {
+      background: #fef3c7;
+      color: #92400e;
+      padding: 2px 8px;
+      border-radius: 4px;
+      font-size: 11px;
+      font-weight: 600;
+      margin-left: 8px;
     }
     .step-box {
       background: #f8fafc;
@@ -106,6 +125,7 @@
     .badge.orange { background: #fef3c7; color: #92400e; }
     .badge.purple { background: #ede9fe; color: #5b21b6; }
     .badge.gray { background: #f1f5f9; color: #475569; }
+    .badge.blue { background: #dbeafe; color: #1e40af; }
     .checklist {
       background: #fefce8;
       border: 1px solid #fef08a;
@@ -116,34 +136,85 @@
     .checklist h3 { color: #854d0e; margin-bottom: 15px; }
     .checklist li { list-style: none; margin-left: 0; }
     .checklist li::before {
-      content: "☐ ";
-      font-size: 16px;
+      content: "[ ] ";
+      font-family: monospace;
     }
+    .feature-card {
+      background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
+      color: white;
+      padding: 20px;
+      border-radius: 12px;
+      margin: 20px 0;
+    }
+    .feature-card h3 { color: white; margin-bottom: 15px; }
+    .feature-card ul { margin-left: 20px; }
+    .feature-card li { color: rgba(255,255,255,0.9); }
     .page-break { page-break-before: always; }
+    .toc {
+      background: #f8fafc;
+      padding: 20px;
+      border-radius: 8px;
+      margin: 20px 0;
+    }
+    .toc h3 { margin-bottom: 15px; }
+    .toc ol { margin-left: 20px; }
+    .toc a { color: #6366f1; text-decoration: none; }
+    .toc a:hover { text-decoration: underline; }
     @media print {
-      body { padding: 20px; }
+      body { padding: 20px; font-size: 11px; }
       h2 { break-after: avoid; }
       .step-box, .credentials { break-inside: avoid; }
+      .page-break { page-break-before: always; }
     }
   </style>
 </head>
 <body>
 
-<h1>🔐 FinACEverse SuperAdmin<br>E2E Test Guide</h1>
+<h1>FinACEverse SuperAdmin<br>E2E Test Guide <span class="version-badge">v2.0</span></h1>
 
-<p><strong>Version:</strong> 1.0 &nbsp;|&nbsp; <strong>Date:</strong> January 2026 &nbsp;|&nbsp; <strong>Environment:</strong> Production</p>
+<p><strong>Version:</strong> 2.0 | <strong>Date:</strong> January 12, 2026 | <strong>Environment:</strong> Production</p>
 
-<div class="credentials">
-  <h3>🔑 SuperAdmin Credentials</h3>
+<div class="feature-card">
+  <h3>What's New in v2.0</h3>
+  <ul>
+    <li>PageSpeed Insights Dashboard with automated weekly scans</li>
+    <li>Content Editor for managing blog posts and pages</li>
+    <li>Enhanced SEO Dashboard with AI-powered recommendations</li>
+    <li>Server-side meta tag injection for crawler compatibility</li>
+    <li>WebP image optimization (92% size reduction)</li>
+  </ul>
+</div>
+
+<div class="toc">
+  <h3>Table of Contents</h3>
+  <ol>
+    <li><a href="#credentials">SuperAdmin Credentials</a></li>
+    <li><a href="#login">Login to SuperAdmin</a></li>
+    <li><a href="#dashboard">Dashboard Overview</a></li>
+    <li><a href="#products">Product Manager</a></li>
+    <li><a href="#analytics">Analytics Dashboard</a></li>
+    <li><a href="#seo">SEO Dashboard</a></li>
+    <li><a href="#pagespeed">PageSpeed Insights (NEW)</a></li>
+    <li><a href="#content">Content Editor (NEW)</a></li>
+    <li><a href="#modules">Modules Page (Public)</a></li>
+    <li><a href="#security">Logout & Security</a></li>
+    <li><a href="#checklist">Quick Test Checklist</a></li>
+  </ol>
+</div>
+
+<div class="credentials" id="credentials">
+  <h3>SuperAdmin Credentials</h3>
   <div class="label">LOGIN URL</div>
-  <code>https://www.finaceverse.io/vault-e9232b8eefbaa45e</code>
+  <code>https://finaceverse.io/superadmin-login</code>
   <div class="label">MASTER KEY</div>
   <code>FV-SuperKey-7e54227eb017247e4786281289189725</code>
   <div class="label">PASSWORD</div>
   <code>FinACE@SuperAdmin2026!Secure</code>
+  <div class="label">CRON SECRET (for automated tasks)</div>
+  <code>91dd505a3631e698a3a949528206b848e451e168d8fdc9e811eed3e324246cf6</code>
 </div>
 
-<h2>1. Login to SuperAdmin</h2>
+<h2 id="login">1. Login to SuperAdmin</h2>
 
 <div class="step-box">
   <ol>
@@ -151,23 +222,55 @@
     <li>Enter the Master Key in the first field</li>
     <li>Enter the Password in the second field</li>
     <li>Click <strong>Login</strong></li>
-    <li><span class="verify">✅ Verify:</span> Redirected to dashboard with 3 cards (Analytics, SEO, Products)</li>
+    <li><span class="verify">Verify:</span> Redirected to dashboard with 4 cards (Analytics, SEO, Products, PageSpeed)</li>
   </ol>
 </div>
 
-<h2>2. Test Product Manager</h2>
+<h2 id="dashboard">2. Dashboard Overview</h2>
 
-<h3>2.1 Access Product Manager</h3>
+<p>The SuperAdmin dashboard now displays 4 main cards:</p>
+
+<table>
+  <tr>
+    <th>Card</th>
+    <th>Description</th>
+    <th>Status</th>
+  </tr>
+  <tr>
+    <td><strong>Analytics Dashboard</strong></td>
+    <td>View traffic, events, geography data from GA4</td>
+    <td><span class="badge green">Active</span></td>
+  </tr>
+  <tr>
+    <td><strong>SEO Dashboard</strong></td>
+    <td>Page scores, keyword tracking, optimization tips</td>
+    <td><span class="badge green">Active</span></td>
+  </tr>
+  <tr>
+    <td><strong>Product Manager</strong></td>
+    <td>Manage products, statuses, visibility on modules page</td>
+    <td><span class="badge green">Active</span></td>
+  </tr>
+  <tr>
+    <td><strong>PageSpeed Insights</strong></td>
+    <td>Mobile/Desktop scores, Core Web Vitals, AI recommendations</td>
+    <td><span class="badge blue">NEW</span></td>
+  </tr>
+</table>
+
+<h2 id="products">3. Test Product Manager</h2>
+
+<h3>3.1 Access Product Manager</h3>
 <ol>
-  <li>Click <strong>Manage Products →</strong></li>
-  <li><span class="verify">✅ Verify:</span> Empty state shows "No Products Yet"</li>
+  <li>Click <strong>Manage Products</strong> card</li>
+  <li><span class="verify">Verify:</span> Product list or empty state appears</li>
 </ol>
 
-<h3>2.2 Seed Default Products</h3>
+<h3>3.2 Seed Default Products</h3>
 <ol>
-  <li>Click <strong>🌱 Seed Defaults</strong> button</li>
-  <li><span class="verify">✅ Verify:</span> Confirmation dialog appears → Click OK</li>
-  <li><span class="verify">✅ Verify:</span> 9 products appear with correct status badges:</li>
+  <li>Click <strong>Seed Defaults</strong> button</li>
+  <li><span class="verify">Verify:</span> Confirmation dialog appears, click OK</li>
+  <li><span class="verify">Verify:</span> 9 products appear with correct status badges:</li>
 </ol>
 
 <table>
@@ -193,98 +296,180 @@
   </tr>
 </table>
 
-<h3>2.3 Test Add Product</h3>
+<h3>3.3 Test CRUD Operations</h3>
 <ol>
-  <li>Click <strong>+ Add Product</strong></li>
-  <li>Fill in: Slug = <code>test-product</code>, Name = <code>Test Product</code></li>
-  <li>Set Status to <strong>Coming Soon</strong></li>
-  <li>Click <strong>Create Product</strong></li>
-  <li><span class="verify">✅ Verify:</span> New product appears in grid</li>
-</ol>
-
-<h3>2.4 Test Edit Product</h3>
-<ol>
-  <li>Find the test product, click <strong>Edit</strong></li>
-  <li>Change Status to <strong>Launched</strong></li>
-  <li>Click <strong>Update Product</strong></li>
-  <li><span class="verify">✅ Verify:</span> Badge changes to green "Launched"</li>
-</ol>
-
-<h3>2.5 Test Delete Product</h3>
-<ol>
-  <li>Click <strong>Delete</strong> on Test Product</li>
-  <li><span class="verify">✅ Verify:</span> Confirmation dialog appears → Click OK</li>
-  <li><span class="verify">✅ Verify:</span> Product removed from grid</li>
-</ol>
-
-<h3>2.6 Test Navigation</h3>
-<ol>
-  <li>Click <strong>← Dashboard</strong> button</li>
-  <li><span class="verify">✅ Verify:</span> Returns to main SuperAdmin dashboard</li>
+  <li><strong>Add:</strong> Click + Add Product, fill slug/name, save</li>
+  <li><strong>Edit:</strong> Click Edit on any product, change status, save</li>
+  <li><strong>Delete:</strong> Click Delete, confirm removal</li>
+  <li><span class="verify">Verify:</span> Changes persist after page refresh</li>
 </ol>
 
 <div class="page-break"></div>
 
-<h2>3. Test Modules Page (Public)</h2>
+<h2 id="analytics">4. Test Analytics Dashboard</h2>
+
+<ol>
+  <li>Return to SuperAdmin dashboard</li>
+  <li>Click <strong>Open Analytics</strong></li>
+  <li><span class="verify">Verify:</span> Analytics dashboard loads with tabs</li>
+  <li>Test each tab:</li>
+</ol>
+
+<table>
+  <tr>
+    <th>Tab</th>
+    <th>Expected Content</th>
+  </tr>
+  <tr>
+    <td>Performance</td>
+    <td>Page views, sessions, bounce rate charts</td>
+  </tr>
+  <tr>
+    <td>Geography</td>
+    <td>Visitor locations by country/city</td>
+  </tr>
+  <tr>
+    <td>Events</td>
+    <td>Custom event tracking (button clicks, etc.)</td>
+  </tr>
+  <tr>
+    <td>Errors</td>
+    <td>JavaScript errors, 404s if any</td>
+  </tr>
+</table>
+
+<ol start="5">
+  <li>Click <strong>Back to Dashboard</strong></li>
+  <li><span class="verify">Verify:</span> Returns to SuperAdmin dashboard</li>
+</ol>
+
+<h2 id="seo">5. Test SEO Dashboard</h2>
+
+<ol>
+  <li>Click <strong>Open SEO</strong></li>
+  <li><span class="verify">Verify:</span> SEO dashboard loads with multiple tabs</li>
+  <li>Test each section:</li>
+</ol>
+
+<table>
+  <tr>
+    <th>Section</th>
+    <th>Features</th>
+  </tr>
+  <tr>
+    <td>Page Scores</td>
+    <td>SEO scores for each page, issues list</td>
+  </tr>
+  <tr>
+    <td>Keywords</td>
+    <td>Target keyword manager, add/remove keywords</td>
+  </tr>
+  <tr>
+    <td>AI Suggestions</td>
+    <td>AI-generated keyword recommendations</td>
+  </tr>
+  <tr>
+    <td>Optimization Tips</td>
+    <td>Page-by-page improvement recommendations</td>
+  </tr>
+</table>
+
+<ol start="4">
+  <li>Click <strong>Run SEO Scan</strong></li>
+  <li><span class="verify">Verify:</span> Scan completes and updates page scores</li>
+</ol>
+
+<h2 id="pagespeed">6. Test PageSpeed Insights <span class="new-feature">NEW</span></h2>
+
+<div class="step-box">
+  <p>The PageSpeed Insights feature provides real-time Core Web Vitals monitoring with AI-powered recommendations.</p>
+</div>
+
+<ol>
+  <li>From dashboard, locate the <strong>PageSpeed Insights</strong> card</li>
+  <li><span class="verify">Verify:</span> Card shows latest scores or "No data yet"</li>
+  <li>Click <strong>Scan Now</strong> button</li>
+  <li><span class="verify">Verify:</span> Loading indicator appears</li>
+  <li><span class="verify">Verify:</span> After 15-30 seconds, scores update</li>
+</ol>
+
+<h3>Expected Metrics:</h3>
+<table>
+  <tr>
+    <th>Metric</th>
+    <th>Target</th>
+    <th>Description</th>
+  </tr>
+  <tr>
+    <td>Performance (Mobile)</td>
+    <td>85+</td>
+    <td>Load speed, interactivity on mobile</td>
+  </tr>
+  <tr>
+    <td>Performance (Desktop)</td>
+    <td>95+</td>
+    <td>Load speed, interactivity on desktop</td>
+  </tr>
+  <tr>
+    <td>Accessibility</td>
+    <td>95+</td>
+    <td>WCAG compliance, screen reader support</td>
+  </tr>
+  <tr>
+    <td>Best Practices</td>
+    <td>95+</td>
+    <td>HTTPS, security headers, etc.</td>
+  </tr>
+  <tr>
+    <td>SEO</td>
+    <td>95+</td>
+    <td>Meta tags, crawlability, mobile-friendly</td>
+  </tr>
+</table>
+
+<h3>Automated Weekly Scans:</h3>
+<p>A cron job runs every Friday at 9 AM UTC to scan PageSpeed and email results to <code>santhosh@finacegroup.com</code></p>
+
+<h2 id="content">7. Test Content Editor <span class="new-feature">NEW</span></h2>
+
+<ol>
+  <li>Navigate to <code>/content-editor</code> from dashboard (if available)</li>
+  <li><span class="verify">Verify:</span> Blog post list appears</li>
+  <li>Click <strong>+ New Post</strong></li>
+  <li>Fill in title, content, category</li>
+  <li>Click <strong>Save Draft</strong></li>
+  <li><span class="verify">Verify:</span> Post saved with "Draft" status</li>
+  <li>Click <strong>Publish</strong></li>
+  <li><span class="verify">Verify:</span> Post appears on /blog page</li>
+</ol>
+
+<div class="page-break"></div>
+
+<h2 id="modules">8. Test Modules Page (Public)</h2>
 
 <div class="step-box">
   <ol>
     <li>Open new browser tab</li>
-    <li>Navigate to: <code>https://www.finaceverse.io/modules</code></li>
-    <li><span class="verify">✅ Verify:</span> View toggle appears in top-right corner</li>
+    <li>Navigate to: <code>https://finaceverse.io/modules</code></li>
+    <li><span class="verify">Verify:</span> View toggle appears in top-right corner</li>
   </ol>
 </div>
 
-<h3>3.1 Test Current Products View</h3>
+<h3>8.1 Test Current Products View</h3>
 <ol>
   <li>Click <strong>Current Products</strong> toggle</li>
-  <li><span class="verify">✅ Verify:</span> Only Launched/Launching/Coming Soon products visible</li>
-  <li><span class="verify">✅ Verify:</span> VAMN, Cyloid, TaxBlitz, Audric are HIDDEN</li>
+  <li><span class="verify">Verify:</span> Only Launched/Launching/Coming Soon products visible</li>
+  <li><span class="verify">Verify:</span> VAMN, Cyloid, TaxBlitz, Audric are HIDDEN</li>
 </ol>
 
-<h3>3.2 Test Full Vision View</h3>
+<h3>8.2 Test Full Vision View</h3>
 <ol>
   <li>Click <strong>Full Vision</strong> toggle</li>
-  <li><span class="verify">✅ Verify:</span> ALL products visible including planned ones</li>
-  <li><span class="verify">✅ Verify:</span> Status badges display on hero cards</li>
+  <li><span class="verify">Verify:</span> ALL products visible including planned ones</li>
+  <li><span class="verify">Verify:</span> Status badges display on hero cards</li>
 </ol>
 
-<h2>4. Test Analytics Dashboard</h2>
-
-<ol>
-  <li>Return to SuperAdmin dashboard</li>
-  <li>Click <strong>Open Analytics →</strong></li>
-  <li><span class="verify">✅ Verify:</span> Analytics dashboard loads</li>
-  <li><span class="verify">✅ Verify:</span> <strong>← Dashboard</strong> button visible top-left</li>
-  <li>Click each tab: Performance, Geography, Events, Errors</li>
-  <li><span class="verify">✅ Verify:</span> Each tab loads without errors</li>
-  <li>Click <strong>← Dashboard</strong></li>
-  <li><span class="verify">✅ Verify:</span> Returns to SuperAdmin dashboard</li>
-</ol>
-
-<h2>5. Test SEO Dashboard</h2>
-
-<ol>
-  <li>Click <strong>Open SEO →</strong></li>
-  <li><span class="verify">✅ Verify:</span> SEO dashboard loads with tabs</li>
-  <li>Click <strong>Page Scores</strong> tab</li>
-  <li>If empty, click <strong>Run SEO Scan</strong></li>
-  <li><span class="verify">✅ Verify:</span> Scan runs, pages appear with scores</li>
-  <li>Click <strong>← Dashboard</strong> button</li>
-  <li><span class="verify">✅ Verify:</span> Returns to SuperAdmin dashboard</li>
-</ol>
-
-<h2>6. Test Logout & Security</h2>
-
-<ol>
-  <li>Click <strong>Logout</strong> button (top right)</li>
-  <li><span class="verify">✅ Verify:</span> Redirected to login page</li>
-  <li>Try accessing dashboard URL directly:<br>
-    <code>https://www.finaceverse.io/vault-e9232b8eefbaa45e/dashboard</code></li>
-  <li><span class="verify">✅ Verify:</span> Redirected back to login (protected route)</li>
-</ol>
-
-<h2>7. Product Status Visibility Matrix</h2>
+<h3>8.3 Product Status Visibility Matrix</h3>
 
 <table>
   <tr>
@@ -294,49 +479,119 @@
   </tr>
   <tr>
     <td><span class="badge green">Launched</span></td>
-    <td>✅ Visible</td>
-    <td>✅ Visible</td>
+    <td>Visible</td>
+    <td>Visible</td>
   </tr>
   <tr>
     <td><span class="badge orange">Launching Soon</span></td>
-    <td>✅ Visible</td>
-    <td>✅ Visible</td>
+    <td>Visible</td>
+    <td>Visible</td>
   </tr>
   <tr>
     <td><span class="badge purple">Coming Soon</span></td>
-    <td>✅ Visible</td>
-    <td>✅ Visible</td>
+    <td>Visible</td>
+    <td>Visible</td>
   </tr>
   <tr>
     <td><span class="badge gray">Planned</span></td>
-    <td>❌ Hidden</td>
-    <td>✅ Visible</td>
+    <td>Hidden</td>
+    <td>Visible</td>
   </tr>
 </table>
 
-<div class="checklist">
-  <h3>📋 Quick Test Checklist</h3>
+<h2 id="security">9. Test Logout & Security</h2>
+
+<ol>
+  <li>Click <strong>Logout</strong> button (top right)</li>
+  <li><span class="verify">Verify:</span> Redirected to login page</li>
+  <li>Try accessing dashboard URL directly:<br>
+    <code>https://finaceverse.io/superadmin-dashboard</code></li>
+  <li><span class="verify">Verify:</span> Redirected back to login (protected route)</li>
+</ol>
+
+<h3>Security Features to Verify:</h3>
+<ul>
+  <li>JWT tokens expire after session</li>
+  <li>Rate limiting on login attempts (10 per 15 min)</li>
+  <li>HTTPS enforced on all endpoints</li>
+  <li>CSP headers block inline scripts</li>
+  <li>Session tokens cleared on logout</li>
+</ul>
+
+<div class="checklist" id="checklist">
+  <h3>Quick Test Checklist</h3>
   <ul>
-    <li>SuperAdmin login works</li>
-    <li>Dashboard shows 3 cards with SVG icons</li>
-    <li>Product Manager opens</li>
+    <li>SuperAdmin login works with master key + password</li>
+    <li>Dashboard shows 4 cards with correct icons</li>
+    <li>Product Manager opens and lists products</li>
     <li>Seed Defaults creates 9 products</li>
-    <li>Add/Edit/Delete products works</li>
+    <li>Add/Edit/Delete products works correctly</li>
+    <li>Analytics dashboard loads all tabs</li>
+    <li>SEO dashboard loads with scan functionality</li>
+    <li>PageSpeed Insights card shows scores (NEW)</li>
+    <li>PageSpeed scan completes successfully (NEW)</li>
+    <li>Content Editor accessible (NEW)</li>
     <li>Modules page toggle appears</li>
     <li>Current view hides planned products</li>
     <li>Vision view shows all products</li>
-    <li>Analytics dashboard accessible</li>
-    <li>SEO dashboard accessible</li>
+    <li>WebP images load correctly (NEW)</li>
     <li>Back navigation works from all dashboards</li>
     <li>Logout clears session properly</li>
+    <li>Protected routes redirect to login</li>
   </ul>
 </div>
+
+<h2>10. API Endpoints Reference</h2>
+
+<table>
+  <tr>
+    <th>Endpoint</th>
+    <th>Method</th>
+    <th>Description</th>
+  </tr>
+  <tr>
+    <td><code>/api/superadmin/login</code></td>
+    <td>POST</td>
+    <td>Authenticate with master key + password</td>
+  </tr>
+  <tr>
+    <td><code>/api/products</code></td>
+    <td>GET/POST</td>
+    <td>List or create products</td>
+  </tr>
+  <tr>
+    <td><code>/api/products/:id</code></td>
+    <td>PUT/DELETE</td>
+    <td>Update or delete product</td>
+  </tr>
+  <tr>
+    <td><code>/api/analytics/pagespeed</code></td>
+    <td>GET</td>
+    <td>Get latest PageSpeed scores</td>
+  </tr>
+  <tr>
+    <td><code>/api/analytics/pagespeed/scan</code></td>
+    <td>POST</td>
+    <td>Trigger new PageSpeed scan</td>
+  </tr>
+  <tr>
+    <td><code>/api/cron/pagespeed-weekly</code></td>
+    <td>POST</td>
+    <td>Weekly cron endpoint (requires X-Cron-Secret)</td>
+  </tr>
+  <tr>
+    <td><code>/api/seo/scan</code></td>
+    <td>POST</td>
+    <td>Run SEO audit on all pages</td>
+  </tr>
+</table>
 
 <hr style="margin: 40px 0; border: none; border-top: 1px solid #e2e8f0;">
 
 <p style="text-align: center; color: #64748b; font-size: 12px;">
-  <strong>FinACEverse</strong> — SuperAdmin E2E Test Guide<br>
-  Confidential — Internal Use Only
+  <strong>FinACEverse</strong> - SuperAdmin E2E Test Guide v2.0<br>
+  Confidential - Internal Use Only<br>
+  Last Updated: January 12, 2026
 </p>
 
 </body>
