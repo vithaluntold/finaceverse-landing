@@ -52,7 +52,7 @@ Transform FinACEverse into the #1 search result for "cognitive finance," "AI acc
 - [x] Core Web Vitals optimization (code splitting, WebP images)
 - [x] PageSpeed Insights monitoring (automated weekly)
 - [x] Server-side rendering for SEO meta tags
-- [ ] Submit sitemaps to Google Search Console
+- [x] Submit sitemaps to Google Search Console
 - [ ] Submit sitemaps to Bing Webmaster Tools
 - [ ] Verify site in Google Search Console
 
@@ -79,7 +79,7 @@ Transform FinACEverse into the #1 search result for "cognitive finance," "AI acc
 ### Week 4: Local & Social Signals
 
 - [ ] Create Google Business Profile
-- [ ] Set up LinkedIn Company Page with SEO-optimized description
+- [x] Set up LinkedIn Company Page with SEO-optimized description
 - [ ] Create Twitter/X profile with consistent branding
 - [ ] Submit to B2B software directories (G2, Capterra, etc.)
 
