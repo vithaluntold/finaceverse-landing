@@ -101,16 +101,16 @@ const Blog = () => {
         <meta property="og:type" content="blog" />
         <meta property="og:title" content="FinACEverse Blog - Cognitive Finance Insights" />
         <meta property="og:description" content="Expert insights on transforming financial operations with AI and cognitive technology." />
-        <meta property="og:url" content="https://www.finaceverse.io/blog" />
+        <meta property="og:url" content="https://finaceverse.io/blog" />
         <meta property="og:site_name" content="FinACEverse" />
-        <meta property="og:image" content="https://www.finaceverse.io/logo.png" />
+        <meta property="og:image" content="https://finaceverse.io/logo.png" />
         
         {/* Twitter Card */}
         <meta name="twitter:card" content="summary_large_image" />
         <meta name="twitter:title" content="FinACEverse Blog - Cognitive Finance Insights" />
         <meta name="twitter:description" content="Expert insights on AI-powered accounting and cognitive finance." />
         
-        <link rel="canonical" href="https://www.finaceverse.io/blog" />
+        <link rel="canonical" href="https://finaceverse.io/blog" />
         
         {/* Structured Data */}
         <script type="application/ld+json">

@@ -8,8 +8,13 @@ const TailoredPilots = (props) => {
   return (
     <div className="tailored-pilots-container">
       <Helmet>
-        <title>Tailored Pilots - FinACEverse</title>
+        <title>Tailored Pilots - FinACEverse | Customized AI Finance Implementation</title>
+        <meta name="description" content="Experience FinACEverse with a customized pilot program. We tailor our cognitive finance platform to your specific needs and workflows." />
+        <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1" />
         <meta property="og:title" content="Tailored Pilots - FinACEverse" />
+        <meta property="og:description" content="Customized pilot programs for cognitive finance implementation." />
+        <meta property="og:url" content="https://finaceverse.io/tailored-pilots" />
+        <link rel="canonical" href="https://finaceverse.io/tailored-pilots" />
       </Helmet>
       <Navigation></Navigation>
       

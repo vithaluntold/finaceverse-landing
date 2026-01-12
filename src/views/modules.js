@@ -173,6 +173,7 @@ const Modules = () => {
         <title>FinACEverse Modules - Cognitive Operating System for Autonomous Enterprises</title>
         <meta name="description" content="Explore the Cognitive OS architecture: Understanding, Execution, Structure, and Optimization layers. The four capabilities that enable organizational autonomy." />
         <meta name="keywords" content={products.map(p => p.name).join(', ') + ', cognitive OS, autonomous enterprises, AI finance'} />
+        <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1" />
         <meta property="og:title" content="FinACEverse Modules - Cognitive Operating System" />
         <meta property="og:description" content="Tools do tasks. Operating systems run worlds. Explore the modules powering organizational autonomy." />
         <meta property="og:url" content="https://finaceverse.io/modules" />

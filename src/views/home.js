@@ -94,6 +94,7 @@ const Home = (props) => {
         <title>FinACEverse - Cognitive Operating System for Autonomous Enterprises | Futurus</title>
         <meta name="description" content="We see what others don't. FinACEverse is the world's first Cognitive Operating System for Autonomous Enterprises — enabling organizational autonomy through understanding, execution, structure, and optimization." />
         <meta name="keywords" content="cognitive OS, autonomous enterprises, VAMN-70B, organizational autonomy, AI finance, Futurus, Accute, Luca, EPI-Q, Finory" />
+        <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1" />
         <meta property="og:title" content="FinACEverse - Cognitive Operating System for Autonomous Enterprises" />
         <meta property="og:description" content="We are Futurus. We build the Cognitive Operating System for Autonomous Enterprises. FinACEverse is only the beginning." />
         <meta property="og:url" content="https://finaceverse.io/" />

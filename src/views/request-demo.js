@@ -11,6 +11,7 @@ const RequestDemo = (props) => {
         <title>Request Demo - FinACEverse | See Cognitive Finance in Action</title>
         <meta name="description" content="Schedule a personalized demo of FinACEverse. See how VAMN, Accute, and Cyloid transform financial operations with AI-powered automation and verification." />
         <meta name="keywords" content="FinACEverse demo, financial software demo, VAMN demo, AI finance demo, accounting automation demo" />
+        <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1" />
         <meta property="og:title" content="Request Demo - FinACEverse" />
         <meta property="og:description" content="See FinACEverse in action. Watch how our Cognitive OS transforms fragmented financial operations." />
         <meta property="og:url" content="https://finaceverse.io/request-demo" />
