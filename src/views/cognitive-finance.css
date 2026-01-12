@@ -1,0 +1,300 @@
+/* Cognitive Finance Page Styles */
+.cognitive-finance-container {
+  width: 100%;
+  min-height: 100vh;
+}
+
+.cf-hero {
+  padding: var(--spacing-4xl) 0 var(--spacing-3xl);
+  background: linear-gradient(135deg, rgba(0, 212, 255, 0.05) 0%, rgba(10, 10, 15, 0.9) 100%);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.cf-hero .hero-title {
+  margin-bottom: var(--spacing-lg);
+}
+
+.cf-hero .hero-subtitle {
+  font-size: var(--font-size-xl);
+  color: var(--color-text-secondary);
+  max-width: 800px;
+  margin: 0 auto;
+  text-align: center;
+}
+
+.cf-content {
+  padding: var(--spacing-4xl) 0;
+}
+
+.content-grid {
+  display: grid;
+  grid-template-columns: 250px 1fr;
+  gap: var(--spacing-3xl);
+  align-items: start;
+}
+
+/* Table of Contents */
+.cf-toc {
+  position: sticky;
+  top: 100px;
+  padding: var(--spacing-xl);
+  background: var(--color-surface);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: var(--border-radius-lg);
+}
+
+.cf-toc h3 {
+  font-size: var(--font-size-lg);
+  font-weight: 600;
+  margin-bottom: var(--spacing-md);
+  color: var(--color-primary);
+}
+
+.cf-toc nav {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-sm);
+}
+
+.cf-toc a {
+  color: var(--color-text-secondary);
+  text-decoration: none;
+  font-size: var(--font-size-sm);
+  padding: var(--spacing-xs) var(--spacing-sm);
+  border-radius: var(--border-radius-sm);
+  transition: all 0.2s ease;
+}
+
+.cf-toc a:hover {
+  color: var(--color-primary);
+  background: rgba(0, 212, 255, 0.1);
+}
+
+/* Article Content */
+.cf-article {
+  max-width: 800px;
+}
+
+.cf-section {
+  margin-bottom: var(--spacing-4xl);
+}
+
+.cf-section h2 {
+  font-size: var(--font-size-3xl);
+  font-weight: 700;
+  margin-bottom: var(--spacing-lg);
+  color: var(--color-primary);
+}
+
+.cf-section h3 {
+  font-size: var(--font-size-xl);
+  font-weight: 600;
+  margin-top: var(--spacing-xl);
+  margin-bottom: var(--spacing-md);
+}
+
+.cf-section p {
+  font-size: var(--font-size-base);
+  line-height: 1.8;
+  color: var(--color-text-secondary);
+  margin-bottom: var(--spacing-md);
+}
+
+.cf-section p.lead {
+  font-size: var(--font-size-lg);
+  color: var(--color-text-primary);
+  font-weight: 500;
+}
+
+.cf-section ul {
+  margin: var(--spacing-md) 0;
+  padding-left: var(--spacing-xl);
+}
+
+.cf-section li {
+  margin-bottom: var(--spacing-sm);
+  line-height: 1.7;
+  color: var(--color-text-secondary);
+}
+
+/* Highlight Box */
+.highlight-box {
+  background: linear-gradient(135deg, rgba(0, 212, 255, 0.1) 0%, rgba(0, 212, 255, 0.05) 100%);
+  border-left: 4px solid var(--color-primary);
+  padding: var(--spacing-lg);
+  border-radius: var(--border-radius-md);
+  margin: var(--spacing-xl) 0;
+}
+
+.highlight-box h3 {
+  margin-top: 0;
+  color: var(--color-primary);
+}
+
+/* Evolution Timeline */
+.evolution-timeline {
+  margin: var(--spacing-xl) 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-lg);
+}
+
+.timeline-item {
+  padding: var(--spacing-lg);
+  background: var(--color-surface);
+  border-left: 4px solid rgba(255, 255, 255, 0.2);
+  border-radius: var(--border-radius-md);
+  transition: all 0.3s ease;
+}
+
+.timeline-item:hover {
+  border-left-color: var(--color-primary);
+  transform: translateX(4px);
+}
+
+.timeline-item.active {
+  background: linear-gradient(135deg, rgba(0, 212, 255, 0.1) 0%, rgba(0, 212, 255, 0.05) 100%);
+  border-left-color: var(--color-primary);
+}
+
+.timeline-item h3 {
+  margin: 0 0 var(--spacing-sm) 0;
+  color: var(--color-primary);
+}
+
+.timeline-item p {
+  margin: 0;
+}
+
+/* Pillar Cards */
+.pillar-card {
+  background: var(--color-surface);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: var(--border-radius-lg);
+  padding: var(--spacing-xl);
+  margin-bottom: var(--spacing-lg);
+}
+
+.pillar-card h3 {
+  margin-top: 0;
+  color: var(--color-primary);
+}
+
+.pillar-card .example {
+  margin-top: var(--spacing-md);
+  padding: var(--spacing-md);
+  background: rgba(0, 212, 255, 0.05);
+  border-radius: var(--border-radius-sm);
+  font-style: italic;
+}
+
+/* Comparison Table */
+.comparison-table {
+  overflow-x: auto;
+  margin: var(--spacing-xl) 0;
+}
+
+.comparison-table table {
+  width: 100%;
+  border-collapse: collapse;
+  background: var(--color-surface);
+  border-radius: var(--border-radius-lg);
+  overflow: hidden;
+}
+
+.comparison-table th,
+.comparison-table td {
+  padding: var(--spacing-md);
+  text-align: left;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.comparison-table th {
+  background: rgba(0, 212, 255, 0.1);
+  color: var(--color-primary);
+  font-weight: 600;
+}
+
+.comparison-table tr:last-child td {
+  border-bottom: none;
+}
+
+/* Use Cases */
+.use-case {
+  background: var(--color-surface);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: var(--border-radius-lg);
+  padding: var(--spacing-xl);
+  margin-bottom: var(--spacing-lg);
+}
+
+.use-case h3 {
+  margin-top: 0;
+  color: var(--color-primary);
+}
+
+/* CTA Box */
+.cta-box {
+  background: linear-gradient(135deg, rgba(0, 212, 255, 0.15) 0%, rgba(0, 212, 255, 0.05) 100%);
+  border: 2px solid var(--color-primary);
+  border-radius: var(--border-radius-lg);
+  padding: var(--spacing-2xl);
+  text-align: center;
+  margin-top: var(--spacing-3xl);
+}
+
+.cta-box h3 {
+  margin-top: 0;
+  color: var(--color-primary);
+}
+
+.cta-buttons {
+  display: flex;
+  gap: var(--spacing-md);
+  justify-content: center;
+  margin-top: var(--spacing-lg);
+}
+
+/* Responsive */
+@media (max-width: 1024px) {
+  .content-grid {
+    grid-template-columns: 1fr;
+  }
+  
+  .cf-toc {
+    position: static;
+    margin-bottom: var(--spacing-xl);
+  }
+  
+  .cf-toc nav {
+    flex-direction: row;
+    flex-wrap: wrap;
+  }
+}
+
+@media (max-width: 768px) {
+  .cf-hero {
+    padding: var(--spacing-3xl) 0 var(--spacing-2xl);
+  }
+  
+  .cf-content {
+    padding: var(--spacing-3xl) 0;
+  }
+  
+  .cf-section {
+    margin-bottom: var(--spacing-3xl);
+  }
+  
+  .cta-buttons {
+    flex-direction: column;
+  }
+  
+  .comparison-table {
+    font-size: var(--font-size-sm);
+  }
+  
+  .comparison-table th,
+  .comparison-table td {
+    padding: var(--spacing-sm);
+  }
+}
