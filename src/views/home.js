@@ -943,8 +943,8 @@ const Home = (props) => {
                   Ensure compliance causality with VAMN-powered tax preparation
                   and proactive future-shaping strategies.
                 </p>
-                <a href="/modules">
-                  <button className="btn btn-outline btn-sm">Learn More</button>
+                <a href="/modules" aria-label="Explore tax practitioner solutions">
+                  <button className="btn btn-outline btn-sm">Explore Tax Solutions</button>
                 </a>
               </div>
             </div>
@@ -955,8 +955,8 @@ const Home = (props) => {
                   In-house teams gain real-time visibility and control across
                   global enterprise operations with Accute.
                 </p>
-                <a href="/expert-consultation">
-                  <button className="btn btn-outline btn-sm">Learn More</button>
+                <a href="/expert-consultation" aria-label="Consult our corporate finance experts">
+                  <button className="btn btn-outline btn-sm">Consult Our Experts</button>
                 </a>
               </div>
             </div>
@@ -968,8 +968,8 @@ const Home = (props) => {
                   Every transaction traces back to source documents with <strong>100% 
                   verification</strong> - reducing audit time by 60%.
                 </p>
-                <a href="/compliance-privacy">
-                  <button className="btn btn-outline btn-sm">Learn More</button>
+                <a href="/compliance-privacy" aria-label="View compliance and audit features">
+                  <button className="btn btn-outline btn-sm">View Compliance Features</button>
                 </a>
               </div>
             </div>

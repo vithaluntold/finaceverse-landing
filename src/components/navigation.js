@@ -28,8 +28,8 @@ const Navigation = (props) => {
   }, []);
 
   return (
-    <div className="navigation-container1">
-      <nav className="navigation-wrapper">
+    <header className="navigation-container1" role="banner">
+      <nav className="navigation-wrapper" aria-label="Main navigation">
         <div className="navigation-container">
           <a href="/">
             <div aria-label="FinACEverse Homepage" className="navigation-brand">
@@ -319,7 +319,7 @@ const Navigation = (props) => {
           ></Script>
         </div>
       </div>
-    </div>
+    </header>
   )
 }
 

@@ -1,17 +1,69 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useHistory } from 'react-router-dom';
 import { Helmet } from 'react-helmet';
 import './superadmin-dashboard.css';
 
 const SuperAdminDashboard = () => {
   const history = useHistory();
+  const [pageSpeedData, setPageSpeedData] = useState(null);
+  const [pageSpeedLoading, setPageSpeedLoading] = useState(false);
+  const [lastReport, setLastReport] = useState(null);
 
   useEffect(() => {
     const token = localStorage.getItem('superadmin_token');
     if (!token) {
       history.push('/vault-e9232b8eefbaa45e');
     }
+    
+    // Fetch latest PageSpeed data
+    fetchPageSpeedData();
   }, [history]);
+
+  const fetchPageSpeedData = async () => {
+    try {
+      const token = localStorage.getItem('superadmin_token');
+      const res = await fetch('/api/analytics/pagespeed', {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      if (res.ok) {
+        const data = await res.json();
+        setPageSpeedData(data);
+        if (data.latest?.mobile?.timestamp) {
+          setLastReport(new Date(data.latest.mobile.timestamp));
+        }
+      }
+    } catch (err) {
+      console.error('Failed to fetch PageSpeed data:', err);
+    }
+  };
+
+  const runPageSpeedScan = async () => {
+    setPageSpeedLoading(true);
+    try {
+      const token = localStorage.getItem('superadmin_token');
+      const res = await fetch('/api/analytics/pagespeed/scan', {
+        method: 'POST',
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      if (res.ok) {
+        await fetchPageSpeedData();
+        alert('PageSpeed scan complete!');
+      } else {
+        const error = await res.json();
+        alert('Scan failed: ' + (error.error || 'Unknown error'));
+      }
+    } catch (err) {
+      alert('Scan failed: ' + err.message);
+    } finally {
+      setPageSpeedLoading(false);
+    }
+  };
+
+  const getScoreColor = (score) => {
+    if (score >= 90) return '#0cce6b';
+    if (score >= 50) return '#ffa400';
+    return '#ff4e42';
+  };
 
   const handleLogout = () => {
     localStorage.removeItem('superadmin_token');
@@ -135,6 +187,73 @@ const SuperAdminDashboard = () => {
             <span>• CTA Content</span>
           </div>
           <button className="card-btn">Edit Content →</button>
+        </div>
+
+        {/* PageSpeed Insights Card */}
+        <div className="dashboard-card pagespeed">
+          <div className="card-header">
+            <div className="card-icon">
+              <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+                <circle cx="12" cy="12" r="10"/>
+                <polyline points="12 6 12 12 16 14"/>
+              </svg>
+            </div>
+            <h2>PageSpeed Insights</h2>
+          </div>
+          <p>Core Web Vitals, performance scores, AI-powered optimization recommendations</p>
+          
+          {pageSpeedData?.latest?.mobile ? (
+            <div className="pagespeed-scores">
+              <div className="score-row">
+                <span>Mobile:</span>
+                <div className="scores-inline">
+                  <span style={{ color: getScoreColor(pageSpeedData.latest.mobile.performance_score) }}>
+                    P:{pageSpeedData.latest.mobile.performance_score}
+                  </span>
+                  <span style={{ color: getScoreColor(pageSpeedData.latest.mobile.accessibility_score) }}>
+                    A:{pageSpeedData.latest.mobile.accessibility_score}
+                  </span>
+                  <span style={{ color: getScoreColor(pageSpeedData.latest.mobile.seo_score) }}>
+                    S:{pageSpeedData.latest.mobile.seo_score}
+                  </span>
+                </div>
+              </div>
+              {pageSpeedData.latest.desktop && (
+                <div className="score-row">
+                  <span>Desktop:</span>
+                  <div className="scores-inline">
+                    <span style={{ color: getScoreColor(pageSpeedData.latest.desktop.performance_score) }}>
+                      P:{pageSpeedData.latest.desktop.performance_score}
+                    </span>
+                    <span style={{ color: getScoreColor(pageSpeedData.latest.desktop.accessibility_score) }}>
+                      A:{pageSpeedData.latest.desktop.accessibility_score}
+                    </span>
+                    <span style={{ color: getScoreColor(pageSpeedData.latest.desktop.seo_score) }}>
+                      S:{pageSpeedData.latest.desktop.seo_score}
+                    </span>
+                  </div>
+                </div>
+              )}
+              {lastReport && (
+                <div className="last-scan">
+                  Last scan: {lastReport.toLocaleDateString()} {lastReport.toLocaleTimeString()}
+                </div>
+              )}
+            </div>
+          ) : (
+            <div className="card-features">
+              <span>• No data yet</span>
+              <span>• Run first scan</span>
+            </div>
+          )}
+          
+          <button 
+            className="card-btn" 
+            onClick={(e) => { e.stopPropagation(); runPageSpeedScan(); }}
+            disabled={pageSpeedLoading}
+          >
+            {pageSpeedLoading ? 'Scanning...' : 'Run PageSpeed Scan →'}
+          </button>
         </div>
       </div>
 

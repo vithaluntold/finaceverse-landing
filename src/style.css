@@ -3367,3 +3367,76 @@
     grid-template-columns: 1fr;
   }
 }
+
+/* ============================================
+   ACCESSIBILITY IMPROVEMENTS
+   ============================================ */
+
+/* Touch targets - minimum 48x48px for mobile accessibility */
+@media (pointer: coarse) {
+  a,
+  button,
+  [role="button"],
+  input[type="submit"],
+  input[type="button"],
+  .btn,
+  .navigation-link,
+  .footer-social-icon {
+    min-height: 48px;
+    min-width: 48px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+  }
+  
+  /* Ensure proper spacing between touch targets */
+  .navigation-links li {
+    margin: 0 4px;
+  }
+  
+  .footer-social-links a {
+    margin: 0 8px;
+  }
+}
+
+/* Focus visible styles for keyboard navigation */
+:focus-visible {
+  outline: 2px solid var(--color-primary, #00d4ff);
+  outline-offset: 2px;
+}
+
+/* Skip to main content link for screen readers */
+.skip-link {
+  position: absolute;
+  top: -100%;
+  left: 0;
+  background: var(--color-primary);
+  color: var(--color-on-primary);
+  padding: 1rem 2rem;
+  z-index: 10000;
+  text-decoration: none;
+  font-weight: 600;
+}
+
+.skip-link:focus {
+  top: 0;
+}
+
+/* Improve contrast for low-contrast elements */
+.section-content,
+.footer-brand-description {
+  color: #bfc9d6; /* Slightly lighter for better contrast */
+}
+
+/* Reduce motion for users who prefer it */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+

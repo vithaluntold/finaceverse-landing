@@ -58,7 +58,9 @@
     "eject": "craco eject",
     "init-db": "NODE_OPTIONS='--no-deprecation' node init-db.js",
     "seo:scan": "NODE_OPTIONS='--no-deprecation' node daily-seo-cron.js",
-    "seo:daily": "NODE_OPTIONS='--no-deprecation' node daily-seo-cron.js"
+    "seo:daily": "NODE_OPTIONS='--no-deprecation' node daily-seo-cron.js",
+    "pagespeed:scan": "NODE_OPTIONS='--no-deprecation' node pagespeed-monitor.js",
+    "pagespeed:weekly": "NODE_OPTIONS='--no-deprecation' node pagespeed-monitor.js"
   },
   "engines": {
     "node": ">=18.x"

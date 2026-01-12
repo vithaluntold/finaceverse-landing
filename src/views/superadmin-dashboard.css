@@ -96,6 +96,10 @@
   border-top: 3px solid #f59e0b;
 }
 
+.dashboard-card.pagespeed {
+  border-top: 3px solid #00d4ff;
+}
+
 .card-header {
   display: flex;
   align-items: center;
@@ -130,6 +134,37 @@
   background: linear-gradient(135deg, rgba(16, 185, 129, 0.15) 0%, rgba(16, 185, 129, 0.05) 100%);
   border-color: rgba(16, 185, 129, 0.2);
   color: #34d399;
+}
+
+.dashboard-card.pagespeed .card-icon {
+  background: linear-gradient(135deg, rgba(0, 212, 255, 0.15) 0%, rgba(0, 212, 255, 0.05) 100%);
+  border-color: rgba(0, 212, 255, 0.2);
+  color: #00d4ff;
+}
+
+.pagespeed-scores {
+  margin-bottom: 1rem;
+}
+
+.score-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.5rem 0;
+  border-bottom: 1px solid rgba(255,255,255,0.05);
+}
+
+.scores-inline {
+  display: flex;
+  gap: 1rem;
+  font-weight: 600;
+  font-size: 0.875rem;
+}
+
+.last-scan {
+  font-size: 0.75rem;
+  color: #64748b;
+  margin-top: 0.5rem;
 }
 
 .dashboard-card h2 {
