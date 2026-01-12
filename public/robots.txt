@@ -1,12 +1,105 @@
-# Allow all crawlers
+# FinACEverse Robots.txt - Optimized for Search Engine Crawling
+# Last Updated: January 12, 2026
+
+# ============================================
+# GENERAL RULES FOR ALL CRAWLERS
+# ============================================
 User-agent: *
 Allow: /
+Allow: /blog
+Allow: /blog/*
+Allow: /modules
+Allow: /request-demo
+Allow: /expert-consultation
+Allow: /tailored-pilots
+Allow: /compliance-privacy
 
-# Disallow API endpoints
+# Disallow admin and API endpoints
 Disallow: /api/
+Disallow: /vault-*
+Disallow: /superadmin*
+Disallow: /analytics-dashboard
+Disallow: /seo-dashboard
+Disallow: /content-editor
+Disallow: /product-manager
 
-# Sitemap
-Sitemap: https://finaceverse.io/sitemap.xml
-
-# Crawl-delay for polite crawling
+# ============================================
+# GOOGLE BOT - Primary Search Engine
+# ============================================
+User-agent: Googlebot
+Allow: /
 Crawl-delay: 1
+
+User-agent: Googlebot-Image
+Allow: /images/
+Allow: /static/
+
+User-agent: Googlebot-News
+Allow: /blog/
+
+# ============================================
+# BING BOT
+# ============================================
+User-agent: Bingbot
+Allow: /
+Crawl-delay: 1
+
+User-agent: MSNBot
+Allow: /
+Crawl-delay: 2
+
+# ============================================
+# OTHER MAJOR SEARCH ENGINES
+# ============================================
+User-agent: Slurp
+Allow: /
+Crawl-delay: 1
+
+User-agent: DuckDuckBot
+Allow: /
+
+User-agent: Baiduspider
+Allow: /
+Crawl-delay: 2
+
+User-agent: YandexBot
+Allow: /
+Crawl-delay: 2
+
+# ============================================
+# SOCIAL MEDIA CRAWLERS
+# ============================================
+User-agent: facebookexternalhit
+Allow: /
+
+User-agent: Twitterbot
+Allow: /
+
+User-agent: LinkedInBot
+Allow: /
+
+# ============================================
+# AI CRAWLERS
+# ============================================
+User-agent: GPTBot
+Disallow: /
+
+User-agent: ChatGPT-User
+Disallow: /
+
+User-agent: CCBot
+Disallow: /
+
+User-agent: anthropic-ai
+Disallow: /
+
+# ============================================
+# SITEMAPS
+# ============================================
+Sitemap: https://www.finaceverse.io/sitemap.xml
+Sitemap: https://www.finaceverse.io/blog-sitemap.xml
+
+# ============================================
+# HOST DIRECTIVE
+# ============================================
+Host: https://www.finaceverse.io

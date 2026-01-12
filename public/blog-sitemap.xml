@@ -1,0 +1,130 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
+        xmlns:news="http://www.google.com/schemas/sitemap-news/0.9"
+        xmlns:image="http://www.google.com/schemas/sitemap-image/1.1">
+  
+  <!-- ============================================ -->
+  <!-- FINACEVERSE BLOG SITEMAP -->
+  <!-- Dedicated sitemap for blog content indexing -->
+  <!-- Last Updated: 2026-01-12 -->
+  <!-- ============================================ -->
+  
+  <!-- Blog Index Page -->
+  <url>
+    <loc>https://www.finaceverse.io/blog</loc>
+    <lastmod>2026-01-12</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.8</priority>
+  </url>
+  
+  <!-- ============================================ -->
+  <!-- FEATURED ARTICLES -->
+  <!-- ============================================ -->
+  
+  <url>
+    <loc>https://www.finaceverse.io/blog/why-cognitive-operating-systems-are-future</loc>
+    <lastmod>2026-01-05</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.9</priority>
+    <news:news>
+      <news:publication>
+        <news:name>FinACEverse Blog</news:name>
+        <news:language>en</news:language>
+      </news:publication>
+      <news:publication_date>2026-01-05</news:publication_date>
+      <news:title>Why Cognitive Operating Systems Are the Future of Finance</news:title>
+      <news:keywords>cognitive finance, AI accounting, financial automation, ERP transformation</news:keywords>
+    </news:news>
+    <image:image>
+      <image:loc>https://images.pexels.com/photos/30547577/pexels-photo-30547577.jpeg</image:loc>
+      <image:title>Cognitive Operating Systems for Finance</image:title>
+      <image:caption>How AI-powered cognitive systems are transforming financial operations</image:caption>
+    </image:image>
+  </url>
+  
+  <url>
+    <loc>https://www.finaceverse.io/blog/ai-workforce-multiplier-explained</loc>
+    <lastmod>2026-01-03</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.85</priority>
+    <news:news>
+      <news:publication>
+        <news:name>FinACEverse Blog</news:name>
+        <news:language>en</news:language>
+      </news:publication>
+      <news:publication_date>2026-01-03</news:publication_date>
+      <news:title>The AI Workforce Multiplier: What It Is and Why It Matters</news:title>
+      <news:keywords>AI workforce, accountant productivity, automation, staffing crisis</news:keywords>
+    </news:news>
+    <image:image>
+      <image:loc>https://images.pexels.com/photos/30547598/pexels-photo-30547598.jpeg</image:loc>
+      <image:title>AI Workforce Multiplier in Accounting</image:title>
+      <image:caption>How AI makes accountants 10x more productive</image:caption>
+    </image:image>
+  </url>
+  
+  <url>
+    <loc>https://www.finaceverse.io/blog/pilot-program-results-2-5x-capacity</loc>
+    <lastmod>2025-12-28</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.85</priority>
+    <news:news>
+      <news:publication>
+        <news:name>FinACEverse Blog</news:name>
+        <news:language>en</news:language>
+      </news:publication>
+      <news:publication_date>2025-12-28</news:publication_date>
+      <news:title>Pilot Program Results: 2.5x Capacity Uplift Without New Hires</news:title>
+      <news:keywords>case study, ROI, capacity, accounting firm growth</news:keywords>
+    </news:news>
+    <image:image>
+      <image:loc>https://images.pexels.com/photos/30547606/pexels-photo-30547606.jpeg</image:loc>
+      <image:title>FinACEverse Pilot Program Results</image:title>
+      <image:caption>Real results from early adopters of cognitive finance</image:caption>
+    </image:image>
+  </url>
+  
+  <url>
+    <loc>https://www.finaceverse.io/blog/process-mining-accounting-firms</loc>
+    <lastmod>2025-12-20</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+    <news:news>
+      <news:publication>
+        <news:name>FinACEverse Blog</news:name>
+        <news:language>en</news:language>
+      </news:publication>
+      <news:publication_date>2025-12-20</news:publication_date>
+      <news:title>Process Mining for Accounting Firms: Finding Hidden Inefficiencies</news:title>
+      <news:keywords>process mining, EPI-Q, workflow optimization, efficiency</news:keywords>
+    </news:news>
+  </url>
+  
+  <!-- ============================================ -->
+  <!-- CATEGORY PAGES (Future Implementation) -->
+  <!-- ============================================ -->
+  
+  <!-- Uncomment when category pages are implemented
+  <url>
+    <loc>https://www.finaceverse.io/blog/category/technology</loc>
+    <lastmod>2026-01-12</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  
+  <url>
+    <loc>https://www.finaceverse.io/blog/category/industry-insights</loc>
+    <lastmod>2026-01-12</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  
+  <url>
+    <loc>https://www.finaceverse.io/blog/category/case-studies</loc>
+    <lastmod>2026-01-12</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  -->
+  
+</urlset>

@@ -43,16 +43,33 @@
     <link rel="icon" type="image/png" href="/logo.png" />
     <link rel="apple-touch-icon" href="/logo.png" />
     
-    <!-- Structured Data / JSON-LD -->
+    <!-- Structured Data / JSON-LD - Organization -->
     <script type="application/ld+json">
     {
       "@context": "https://schema.org",
       "@type": "Organization",
+      "@id": "https://www.finaceverse.io/#organization",
       "name": "FinACEverse",
-      "description": "Cognitive Operating System for Finance",
-      "url": "https://finaceverse.io",
-      "logo": "https://finaceverse.io/logo.png",
+      "legalName": "FinACEverse Technologies",
+      "description": "Cognitive Operating System for Autonomous Enterprises - Transforming financial operations through AI-powered intelligence",
+      "url": "https://www.finaceverse.io",
+      "logo": {
+        "@type": "ImageObject",
+        "url": "https://www.finaceverse.io/logo.png",
+        "width": 512,
+        "height": 512
+      },
+      "image": "https://www.finaceverse.io/logo.png",
       "foundingDate": "2024",
+      "founder": {
+        "@type": "Person",
+        "name": "Vithal Valluri",
+        "jobTitle": "Founder & CEO"
+      },
+      "address": {
+        "@type": "PostalAddress",
+        "addressCountry": "AU"
+      },
       "sameAs": [
         "https://www.linkedin.com/company/finaceverse",
         "https://twitter.com/finaceverse"
@@ -60,24 +77,136 @@
       "contactPoint": {
         "@type": "ContactPoint",
         "email": "info@finacegroup.com",
-        "contactType": "Customer Service"
-      }
+        "contactType": "Customer Service",
+        "availableLanguage": ["English"]
+      },
+      "areaServed": "Worldwide",
+      "knowsAbout": [
+        "Cognitive Finance",
+        "AI Accounting",
+        "Financial Automation",
+        "Tax Technology",
+        "Enterprise AI",
+        "Process Mining"
+      ]
     }
     </script>
     
+    <!-- Structured Data / JSON-LD - WebSite with SearchAction -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "WebSite",
+      "@id": "https://www.finaceverse.io/#website",
+      "name": "FinACEverse",
+      "url": "https://www.finaceverse.io",
+      "publisher": {
+        "@id": "https://www.finaceverse.io/#organization"
+      },
+      "description": "Cognitive Operating System for Finance - Powering the Path to Autonomous Enterprises",
+      "inLanguage": "en-US"
+    }
+    </script>
+    
+    <!-- Structured Data / JSON-LD - SoftwareApplication -->
     <script type="application/ld+json">
     {
       "@context": "https://schema.org",
       "@type": "SoftwareApplication",
-      "name": "FinACEverse",
-      "applicationCategory": "FinanceApplication",
-      "operatingSystem": "Web",
+      "@id": "https://www.finaceverse.io/#software",
+      "name": "FinACEverse Cognitive OS",
+      "applicationCategory": "BusinessApplication",
+      "applicationSubCategory": "FinanceApplication",
+      "operatingSystem": "Web-based",
       "offers": {
         "@type": "Offer",
         "price": "0",
-        "priceCurrency": "USD"
+        "priceCurrency": "USD",
+        "description": "Free consultation and demo available"
       },
-      "description": "Cognitive Operating System for Finance - Unifying accounting, finance, and taxation into a single intelligent ecosystem"
+      "description": "Cognitive Operating System for Finance - Unifying accounting, finance, and taxation into a single intelligent ecosystem powered by AI",
+      "featureList": [
+        "EPI-Q Process Intelligence",
+        "Fin(Ai)d Hub Workforce Multiplication",
+        "Luca AI Financial Advisor",
+        "Cognitive Automation",
+        "Real-time Analytics"
+      ],
+      "screenshot": "https://www.finaceverse.io/images/dashboard-preview.png",
+      "softwareVersion": "1.0",
+      "author": {
+        "@id": "https://www.finaceverse.io/#organization"
+      }
+    }
+    </script>
+    
+    <!-- Structured Data / JSON-LD - FAQPage -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "FAQPage",
+      "mainEntity": [
+        {
+          "@type": "Question",
+          "name": "What is a Cognitive Operating System for Finance?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "A Cognitive Operating System (Cognitive OS) is an AI-powered platform that unifies all financial operations - accounting, tax, audit, and advisory - into a single intelligent ecosystem. Unlike traditional software that just records data, a Cognitive OS understands context, learns patterns, and automates complex workflows."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "How does FinACEverse help accounting firms?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "FinACEverse multiplies your team's capacity without adding headcount. Our AI-powered modules handle routine tasks, surface insights, and orchestrate workflows - allowing your professionals to focus on high-value advisory work. Early adopters report 2.5x capacity increases."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "What are the 5 Stages of AI Maturity?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "The 5 Stages are: 1) Status Quo - Manual processes and disconnected tools, 2) Functional AI - AI assistants for specific tasks, 3) Intelligent Agents - AI handling end-to-end workflows, 4) Agentic Organization - AI coordinating across departments, 5) Fully Autonomous - Self-optimizing enterprise operations."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "What is the Futurus Multiverse?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "The Futurus Multiverse is FinACEverse's vision for interconnected cognitive products: FinACEverse for Finance, TaxBlitz for Tax, VAMN for AI reasoning, Audric for Audit, and Cyloid for automation. Together, they form a complete Cognitive OS ecosystem."
+          }
+        }
+      ]
+    }
+    </script>
+    
+    <!-- Structured Data / JSON-LD - BreadcrumbList -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "BreadcrumbList",
+      "itemListElement": [
+        {
+          "@type": "ListItem",
+          "position": 1,
+          "name": "Home",
+          "item": "https://www.finaceverse.io/"
+        },
+        {
+          "@type": "ListItem",
+          "position": 2,
+          "name": "Modules",
+          "item": "https://www.finaceverse.io/modules"
+        },
+        {
+          "@type": "ListItem",
+          "position": 3,
+          "name": "Blog",
+          "item": "https://www.finaceverse.io/blog"
+        }
+      ]
     }
     </script>
     <style data-tag="reset-style-sheet">

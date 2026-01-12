@@ -492,17 +492,106 @@ const BlogArticle = () => {
   if (!article) {
     return <Redirect to="/blog" />
   }
+
+  // Generate Article structured data for SEO
+  const articleSchema = {
+    "@context": "https://schema.org",
+    "@type": "BlogPosting",
+    "@id": `https://www.finaceverse.io/blog/${slug}#article`,
+    "mainEntityOfPage": {
+      "@type": "WebPage",
+      "@id": `https://www.finaceverse.io/blog/${slug}`
+    },
+    "headline": article.title,
+    "description": article.excerpt,
+    "image": {
+      "@type": "ImageObject",
+      "url": article.image,
+      "width": 1500,
+      "height": 1000
+    },
+    "datePublished": article.date,
+    "dateModified": article.date,
+    "author": {
+      "@type": "Person",
+      "name": article.author,
+      "jobTitle": article.authorRole
+    },
+    "publisher": {
+      "@type": "Organization",
+      "name": "FinACEverse",
+      "logo": {
+        "@type": "ImageObject",
+        "url": "https://www.finaceverse.io/logo.png"
+      }
+    },
+    "articleSection": article.category,
+    "keywords": `${article.category}, cognitive finance, AI accounting, FinACEverse`,
+    "wordCount": article.content.split(/\s+/).length,
+    "inLanguage": "en-US"
+  }
+
+  // Breadcrumb schema
+  const breadcrumbSchema = {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    "itemListElement": [
+      {
+        "@type": "ListItem",
+        "position": 1,
+        "name": "Home",
+        "item": "https://www.finaceverse.io/"
+      },
+      {
+        "@type": "ListItem",
+        "position": 2,
+        "name": "Blog",
+        "item": "https://www.finaceverse.io/blog"
+      },
+      {
+        "@type": "ListItem",
+        "position": 3,
+        "name": article.title,
+        "item": `https://www.finaceverse.io/blog/${slug}`
+      }
+    ]
+  }
   
   return (
     <div className="blog-article-container">
       <Helmet>
         <title>{article.title} | FinACEverse Blog</title>
         <meta name="description" content={article.excerpt} />
+        <meta name="keywords" content={`${article.category}, cognitive finance, AI accounting, financial automation, FinACEverse`} />
+        <meta name="author" content={article.author} />
+        <meta name="robots" content="index, follow, max-image-preview:large" />
+        
+        {/* Open Graph */}
+        <meta property="og:type" content="article" />
         <meta property="og:title" content={article.title} />
         <meta property="og:description" content={article.excerpt} />
         <meta property="og:image" content={article.image} />
-        <meta property="og:url" content={`https://finaceverse.io/blog/${slug}`} />
-        <link rel="canonical" href={`https://finaceverse.io/blog/${slug}`} />
+        <meta property="og:url" content={`https://www.finaceverse.io/blog/${slug}`} />
+        <meta property="og:site_name" content="FinACEverse" />
+        <meta property="article:published_time" content={article.date} />
+        <meta property="article:author" content={article.author} />
+        <meta property="article:section" content={article.category} />
+        
+        {/* Twitter Card */}
+        <meta name="twitter:card" content="summary_large_image" />
+        <meta name="twitter:title" content={article.title} />
+        <meta name="twitter:description" content={article.excerpt} />
+        <meta name="twitter:image" content={article.image} />
+        
+        <link rel="canonical" href={`https://www.finaceverse.io/blog/${slug}`} />
+        
+        {/* Structured Data */}
+        <script type="application/ld+json">
+          {JSON.stringify(articleSchema)}
+        </script>
+        <script type="application/ld+json">
+          {JSON.stringify(breadcrumbSchema)}
+        </script>
       </Helmet>
       
       <Navigation />

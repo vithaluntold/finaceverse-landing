@@ -251,31 +251,37 @@ const SEODashboard = () => {
     const token = localStorage.getItem('superadmin_token');
     const headers = { 'Authorization': `Bearer ${token}`, 'Content-Type': 'application/json' };
     try {
-      const res = await fetch(`${API_URL}/api/seo/ai-suggestions`, { headers });
-      if (res.ok) {
-        const data = await res.json();
-        setAiSuggestions(data.suggestions || []);
-        setOptimizationTips(data.tips || []);
+      // Fetch AI keyword suggestions
+      const suggestionsRes = await fetch(`${API_URL}/api/seo/ai-suggestions`, { headers });
+      if (suggestionsRes.ok) {
+        const suggestionsData = await suggestionsRes.json();
+        setAiSuggestions(suggestionsData.suggestions || []);
+      }
+      
+      // Fetch optimization tips
+      const tipsRes = await fetch(`${API_URL}/api/seo/optimization-tips`, { headers });
+      if (tipsRes.ok) {
+        const tipsData = await tipsRes.json();
+        setOptimizationTips(tipsData.tips || []);
       }
     } catch (error) {
       console.error('Error getting AI suggestions:', error);
       // Fallback suggestions based on common SEO best practices
       setAiSuggestions([
-        { keyword: 'cognitive operating system', volume: 1200, difficulty: 45, relevance: 95 },
-        { keyword: 'autonomous enterprise', volume: 890, difficulty: 38, relevance: 92 },
-        { keyword: 'AI financial automation', volume: 2400, difficulty: 52, relevance: 88 },
-        { keyword: 'enterprise AI platform', volume: 3100, difficulty: 65, relevance: 85 },
-        { keyword: 'financial process automation', volume: 1800, difficulty: 48, relevance: 90 },
-        { keyword: 'cognitive finance', volume: 720, difficulty: 32, relevance: 98 },
-        { keyword: 'AI accounting software', volume: 4200, difficulty: 72, relevance: 82 },
-        { keyword: 'enterprise process mining', volume: 1100, difficulty: 41, relevance: 87 }
+        { keyword: 'cognitive operating system', volume: 1200, difficulty: 'Medium', trend: 'up' },
+        { keyword: 'autonomous enterprise', volume: 890, difficulty: 'Low', trend: 'up' },
+        { keyword: 'AI financial automation', volume: 2400, difficulty: 'High', trend: 'up' },
+        { keyword: 'enterprise AI platform', volume: 3100, difficulty: 'High', trend: 'stable' },
+        { keyword: 'financial process automation', volume: 1800, difficulty: 'Medium', trend: 'up' },
+        { keyword: 'cognitive finance', volume: 720, difficulty: 'Low', trend: 'up' },
+        { keyword: 'AI accounting software', volume: 4200, difficulty: 'High', trend: 'up' },
+        { keyword: 'enterprise process mining', volume: 1100, difficulty: 'Medium', trend: 'up' }
       ]);
       setOptimizationTips([
-        { page: '/', tip: 'Add more long-tail keywords in hero section', priority: 'high', impact: '+15% organic traffic' },
-        { page: '/modules', tip: 'Include product comparison keywords', priority: 'medium', impact: '+8% CTR' },
-        { page: '/', tip: 'Add FAQ schema markup for featured snippets', priority: 'high', impact: '+20% visibility' },
-        { page: '/tailored-pilots', tip: 'Target "enterprise AI pilot program" keyword', priority: 'medium', impact: '+12% conversions' },
-        { page: '/', tip: 'Optimize meta description with action verbs', priority: 'low', impact: '+5% CTR' }
+        { page: 'Homepage', issue: 'Missing H2 keyword density', recommendation: 'Add target keywords to H2 headings', impact: 'High' },
+        { page: '/modules', issue: 'Low internal linking', recommendation: 'Add links to blog from modules', impact: 'Medium' },
+        { page: '/blog', issue: 'Missing FAQ schema', recommendation: 'Add FAQ structured data', impact: 'High' },
+        { page: 'All pages', issue: 'Image alt optimization', recommendation: 'Update alt text with keywords', impact: 'Medium' }
       ]);
     } finally {
       setAiLoading(false);

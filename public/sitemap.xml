@@ -1,61 +1,129 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
-        xmlns:image="http://www.google.com/schemas/sitemap-image/1.1">
+        xmlns:image="http://www.google.com/schemas/sitemap-image/1.1"
+        xmlns:xhtml="http://www.w3.org/1999/xhtml">
   
-  <!-- Homepage -->
+  <!-- ============================================ -->
+  <!-- PRIMARY PAGES - High Priority -->
+  <!-- ============================================ -->
+  
+  <!-- Homepage - Highest Priority -->
   <url>
-    <loc>https://finaceverse.io/</loc>
-    <lastmod>2026-01-06</lastmod>
+    <loc>https://www.finaceverse.io/</loc>
+    <lastmod>2026-01-12</lastmod>
     <changefreq>weekly</changefreq>
     <priority>1.0</priority>
+    <image:image>
+      <image:loc>https://www.finaceverse.io/logo.png</image:loc>
+      <image:title>FinACEverse - Cognitive Operating System for Finance</image:title>
+    </image:image>
   </url>
   
-  <!-- Modules -->
+  <!-- Modules - Product Overview -->
   <url>
-    <loc>https://finaceverse.io/modules</loc>
-    <lastmod>2026-01-06</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.9</priority>
+    <loc>https://www.finaceverse.io/modules</loc>
+    <lastmod>2026-01-12</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.95</priority>
+    <image:image>
+      <image:loc>https://www.finaceverse.io/images/cognitive-cycle.png</image:loc>
+      <image:title>FinACEverse Cognitive Cycle - EPI-Q, Fin(Ai)d Hub, Luca</image:title>
+    </image:image>
   </url>
+  
+  <!-- ============================================ -->
+  <!-- CONVERSION PAGES - High Priority -->
+  <!-- ============================================ -->
   
   <!-- Request Demo -->
   <url>
-    <loc>https://finaceverse.io/request-demo</loc>
-    <lastmod>2026-01-06</lastmod>
+    <loc>https://www.finaceverse.io/request-demo</loc>
+    <lastmod>2026-01-12</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.9</priority>
   </url>
   
   <!-- Expert Consultation -->
   <url>
-    <loc>https://finaceverse.io/expert-consultation</loc>
-    <lastmod>2026-01-06</lastmod>
+    <loc>https://www.finaceverse.io/expert-consultation</loc>
+    <lastmod>2026-01-12</lastmod>
     <changefreq>monthly</changefreq>
-    <priority>0.8</priority>
+    <priority>0.85</priority>
   </url>
   
   <!-- Tailored Pilots -->
   <url>
-    <loc>https://finaceverse.io/tailored-pilots</loc>
-    <lastmod>2026-01-06</lastmod>
+    <loc>https://www.finaceverse.io/tailored-pilots</loc>
+    <lastmod>2026-01-12</lastmod>
     <changefreq>monthly</changefreq>
+    <priority>0.85</priority>
+  </url>
+  
+  <!-- ============================================ -->
+  <!-- BLOG - Content Hub -->
+  <!-- ============================================ -->
+  
+  <!-- Blog Index -->
+  <url>
+    <loc>https://www.finaceverse.io/blog</loc>
+    <lastmod>2026-01-12</lastmod>
+    <changefreq>daily</changefreq>
     <priority>0.8</priority>
   </url>
   
-  <!-- Blog -->
+  <!-- Blog Article: Cognitive Operating Systems -->
   <url>
-    <loc>https://finaceverse.io/blog</loc>
-    <lastmod>2026-01-06</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.7</priority>
+    <loc>https://www.finaceverse.io/blog/why-cognitive-operating-systems-are-future</loc>
+    <lastmod>2026-01-05</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.75</priority>
+    <image:image>
+      <image:loc>https://images.pexels.com/photos/30547577/pexels-photo-30547577.jpeg</image:loc>
+      <image:title>Why Cognitive Operating Systems Are the Future of Finance</image:title>
+    </image:image>
   </url>
   
-  <!-- Compliance & Privacy -->
+  <!-- Blog Article: AI Workforce Multiplier -->
   <url>
-    <loc>https://finaceverse.io/compliance-privacy</loc>
-    <lastmod>2026-01-06</lastmod>
+    <loc>https://www.finaceverse.io/blog/ai-workforce-multiplier-explained</loc>
+    <lastmod>2026-01-03</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.75</priority>
+    <image:image>
+      <image:loc>https://images.pexels.com/photos/30547598/pexels-photo-30547598.jpeg</image:loc>
+      <image:title>The AI Workforce Multiplier Explained</image:title>
+    </image:image>
+  </url>
+  
+  <!-- Blog Article: Pilot Program Results -->
+  <url>
+    <loc>https://www.finaceverse.io/blog/pilot-program-results-2-5x-capacity</loc>
+    <lastmod>2025-12-28</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.75</priority>
+    <image:image>
+      <image:loc>https://images.pexels.com/photos/30547606/pexels-photo-30547606.jpeg</image:loc>
+      <image:title>Pilot Program Results - 2.5x Capacity Uplift</image:title>
+    </image:image>
+  </url>
+  
+  <!-- Blog Article: Process Mining -->
+  <url>
+    <loc>https://www.finaceverse.io/blog/process-mining-accounting-firms</loc>
+    <lastmod>2025-12-20</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.75</priority>
+  </url>
+  
+  <!-- ============================================ -->
+  <!-- LEGAL & COMPLIANCE -->
+  <!-- ============================================ -->
+  
+  <url>
+    <loc>https://www.finaceverse.io/compliance-privacy</loc>
+    <lastmod>2026-01-01</lastmod>
     <changefreq>yearly</changefreq>
-    <priority>0.5</priority>
+    <priority>0.4</priority>
   </url>
   
 </urlset>

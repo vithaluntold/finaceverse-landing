@@ -56,17 +56,66 @@ const Blog = () => {
   const filteredPosts = selectedCategory === 'all' 
     ? blogPosts 
     : blogPosts.filter(post => post.category === selectedCategory)
+
+  // Generate Blog structured data
+  const blogSchema = {
+    "@context": "https://schema.org",
+    "@type": "Blog",
+    "@id": "https://www.finaceverse.io/blog#blog",
+    "name": "FinACEverse Blog - Cognitive Finance Insights",
+    "description": "Expert insights on AI-powered accounting, cognitive finance, and the future of financial operations",
+    "url": "https://www.finaceverse.io/blog",
+    "publisher": {
+      "@type": "Organization",
+      "name": "FinACEverse",
+      "logo": {
+        "@type": "ImageObject",
+        "url": "https://www.finaceverse.io/logo.png"
+      }
+    },
+    "blogPost": blogPosts.map(post => ({
+      "@type": "BlogPosting",
+      "headline": post.title,
+      "description": post.excerpt,
+      "datePublished": post.date,
+      "author": {
+        "@type": "Person",
+        "name": post.author
+      },
+      "image": post.image,
+      "url": `https://www.finaceverse.io/blog/${post.slug}`,
+      "keywords": post.category
+    }))
+  }
   
   return (
     <div className="blog-container">
       <Helmet>
         <title>FinACEverse Blog - Insights on Cognitive Finance & AI Automation</title>
-        <meta name="description" content="Stay updated with the latest insights on cognitive finance, AI-powered accounting, tax automation, and financial intelligence from FinACEverse experts." />
-        <meta name="keywords" content="finance blog, AI accounting insights, tax automation news, financial intelligence, FinTech trends" />
+        <meta name="description" content="Stay updated with the latest insights on cognitive finance, AI-powered accounting, tax automation, and financial intelligence from FinACEverse experts. Learn how autonomous enterprises are transforming financial operations." />
+        <meta name="keywords" content="cognitive finance blog, AI accounting insights, tax automation news, financial intelligence, FinTech trends, autonomous enterprise, process mining, workflow automation, accounting technology" />
+        <meta name="author" content="FinACEverse" />
+        <meta name="robots" content="index, follow, max-image-preview:large" />
+        
+        {/* Open Graph */}
+        <meta property="og:type" content="blog" />
         <meta property="og:title" content="FinACEverse Blog - Cognitive Finance Insights" />
         <meta property="og:description" content="Expert insights on transforming financial operations with AI and cognitive technology." />
-        <meta property="og:url" content="https://finaceverse.io/blog" />
-        <link rel="canonical" href="https://finaceverse.io/blog" />
+        <meta property="og:url" content="https://www.finaceverse.io/blog" />
+        <meta property="og:site_name" content="FinACEverse" />
+        <meta property="og:image" content="https://www.finaceverse.io/logo.png" />
+        
+        {/* Twitter Card */}
+        <meta name="twitter:card" content="summary_large_image" />
+        <meta name="twitter:title" content="FinACEverse Blog - Cognitive Finance Insights" />
+        <meta name="twitter:description" content="Expert insights on AI-powered accounting and cognitive finance." />
+        
+        <link rel="canonical" href="https://www.finaceverse.io/blog" />
+        
+        {/* Structured Data */}
+        <script type="application/ld+json">
+          {JSON.stringify(blogSchema)}
+        </script>
       </Helmet>
       
       <Navigation />
