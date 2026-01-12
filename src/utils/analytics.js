@@ -2,7 +2,7 @@ import ReactGA from 'react-ga4';
 
 // Initialize GA4
 export const initGA = () => {
-  const measurementId = process.env.REACT_APP_GA_MEASUREMENT_ID || 'G-XXXXXXXXXX';
+  const measurementId = process.env.REACT_APP_GA_MEASUREMENT_ID || 'G-BNY3XNL6KD';
   
   ReactGA.initialize(measurementId, {
     gaOptions: {
