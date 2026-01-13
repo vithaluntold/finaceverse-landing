@@ -362,7 +362,7 @@ The modular architecture we designed can:
 
 ## 💎 Your Unique Advantage
 
-**The 7 Integrated Modules:**
+**The 8 Integrated Modules:**
 1. VAMN (Cognitive Intelligence)
 2. Accute (Workflow Orchestration)
 3. Cyloid (Document Verification)
@@ -370,6 +370,7 @@ The modular architecture we designed can:
 5. Finaid Hub (Execution Platform)
 6. Finory (Reporting & Analytics)
 7. EPI-Q (Tax Optimization)
+8. SumBuddy (Client Acquisition Marketplace)
 
 **This is a platform, not a point solution.**
 **This creates network effects.**

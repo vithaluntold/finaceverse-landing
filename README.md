@@ -2,9 +2,9 @@
 
 ## 🎯 What is FinACEverse?
 
-A unified SaaS platform hosting 7 independent AI-powered financial modules designed to revolutionize financial operations for businesses worldwide.
+A unified SaaS platform hosting 8 independent AI-powered financial modules designed to revolutionize financial operations for businesses worldwide.
 
-### **The 7 Modules:**
+### **The 8 Modules:**
 1. **VAMN** - Cognitive Intelligence (AI brain)
 2. **Accute** - Workflow Orchestration
 3. **Cyloid** - Document Verification
@@ -12,6 +12,7 @@ A unified SaaS platform hosting 7 independent AI-powered financial modules desig
 5. **Finaid Hub** - Execution Platform
 6. **Finory** - Reporting & Analytics
 7. **EPI-Q** - Tax Optimization
+8. **SumBuddy** - Client Acquisition Marketplace
 
 ---
 

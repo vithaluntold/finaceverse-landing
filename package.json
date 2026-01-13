@@ -80,6 +80,8 @@
   },
   "devDependencies": {
     "@fullhuman/postcss-purgecss": "^5.0.0",
+    "pdf-parse": "^2.4.5",
+    "pdfjs-dist": "^5.4.530",
     "react-scripts": "^5.0.1"
   },
   "overrides": {
