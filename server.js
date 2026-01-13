@@ -371,6 +371,9 @@ app.use((req, res, next) => {
 // Serve static files from React build
 app.use(express.static(path.join(__dirname, 'build')));
 
+// Serve docs/architecture for architecture diagrams
+app.use('/docs', express.static(path.join(__dirname, 'docs')));
+
 // PostgreSQL connection pool - use PG* env vars for Railway database
 // If PG* vars exist, use them, otherwise fall back to DATABASE_URL
 const dbConfig = process.env.PGHOST ? {
