@@ -1,5 +1,9 @@
 -- FinACEverse Command Center - PostgreSQL Initialization
--- Creates databases for all Phase 1 services
+-- Creates databases for Phase 1 + Phase 2 services
+
+-- ============================================
+-- PHASE 1: Core Infrastructure
+-- ============================================
 
 -- Create Zitadel database and user
 CREATE USER zitadel WITH PASSWORD 'Zitadel_Secure_2026!';
@@ -8,6 +12,32 @@ GRANT ALL PRIVILEGES ON DATABASE zitadel TO zitadel;
 
 -- Create Command Center database
 CREATE DATABASE command_center OWNER finaceverse;
+
+-- ============================================
+-- PHASE 2: Billing (Lago)
+-- ============================================
+
+-- Create Lago database and user
+CREATE USER lago WITH PASSWORD 'Lago_Secure_2026!';
+CREATE DATABASE lago OWNER lago;
+GRANT ALL PRIVILEGES ON DATABASE lago TO lago;
+
+-- ============================================
+-- PHASE 2: Support (Chatwoot)
+-- ============================================
+
+-- Create Chatwoot database and user
+CREATE USER chatwoot WITH PASSWORD 'Chatwoot_Secure_2026!';
+CREATE DATABASE chatwoot OWNER chatwoot;
+GRANT ALL PRIVILEGES ON DATABASE chatwoot TO chatwoot;
+
+-- Enable pgcrypto for Chatwoot
+\c chatwoot
+CREATE EXTENSION IF NOT EXISTS "pgcrypto";
+
+-- ============================================
+-- Command Center Schema
+-- ============================================
 
 -- Connect to command_center and create schema
 \c command_center

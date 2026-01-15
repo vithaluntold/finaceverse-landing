@@ -101,6 +101,119 @@ routes:
         bearer_only: true
 
   # ============================================
+  # PHASE 2: LAGO BILLING ROUTES
+  # Module 1: Financial Operations Center
+  # ============================================
+  
+  # Lago API - Subscriptions
+  - uri: /api/v1/subscriptions/*
+    name: lago-subscriptions
+    methods: ["GET", "POST", "PUT", "DELETE"]
+    upstream:
+      type: roundrobin
+      nodes:
+        "lago-api:3000": 1
+    plugins:
+      openid-connect:
+        client_id: finaceverse-billing
+        client_secret: "${OIDC_CLIENT_SECRET}"
+        discovery: http://zitadel:8080/.well-known/openid-configuration
+        bearer_only: true
+      limit-count:
+        count: 100
+        time_window: 60
+        key_type: var
+        key: remote_addr
+      proxy-rewrite:
+        regex_uri: ["^/api/v1/subscriptions/(.*)", "/api/v1/subscriptions/$1"]
+
+  # Lago API - Invoices
+  - uri: /api/v1/invoices/*
+    name: lago-invoices
+    methods: ["GET", "POST"]
+    upstream:
+      type: roundrobin
+      nodes:
+        "lago-api:3000": 1
+    plugins:
+      openid-connect:
+        client_id: finaceverse-billing
+        client_secret: "${OIDC_CLIENT_SECRET}"
+        discovery: http://zitadel:8080/.well-known/openid-configuration
+        bearer_only: true
+
+  # Lago API - Customers
+  - uri: /api/v1/customers/*
+    name: lago-customers
+    methods: ["GET", "POST", "PUT", "DELETE"]
+    upstream:
+      type: roundrobin
+      nodes:
+        "lago-api:3000": 1
+    plugins:
+      openid-connect:
+        client_id: finaceverse-billing
+        client_secret: "${OIDC_CLIENT_SECRET}"
+        discovery: http://zitadel:8080/.well-known/openid-configuration
+        bearer_only: true
+
+  # Lago Webhooks (No Auth - Signature Verified)
+  - uri: /webhooks/lago
+    name: lago-webhooks
+    methods: ["POST"]
+    upstream:
+      type: roundrobin
+      nodes:
+        "backend:3000": 1
+    plugins:
+      limit-count:
+        count: 1000
+        time_window: 60
+
+  # ============================================
+  # PHASE 2: CHATWOOT SUPPORT ROUTES
+  # Module 5: Support Center
+  # ============================================
+  
+  # Chatwoot Widget (Public)
+  - uri: /widget/*
+    name: chatwoot-widget
+    methods: ["GET", "POST"]
+    upstream:
+      type: roundrobin
+      nodes:
+        "chatwoot:3000": 1
+    plugins:
+      cors:
+        allow_origins: "*"
+        allow_methods: "GET, POST, OPTIONS"
+        allow_headers: "Content-Type, Authorization"
+
+  # Chatwoot API
+  - uri: /api/v1/accounts/*
+    name: chatwoot-accounts
+    methods: ["GET", "POST", "PUT", "DELETE", "PATCH"]
+    upstream:
+      type: roundrobin
+      nodes:
+        "chatwoot:3000": 1
+    plugins:
+      openid-connect:
+        client_id: finaceverse-support
+        client_secret: "${OIDC_CLIENT_SECRET}"
+        discovery: http://zitadel:8080/.well-known/openid-configuration
+        bearer_only: true
+
+  # Chatwoot Webhooks
+  - uri: /webhooks/chatwoot
+    name: chatwoot-webhooks
+    methods: ["POST"]
+    upstream:
+      type: roundrobin
+      nodes:
+        "backend:3000": 1
+
+  # ============================================
   # HONEYPOT ROUTES (Security Traps)
   # ============================================
   
@@ -152,5 +265,23 @@ routes:
         abort:
           http_status: 500
           body: '{"error": "Internal server error"}'
+
+  - uri: /phpmyadmin
+    name: honeypot-phpmyadmin
+    methods: ["GET", "POST"]
+    plugins:
+      fault-injection:
+        delay:
+          duration: 20
+        abort:
+          http_status: 404
+
+  - uri: /xmlrpc.php
+    name: honeypot-xmlrpc
+    methods: ["GET", "POST"]
+    plugins:
+      fault-injection:
+        abort:
+          http_status: 404
 
 #END

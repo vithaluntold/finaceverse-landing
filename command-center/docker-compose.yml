@@ -1,16 +1,20 @@
-# FinACEverse Command Center - Phase 1: Core Infrastructure
-# Version: 1.0
-# Last Updated: January 14, 2026
+# FinACEverse Command Center - Phase 1 + Phase 2
+# Version: 2.0
+# Last Updated: January 16, 2026
 # 
-# Services: Zitadel (Identity), Cerbos (AuthZ), Vault (Secrets), 
-#           APISIX (API Gateway), SigNoz (APM), PostgreSQL
+# Phase 1: Zitadel (Identity), Cerbos (AuthZ), Vault (Secrets), 
+#          APISIX (API Gateway), SigNoz (APM), PostgreSQL
+# Phase 2: Lago (Billing), Chatwoot (Support), BookStack (Knowledge Base)
 #
 # Usage: docker-compose up -d
 # Dashboard URLs:
-#   - Zitadel Console: http://localhost:8080
-#   - APISIX Dashboard: http://localhost:9000
-#   - SigNoz: http://localhost:3301
-#   - Vault: http://localhost:8200
+#   - Zitadel Console:    http://localhost:8080
+#   - APISIX Dashboard:   http://localhost:9000
+#   - SigNoz:             http://localhost:3301
+#   - Vault:              http://localhost:8200
+#   - Lago:               http://localhost:3000
+#   - Chatwoot:           http://localhost:3100
+#   - BookStack:          http://localhost:6875
 
 version: '3.8'
 
@@ -24,6 +28,9 @@ volumes:
   vault_data:
   signoz_data:
   apisix_logs:
+  lago_storage:
+  chatwoot_storage:
+  bookstack_data:
 
 services:
   # ============================================
@@ -237,5 +244,173 @@ services:
     command: redis-server --appendonly yes --requirepass ${REDIS_PASSWORD:-Redis_Secure_2026!}
     ports:
       - "6379:6379"
+    networks:
+      - finaceverse
+
+  # ============================================
+  # PHASE 2: BILLING (Lago)
+  # Module 1: Financial Operations Center
+  # ============================================
+  
+  lago-api:
+    image: getlago/api:v1.3.5
+    container_name: finaceverse-lago-api
+    restart: unless-stopped
+    environment:
+      LAGO_API_URL: http://localhost:3000
+      DATABASE_URL: postgresql://lago:${LAGO_DB_PASSWORD:-Lago_Secure_2026!}@postgres:5432/lago
+      REDIS_URL: redis://:${REDIS_PASSWORD:-Redis_Secure_2026!}@redis:6379
+      SECRET_KEY_BASE: ${LAGO_SECRET_KEY:-your-secret-key-base-at-least-64-chars-long-for-production}
+      RAILS_ENV: production
+      LAGO_FRONT_URL: http://localhost:3000
+      RSA_PRIVATE_KEY: ${LAGO_RSA_PRIVATE_KEY:-}
+      LAGO_RSA_PRIVATE_KEY: ${LAGO_RSA_PRIVATE_KEY:-}
+      ENCRYPTION_PRIMARY_KEY: ${LAGO_ENCRYPTION_KEY:-encryption-key-32-chars-minimum!}
+      ENCRYPTION_DETERMINISTIC_KEY: ${LAGO_DETERMINISTIC_KEY:-deterministic-key-32-chars-min!}
+      ENCRYPTION_KEY_DERIVATION_SALT: ${LAGO_KEY_SALT:-key-derivation-salt-minimum-32!}
+      LAGO_WEBHOOK_ATTEMPTS: 3
+      LAGO_USE_AWS_S3: "false"
+      SIDEKIQ_EVENTS: "true"
+    ports:
+      - "3000:3000"
+    volumes:
+      - lago_storage:/app/storage
+    networks:
+      - finaceverse
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_started
+
+  lago-worker:
+    image: getlago/api:v1.3.5
+    container_name: finaceverse-lago-worker
+    restart: unless-stopped
+    command: bundle exec sidekiq -C config/sidekiq.yml
+    environment:
+      LAGO_API_URL: http://localhost:3000
+      DATABASE_URL: postgresql://lago:${LAGO_DB_PASSWORD:-Lago_Secure_2026!}@postgres:5432/lago
+      REDIS_URL: redis://:${REDIS_PASSWORD:-Redis_Secure_2026!}@redis:6379
+      SECRET_KEY_BASE: ${LAGO_SECRET_KEY:-your-secret-key-base-at-least-64-chars-long-for-production}
+      RAILS_ENV: production
+      ENCRYPTION_PRIMARY_KEY: ${LAGO_ENCRYPTION_KEY:-encryption-key-32-chars-minimum!}
+      ENCRYPTION_DETERMINISTIC_KEY: ${LAGO_DETERMINISTIC_KEY:-deterministic-key-32-chars-min!}
+      ENCRYPTION_KEY_DERIVATION_SALT: ${LAGO_KEY_SALT:-key-derivation-salt-minimum-32!}
+    networks:
+      - finaceverse
+    depends_on:
+      - lago-api
+
+  lago-front:
+    image: getlago/front:v1.3.5
+    container_name: finaceverse-lago-front
+    restart: unless-stopped
+    environment:
+      API_URL: http://lago-api:3000
+      APP_ENV: production
+      LAGO_OAUTH_PROVIDERS_ENABLED: "false"
+    ports:
+      - "8081:80"
+    networks:
+      - finaceverse
+    depends_on:
+      - lago-api
+
+  # ============================================
+  # PHASE 2: SUPPORT (Chatwoot)
+  # Module 5: Support Center
+  # ============================================
+  
+  chatwoot:
+    image: chatwoot/chatwoot:v3.5.0
+    container_name: finaceverse-chatwoot
+    restart: unless-stopped
+    command: bundle exec rails s -p 3000 -b 0.0.0.0
+    environment:
+      RAILS_ENV: production
+      SECRET_KEY_BASE: ${CHATWOOT_SECRET_KEY:-chatwoot-secret-key-base-minimum-64-characters-long-for-security}
+      FRONTEND_URL: http://localhost:3100
+      DATABASE_URL: postgresql://chatwoot:${CHATWOOT_DB_PASSWORD:-Chatwoot_Secure_2026!}@postgres:5432/chatwoot
+      REDIS_URL: redis://:${REDIS_PASSWORD:-Redis_Secure_2026!}@redis:6379
+      POSTGRES_HOST: postgres
+      POSTGRES_USERNAME: chatwoot
+      POSTGRES_PASSWORD: ${CHATWOOT_DB_PASSWORD:-Chatwoot_Secure_2026!}
+      POSTGRES_DATABASE: chatwoot
+      RAILS_LOG_TO_STDOUT: "true"
+      LOG_LEVEL: info
+      DEFAULT_LOCALE: en
+      ENABLE_ACCOUNT_SIGNUP: "false"
+      MAILER_SENDER_EMAIL: support@finaceverse.com
+      SMTP_DOMAIN: finaceverse.com
+      SMTP_ADDRESS: ${SMTP_ADDRESS:-}
+      SMTP_PORT: ${SMTP_PORT:-587}
+      SMTP_USERNAME: ${SMTP_USERNAME:-}
+      SMTP_PASSWORD: ${SMTP_PASSWORD:-}
+      SMTP_AUTHENTICATION: plain
+      SMTP_ENABLE_STARTTLS_AUTO: "true"
+    ports:
+      - "3100:3000"
+    volumes:
+      - chatwoot_storage:/app/storage
+    networks:
+      - finaceverse
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_started
+
+  chatwoot-worker:
+    image: chatwoot/chatwoot:v3.5.0
+    container_name: finaceverse-chatwoot-worker
+    restart: unless-stopped
+    command: bundle exec sidekiq -C config/sidekiq.yml
+    environment:
+      RAILS_ENV: production
+      SECRET_KEY_BASE: ${CHATWOOT_SECRET_KEY:-chatwoot-secret-key-base-minimum-64-characters-long-for-security}
+      DATABASE_URL: postgresql://chatwoot:${CHATWOOT_DB_PASSWORD:-Chatwoot_Secure_2026!}@postgres:5432/chatwoot
+      REDIS_URL: redis://:${REDIS_PASSWORD:-Redis_Secure_2026!}@redis:6379
+    networks:
+      - finaceverse
+    depends_on:
+      - chatwoot
+
+  # ============================================
+  # PHASE 2: KNOWLEDGE BASE (BookStack)
+  # Module 5: Support Center - Knowledge Base
+  # ============================================
+  
+  bookstack:
+    image: lscr.io/linuxserver/bookstack:24.02.3
+    container_name: finaceverse-bookstack
+    restart: unless-stopped
+    environment:
+      PUID: 1000
+      PGID: 1000
+      APP_URL: http://localhost:6875
+      DB_HOST: bookstack-db
+      DB_PORT: 3306
+      DB_USER: bookstack
+      DB_PASS: ${BOOKSTACK_DB_PASSWORD:-BookStack_Secure_2026!}
+      DB_DATABASE: bookstack
+    ports:
+      - "6875:80"
+    volumes:
+      - bookstack_data:/config
+    networks:
+      - finaceverse
+    depends_on:
+      - bookstack-db
+
+  bookstack-db:
+    image: mariadb:10.11
+    container_name: finaceverse-bookstack-db
+    restart: unless-stopped
+    environment:
+      MYSQL_ROOT_PASSWORD: ${BOOKSTACK_ROOT_PASSWORD:-BookStack_Root_2026!}
+      MYSQL_DATABASE: bookstack
+      MYSQL_USER: bookstack
+      MYSQL_PASSWORD: ${BOOKSTACK_DB_PASSWORD:-BookStack_Secure_2026!}
     networks:
       - finaceverse

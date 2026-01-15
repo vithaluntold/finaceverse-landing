@@ -65,6 +65,7 @@ init_env() {
 
     echo -e "${GREEN}Generating secure passwords...${NC}"
     
+    # Phase 1 credentials
     POSTGRES_PASSWORD=$(openssl rand -base64 24 | tr -dc 'a-zA-Z0-9' | head -c 24)
     ZITADEL_MASTERKEY=$(openssl rand -base64 32 | tr -dc 'a-zA-Z0-9' | head -c 32)
     ZITADEL_DB_PASSWORD=$(openssl rand -base64 24 | tr -dc 'a-zA-Z0-9' | head -c 24)
@@ -74,11 +75,30 @@ init_env() {
     APISIX_ADMIN_KEY=$(openssl rand -base64 32 | tr -dc 'a-zA-Z0-9' | head -c 32)
     APISIX_DASHBOARD_SECRET=$(openssl rand -base64 32 | tr -dc 'a-zA-Z0-9' | head -c 32)
     APISIX_DASHBOARD_PASSWORD=$(openssl rand -base64 16 | tr -dc 'a-zA-Z0-9' | head -c 16)
+    
+    # Phase 2 credentials - Lago (Billing)
+    LAGO_DB_PASSWORD=$(openssl rand -base64 24 | tr -dc 'a-zA-Z0-9' | head -c 24)
+    LAGO_SECRET_KEY=$(openssl rand -base64 48 | tr -dc 'a-zA-Z0-9' | head -c 64)
+    LAGO_ENCRYPTION_KEY=$(openssl rand -base64 32 | tr -dc 'a-zA-Z0-9' | head -c 32)
+    LAGO_DETERMINISTIC_KEY=$(openssl rand -base64 32 | tr -dc 'a-zA-Z0-9' | head -c 32)
+    LAGO_KEY_SALT=$(openssl rand -base64 32 | tr -dc 'a-zA-Z0-9' | head -c 32)
+    
+    # Phase 2 credentials - Chatwoot (Support)
+    CHATWOOT_DB_PASSWORD=$(openssl rand -base64 24 | tr -dc 'a-zA-Z0-9' | head -c 24)
+    CHATWOOT_SECRET_KEY=$(openssl rand -base64 48 | tr -dc 'a-zA-Z0-9' | head -c 64)
+    
+    # Phase 2 credentials - BookStack (Knowledge Base)
+    BOOKSTACK_DB_PASSWORD=$(openssl rand -base64 24 | tr -dc 'a-zA-Z0-9' | head -c 24)
+    BOOKSTACK_ROOT_PASSWORD=$(openssl rand -base64 24 | tr -dc 'a-zA-Z0-9' | head -c 24)
 
     cat > .env << EOF
 # FinACEverse Command Center Environment
 # Generated: $(date -Iseconds)
 # WARNING: Keep this file secure! Do not commit to version control.
+
+# ============================================
+# PHASE 1: Core Infrastructure
+# ============================================
 
 # Database
 POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
@@ -99,6 +119,31 @@ APISIX_ADMIN_KEY=${APISIX_ADMIN_KEY}
 APISIX_DASHBOARD_SECRET=${APISIX_DASHBOARD_SECRET}
 APISIX_DASHBOARD_PASSWORD=${APISIX_DASHBOARD_PASSWORD}
 
+# ============================================
+# PHASE 2: Billing & Support
+# ============================================
+
+# Lago (Billing - Module 1)
+LAGO_DB_PASSWORD=${LAGO_DB_PASSWORD}
+LAGO_SECRET_KEY=${LAGO_SECRET_KEY}
+LAGO_ENCRYPTION_KEY=${LAGO_ENCRYPTION_KEY}
+LAGO_DETERMINISTIC_KEY=${LAGO_DETERMINISTIC_KEY}
+LAGO_KEY_SALT=${LAGO_KEY_SALT}
+
+# Chatwoot (Support - Module 5)
+CHATWOOT_DB_PASSWORD=${CHATWOOT_DB_PASSWORD}
+CHATWOOT_SECRET_KEY=${CHATWOOT_SECRET_KEY}
+
+# BookStack (Knowledge Base)
+BOOKSTACK_DB_PASSWORD=${BOOKSTACK_DB_PASSWORD}
+BOOKSTACK_ROOT_PASSWORD=${BOOKSTACK_ROOT_PASSWORD}
+
+# SMTP (for Chatwoot email)
+SMTP_ADDRESS=
+SMTP_PORT=587
+SMTP_USERNAME=
+SMTP_PASSWORD=
+
 # Environment
 ENVIRONMENT=development
 EOF
@@ -109,6 +154,7 @@ EOF
     echo ""
     echo -e "${YELLOW}IMPORTANT: Save these credentials securely!${NC}"
     echo ""
+    echo -e "${BLUE}=== PHASE 1: Core Infrastructure ===${NC}"
     echo -e "SuperAdmin Login:"
     echo -e "  Username: ${BLUE}superadmin${NC}"
     echo -e "  Password: ${BLUE}${SUPERADMIN_PASSWORD}${NC}"
@@ -117,6 +163,13 @@ EOF
     echo -e "  Username: ${BLUE}admin${NC}"
     echo -e "  Password: ${BLUE}${APISIX_DASHBOARD_PASSWORD}${NC}"
     echo ""
+    echo -e "${BLUE}=== PHASE 2: Billing & Support ===${NC}"
+    echo -e "Lago (Billing):     http://localhost:8081"
+    echo -e "Chatwoot (Support): http://localhost:3100"
+    echo -e "BookStack (KB):     http://localhost:6875"
+    echo ""
+    echo -e "${YELLOW}Note: Configure SMTP settings in .env for email functionality${NC}"
+    echo ""
 }
 
 # Start services
@@ -124,7 +177,7 @@ start_services() {
     print_banner
     load_env
     
-    echo -e "${GREEN}Starting Command Center services...${NC}"
+    echo -e "${GREEN}Starting Command Center services (Phase 1 + Phase 2)...${NC}"
     echo ""
     
     docker-compose up -d
@@ -132,16 +185,22 @@ start_services() {
     echo ""
     echo -e "${GREEN}✓ Services started!${NC}"
     echo ""
-    echo -e "${BLUE}Service URLs:${NC}"
+    echo -e "${BLUE}=== PHASE 1: Core Infrastructure ===${NC}"
     echo -e "  • Zitadel Console:    http://localhost:8080"
     echo -e "  • APISIX Dashboard:   http://localhost:9000"
-    echo -e "  • SigNoz:             http://localhost:3301"
-    echo -e "  • Vault:              http://localhost:8200"
-    echo -e "  • Cerbos:             http://localhost:3593"
+    echo -e "  • SigNoz APM:         http://localhost:3301"
+    echo -e "  • Vault Secrets:      http://localhost:8200"
+    echo -e "  • Cerbos AuthZ:       http://localhost:3593"
     echo -e "  • API Gateway:        http://localhost:9080"
     echo ""
+    echo -e "${BLUE}=== PHASE 2: Billing & Support ===${NC}"
+    echo -e "  • Lago Billing:       http://localhost:8081"
+    echo -e "  • Lago API:           http://localhost:3000"
+    echo -e "  • Chatwoot Support:   http://localhost:3100"
+    echo -e "  • BookStack KB:       http://localhost:6875"
+    echo ""
     echo -e "${YELLOW}Waiting for services to be healthy...${NC}"
-    sleep 10
+    sleep 15
     
     # Check service health
     echo ""

@@ -1,8 +1,8 @@
 # FinACEverse Command Center
 
-**Phase 1: Core Infrastructure**  
-**Version:** 1.0  
-**Date:** January 14, 2026  
+**Phase 1 + Phase 2: Core Infrastructure, Billing & Support**  
+**Version:** 2.0  
+**Date:** January 16, 2026  
 **Status:** ✅ Ready for Deployment
 
 ---
@@ -24,6 +24,8 @@ chmod +x start.sh
 
 ## 📦 Services Included
 
+### Phase 1: Core Infrastructure
+
 | Service | Purpose | Port | Dashboard |
 |---------|---------|------|-----------|
 | **Zitadel** | Identity Provider (SSO, OIDC) | 8080 | http://localhost:8080 |
@@ -33,6 +35,14 @@ chmod +x start.sh
 | **SigNoz** | APM & Tracing | 4317/4318 | http://localhost:3301 |
 | **PostgreSQL** | Database | 5432 | - |
 | **Redis** | Cache & Events | 6379 | - |
+
+### Phase 2: Billing & Support
+
+| Service | Purpose | Port | Dashboard |
+|---------|---------|------|-----------|
+| **Lago** | Subscription Billing (Module 1) | 3000/8081 | http://localhost:8081 |
+| **Chatwoot** | Live Chat & Tickets (Module 5) | 3100 | http://localhost:3100 |
+| **BookStack** | Knowledge Base | 6875 | http://localhost:6875 |
 
 ---
 
@@ -47,6 +57,10 @@ After running `./start.sh init`, credentials are stored in `.env` file.
 **APISIX Dashboard:**
 - Username: `admin`
 - Password: (see .env → `APISIX_DASHBOARD_PASSWORD`)
+
+**BookStack:**
+- Email: `admin@admin.com`
+- Password: `password` (change on first login)
 
 ---
 
