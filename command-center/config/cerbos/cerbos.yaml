@@ -1,0 +1,24 @@
+# Cerbos Server Configuration
+# FinACEverse Command Center - RBAC Policy Engine
+
+server:
+  httpListenAddr: ":3593"
+  grpcListenAddr: ":3592"
+
+storage:
+  driver: disk
+  disk:
+    directory: /policies
+    watchForChanges: true
+
+audit:
+  enabled: true
+  accessLogsEnabled: true
+  decisionLogsEnabled: true
+  backend: local
+  local:
+    storagePath: /tmp/cerbos-audit
+    retentionPeriod: 168h  # 7 days
+
+engine:
+  defaultPolicyVersion: "default"

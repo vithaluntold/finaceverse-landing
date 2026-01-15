@@ -1,0 +1,241 @@
+# FinACEverse Command Center - Phase 1: Core Infrastructure
+# Version: 1.0
+# Last Updated: January 14, 2026
+# 
+# Services: Zitadel (Identity), Cerbos (AuthZ), Vault (Secrets), 
+#           APISIX (API Gateway), SigNoz (APM), PostgreSQL
+#
+# Usage: docker-compose up -d
+# Dashboard URLs:
+#   - Zitadel Console: http://localhost:8080
+#   - APISIX Dashboard: http://localhost:9000
+#   - SigNoz: http://localhost:3301
+#   - Vault: http://localhost:8200
+
+version: '3.8'
+
+networks:
+  finaceverse:
+    driver: bridge
+
+volumes:
+  postgres_data:
+  zitadel_data:
+  vault_data:
+  signoz_data:
+  apisix_logs:
+
+services:
+  # ============================================
+  # DATABASE LAYER
+  # ============================================
+  postgres:
+    image: postgres:15-alpine
+    container_name: finaceverse-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: finaceverse
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-FinACE_Secure_2026!}
+      POSTGRES_DB: finaceverse
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./init-scripts/postgres:/docker-entrypoint-initdb.d
+    ports:
+      - "5432:5432"
+    networks:
+      - finaceverse
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U finaceverse"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # ============================================
+  # IDENTITY & ACCESS MANAGEMENT
+  # ============================================
+  
+  # Zitadel - Identity Provider (SSO, OIDC, SAML)
+  zitadel:
+    image: ghcr.io/zitadel/zitadel:v2.45.0
+    container_name: finaceverse-zitadel
+    restart: unless-stopped
+    command: start-from-init --masterkeyFromEnv --tlsMode disabled
+    environment:
+      ZITADEL_MASTERKEY: ${ZITADEL_MASTERKEY:-MasterkeyForFinACEverse2026SecureKey}
+      ZITADEL_DATABASE_POSTGRES_HOST: postgres
+      ZITADEL_DATABASE_POSTGRES_PORT: 5432
+      ZITADEL_DATABASE_POSTGRES_DATABASE: zitadel
+      ZITADEL_DATABASE_POSTGRES_USER: zitadel
+      ZITADEL_DATABASE_POSTGRES_PASSWORD: ${ZITADEL_DB_PASSWORD:-Zitadel_Secure_2026!}
+      ZITADEL_DATABASE_POSTGRES_SSL_MODE: disable
+      ZITADEL_EXTERNALSECURE: "false"
+      ZITADEL_EXTERNALDOMAIN: localhost
+      ZITADEL_EXTERNALPORT: 8080
+      ZITADEL_FIRSTINSTANCE_ORG_NAME: FinACEverse
+      ZITADEL_FIRSTINSTANCE_ORG_HUMAN_USERNAME: superadmin
+      ZITADEL_FIRSTINSTANCE_ORG_HUMAN_PASSWORD: ${SUPERADMIN_PASSWORD:-SuperAdmin_2026!}
+    ports:
+      - "8080:8080"
+    volumes:
+      - zitadel_data:/data
+      - ./config/zitadel:/config:ro
+    networks:
+      - finaceverse
+    depends_on:
+      postgres:
+        condition: service_healthy
+
+  # Cerbos - Policy-Based Access Control
+  cerbos:
+    image: ghcr.io/cerbos/cerbos:0.32.0
+    container_name: finaceverse-cerbos
+    restart: unless-stopped
+    command: server --config=/config/cerbos.yaml
+    ports:
+      - "3592:3592"  # gRPC
+      - "3593:3593"  # HTTP
+    volumes:
+      - ./config/cerbos:/config:ro
+      - ./policies:/policies:ro
+    networks:
+      - finaceverse
+
+  # ============================================
+  # SECRETS MANAGEMENT
+  # ============================================
+  
+  # HashiCorp Vault - Secrets & Encryption
+  vault:
+    image: hashicorp/vault:1.15
+    container_name: finaceverse-vault
+    restart: unless-stopped
+    cap_add:
+      - IPC_LOCK
+    environment:
+      VAULT_DEV_ROOT_TOKEN_ID: ${VAULT_ROOT_TOKEN:-finaceverse-dev-token}
+      VAULT_DEV_LISTEN_ADDRESS: 0.0.0.0:8200
+      VAULT_ADDR: http://127.0.0.1:8200
+    ports:
+      - "8200:8200"
+    volumes:
+      - vault_data:/vault/file
+      - ./config/vault:/vault/config:ro
+    networks:
+      - finaceverse
+
+  # ============================================
+  # API GATEWAY
+  # ============================================
+  
+  # Apache APISIX - API Gateway
+  apisix:
+    image: apache/apisix:3.8.0-debian
+    container_name: finaceverse-apisix
+    restart: unless-stopped
+    volumes:
+      - ./config/apisix/config.yaml:/usr/local/apisix/conf/config.yaml:ro
+      - ./config/apisix/apisix.yaml:/usr/local/apisix/conf/apisix.yaml:ro
+      - apisix_logs:/usr/local/apisix/logs
+    ports:
+      - "9080:9080"   # HTTP
+      - "9443:9443"   # HTTPS
+      - "9180:9180"   # Admin API
+    networks:
+      - finaceverse
+    depends_on:
+      - etcd
+
+  # APISIX Dashboard
+  apisix-dashboard:
+    image: apache/apisix-dashboard:3.0.1-alpine
+    container_name: finaceverse-apisix-dashboard
+    restart: unless-stopped
+    volumes:
+      - ./config/apisix/dashboard.yaml:/usr/local/apisix-dashboard/conf/conf.yaml:ro
+    ports:
+      - "9000:9000"
+    networks:
+      - finaceverse
+    depends_on:
+      - apisix
+
+  # etcd - APISIX configuration store
+  etcd:
+    image: bitnami/etcd:3.5
+    container_name: finaceverse-etcd
+    restart: unless-stopped
+    environment:
+      ALLOW_NONE_AUTHENTICATION: "yes"
+      ETCD_ADVERTISE_CLIENT_URLS: http://etcd:2379
+      ETCD_LISTEN_CLIENT_URLS: http://0.0.0.0:2379
+    networks:
+      - finaceverse
+
+  # ============================================
+  # OBSERVABILITY
+  # ============================================
+  
+  # SigNoz - APM & Tracing (All-in-one)
+  signoz:
+    image: signoz/signoz-otel-collector:0.88.11
+    container_name: finaceverse-signoz-collector
+    restart: unless-stopped
+    command: ["--config=/etc/otel-collector-config.yaml"]
+    volumes:
+      - ./config/signoz/otel-collector-config.yaml:/etc/otel-collector-config.yaml:ro
+    ports:
+      - "4317:4317"   # OTLP gRPC
+      - "4318:4318"   # OTLP HTTP
+    networks:
+      - finaceverse
+
+  signoz-frontend:
+    image: signoz/frontend:0.38.0
+    container_name: finaceverse-signoz-frontend
+    restart: unless-stopped
+    ports:
+      - "3301:3301"
+    environment:
+      SIGNOZ_BACKEND_URL: http://signoz-query:8080
+    networks:
+      - finaceverse
+    depends_on:
+      - signoz-query
+
+  signoz-query:
+    image: signoz/query-service:0.38.0
+    container_name: finaceverse-signoz-query
+    restart: unless-stopped
+    environment:
+      ClickHouseUrl: tcp://clickhouse:9000
+      STORAGE: clickhouse
+    networks:
+      - finaceverse
+    depends_on:
+      - clickhouse
+
+  clickhouse:
+    image: clickhouse/clickhouse-server:23.8
+    container_name: finaceverse-clickhouse
+    restart: unless-stopped
+    volumes:
+      - signoz_data:/var/lib/clickhouse
+    networks:
+      - finaceverse
+    ulimits:
+      nofile:
+        soft: 262144
+        hard: 262144
+
+  # ============================================
+  # REDIS (Cache & Event Bus)
+  # ============================================
+  redis:
+    image: redis:7-alpine
+    container_name: finaceverse-redis
+    restart: unless-stopped
+    command: redis-server --appendonly yes --requirepass ${REDIS_PASSWORD:-Redis_Secure_2026!}
+    ports:
+      - "6379:6379"
+    networks:
+      - finaceverse

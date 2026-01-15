@@ -30,7 +30,11 @@ Build an intelligent site performance monitoring and optimization system that:
 - Device breakdown (desktop, mobile, tablet)
 - Real-time active users by country
 ```
-
+Issue	Status
+Issue 1: DI generic labeling	Needs investigation
+Issue 4: Incomplete contributor tracking	Will improve with cascade fix
+Issue 5: Stage 3 skipped	Future enhancement
+Issue 6: Stage 4 uses AI	Future enhancement
 **Setup Steps**:
 1. Create GA4 property for finaceverse.io
 2. Add GA4 measurement ID to `public/index.html`

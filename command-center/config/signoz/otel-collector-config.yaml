@@ -1,0 +1,94 @@
+# SigNoz OpenTelemetry Collector Configuration
+# FinACEverse Command Center - APM & Tracing
+
+receivers:
+  otlp:
+    protocols:
+      grpc:
+        endpoint: 0.0.0.0:4317
+      http:
+        endpoint: 0.0.0.0:4318
+
+  # Collect host metrics
+  hostmetrics:
+    collection_interval: 30s
+    scrapers:
+      cpu:
+      disk:
+      load:
+      filesystem:
+      memory:
+      network:
+      paging:
+      processes:
+
+processors:
+  batch:
+    timeout: 10s
+    send_batch_size: 10000
+
+  # Add resource attributes
+  resource:
+    attributes:
+      - key: deployment.environment
+        value: ${ENVIRONMENT:-development}
+        action: upsert
+      - key: service.namespace
+        value: finaceverse
+        action: upsert
+
+  # Memory limiter to prevent OOM
+  memory_limiter:
+    check_interval: 1s
+    limit_mib: 1000
+    spike_limit_mib: 200
+
+  # Filter sensitive data
+  attributes:
+    actions:
+      - key: http.request.header.authorization
+        action: delete
+      - key: db.statement
+        action: hash
+      - key: http.request.body
+        action: delete
+
+exporters:
+  clickhouse:
+    endpoint: tcp://clickhouse:9000
+    database: signoz_traces
+    ttl_days: 30
+    timeout: 10s
+    sending_queue:
+      queue_size: 1000
+    retry_on_failure:
+      enabled: true
+      initial_interval: 5s
+      max_interval: 30s
+      max_elapsed_time: 300s
+
+  logging:
+    loglevel: info
+
+service:
+  pipelines:
+    traces:
+      receivers: [otlp]
+      processors: [memory_limiter, batch, resource, attributes]
+      exporters: [clickhouse, logging]
+    
+    metrics:
+      receivers: [otlp, hostmetrics]
+      processors: [memory_limiter, batch, resource]
+      exporters: [clickhouse]
+    
+    logs:
+      receivers: [otlp]
+      processors: [memory_limiter, batch, resource, attributes]
+      exporters: [clickhouse]
+
+  telemetry:
+    logs:
+      level: info
+    metrics:
+      address: 0.0.0.0:8888

@@ -1,0 +1,72 @@
+# Apache APISIX Configuration
+# FinACEverse Command Center - API Gateway
+
+apisix:
+  node_listen: 9080
+  enable_ipv6: false
+  enable_admin: true
+  admin_key:
+    - name: admin
+      key: ${APISIX_ADMIN_KEY:-FinACE_APISIX_Admin_2026}
+      role: admin
+
+  ssl:
+    enable: true
+    listen_port: 9443
+
+nginx_config:
+  error_log_level: warn
+  http:
+    access_log_format: '{"time": "$time_iso8601", "remote_addr": "$remote_addr", "request": "$request", "status": "$status", "body_bytes_sent": "$body_bytes_sent", "request_time": "$request_time", "upstream_response_time": "$upstream_response_time"}'
+
+etcd:
+  host:
+    - "http://etcd:2379"
+  prefix: /apisix
+  timeout: 30
+
+plugins:
+  - real-ip
+  - cors
+  - response-rewrite
+  - limit-req
+  - limit-count
+  - limit-conn
+  - jwt-auth
+  - key-auth
+  - basic-auth
+  - openid-connect
+  - authz-keycloak
+  - request-id
+  - ip-restriction
+  - ua-restriction
+  - referer-restriction
+  - consumer-restriction
+  - opentelemetry
+  - prometheus
+  - request-validation
+  - proxy-rewrite
+  - redirect
+  - response-headers
+  - fault-injection
+
+plugin_attr:
+  opentelemetry:
+    resource:
+      service.name: finaceverse-gateway
+    collector:
+      address: signoz:4317
+      request_timeout: 3
+      request_headers:
+        Authorization: ""
+
+  prometheus:
+    export_uri: /apisix/prometheus/metrics
+    metric_prefix: finaceverse_
+
+  limit-count:
+    # Default global rate limit
+    count: 1000
+    time_window: 60
+    rejected_code: 429
+    rejected_msg: '{"error": "Rate limit exceeded", "code": "RATE_LIMIT_429"}'

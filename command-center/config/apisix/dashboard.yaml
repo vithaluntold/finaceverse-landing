@@ -1,0 +1,23 @@
+# APISIX Dashboard Configuration
+# FinACEverse Command Center
+
+conf:
+  listen:
+    host: 0.0.0.0
+    port: 9000
+  etcd:
+    endpoints:
+      - etcd:2379
+  log:
+    error_log:
+      level: warn
+      file_path: /usr/local/apisix-dashboard/logs/error.log
+    access_log:
+      file_path: /usr/local/apisix-dashboard/logs/access.log
+
+authentication:
+  secret: ${APISIX_DASHBOARD_SECRET:-FinACE_Dashboard_Secret_2026}
+  expire_time: 3600
+  users:
+    - username: admin
+      password: ${APISIX_DASHBOARD_PASSWORD:-Admin_Dashboard_2026!}

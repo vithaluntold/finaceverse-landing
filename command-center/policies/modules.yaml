@@ -1,0 +1,475 @@
+# FinACEverse Command Center - Module-Specific Policies
+# Granular access control per operational module
+# Version: 1.0 | Date: January 14, 2026
+#
+# All 14 Modules with resource names:
+#   1. financial_operations_center    8. api_developer_portal
+#   2. platform_health_center         9. communication_hub
+#   3. devops_center                 10. legal_compliance
+#   4. user_operations_center        11. partner_affiliate_portal
+#   5. support_center                12. infrastructure_control
+#   6. security_operations_center    13. seo_analytics
+#   7. ai_agent_factory              14. business_intelligence
+---
+# Module 1: Financial Operations Center
+apiVersion: api.cerbos.dev/v1
+resourcePolicy:
+  version: default
+  resource: financial_operations_center
+  rules:
+    - actions:
+        - view_revenue
+        - manage_subscriptions
+        - manage_billing
+        - refund
+        - view_invoices
+        - manage_pricing
+        - manage_coupons
+      effect: EFFECT_ALLOW
+      roles:
+        - superadmin
+        - admin
+        - finance_admin
+      name: finance_full_access
+
+    - actions:
+        - view_revenue
+        - view_invoices
+      effect: EFFECT_ALLOW
+      roles:
+        - operator
+        - viewer
+      name: finance_read_access
+
+    - actions:
+        - refund
+      effect: EFFECT_ALLOW
+      roles:
+        - finance_admin
+      condition:
+        match:
+          expr: request.resource.attr.amount <= 10000
+      name: finance_admin_limited_refund
+---
+# Module 2: Platform Health Center
+apiVersion: api.cerbos.dev/v1
+resourcePolicy:
+  version: default
+  resource: platform_health_center
+  rules:
+    - actions:
+        - view_uptime
+        - view_errors
+        - view_metrics
+        - manage_alerts
+        - view_sla
+      effect: EFFECT_ALLOW
+      roles:
+        - superadmin
+        - admin
+        - devops_admin
+      name: health_full_access
+
+    - actions:
+        - view_uptime
+        - view_errors
+        - view_metrics
+      effect: EFFECT_ALLOW
+      roles:
+        - operator
+        - viewer
+      name: health_read_access
+---
+# Module 3: DevOps Center
+apiVersion: api.cerbos.dev/v1
+resourcePolicy:
+  version: default
+  resource: devops_center
+  rules:
+    - actions:
+        - manage_modules
+        - deploy_production
+        - manage_feature_flags
+        - manage_kill_switches
+        - manage_migrations
+      effect: EFFECT_ALLOW
+      roles:
+        - superadmin
+        - devops_admin
+      name: devops_full_access
+
+    - actions:
+        - view_deployments
+        - manage_feature_flags
+        - deploy_staging
+      effect: EFFECT_ALLOW
+      roles:
+        - admin
+        - developer
+      name: devops_limited_access
+
+    - actions:
+        - deploy_production
+        - manage_kill_switches
+      effect: EFFECT_DENY
+      roles:
+        - developer
+      name: developer_no_prod
+---
+# Module 4: User Operations Center
+apiVersion: api.cerbos.dev/v1
+resourcePolicy:
+  version: default
+  resource: user_operations_center
+  rules:
+    - actions:
+        - view_users
+        - create_user
+        - update_user
+        - impersonate
+        - manage_roles
+        - manage_tenants
+      effect: EFFECT_ALLOW
+      roles:
+        - superadmin
+      name: user_ops_full_access
+
+    - actions:
+        - view_users
+        - create_user
+        - update_user
+        - manage_roles
+      effect: EFFECT_ALLOW
+      roles:
+        - admin
+      name: user_ops_admin_access
+
+    - actions:
+        - impersonate
+      effect: EFFECT_DENY
+      roles:
+        - admin
+      name: admin_no_impersonate
+
+    - actions:
+        - view_users
+      effect: EFFECT_ALLOW
+      roles:
+        - operator
+        - viewer
+      name: user_ops_read_access
+---
+# Module 5: Support Center
+apiVersion: api.cerbos.dev/v1
+resourcePolicy:
+  version: default
+  resource: support_center
+  rules:
+    - actions:
+        - manage_tickets
+        - manage_chat
+        - manage_voice
+        - manage_knowledge_base
+        - view_agent_performance
+      effect: EFFECT_ALLOW
+      roles:
+        - superadmin
+        - admin
+        - support_admin
+      name: support_full_access
+
+    - actions:
+        - manage_tickets
+        - manage_chat
+        - view_knowledge_base
+      effect: EFFECT_ALLOW
+      roles:
+        - operator
+        - support_agent
+      name: support_agent_access
+
+    - actions:
+        - view_tickets
+        - view_knowledge_base
+      effect: EFFECT_ALLOW
+      roles:
+        - viewer
+      name: support_read_access
+---
+# Module 6: Security Operations Center
+apiVersion: api.cerbos.dev/v1
+resourcePolicy:
+  version: default
+  resource: security_operations_center
+  rules:
+    - actions:
+        - "*"
+      effect: EFFECT_ALLOW
+      roles:
+        - superadmin
+        - security_admin
+      name: security_full_access
+
+    - actions:
+        - view_threats
+        - view_audit_logs
+        - view_incidents
+        - view_compliance
+      effect: EFFECT_ALLOW
+      roles:
+        - admin
+        - operator
+      name: security_read_access
+
+    - actions:
+        - modify_security_rules
+        - whitelist_ip
+        - disable_2fa
+        - manage_waf
+      effect: EFFECT_DENY
+      roles:
+        - admin
+        - operator
+      name: restrict_security_changes
+---
+# Module 7: AI Agent Factory
+apiVersion: api.cerbos.dev/v1
+resourcePolicy:
+  version: default
+  resource: ai_agent_factory
+  rules:
+    - actions:
+        - create_agent
+        - deploy_agent
+        - delete_agent
+        - view_agents
+        - test_agent
+        - manage_erp_connectors
+      effect: EFFECT_ALLOW
+      roles:
+        - superadmin
+        - admin
+      name: agent_factory_full_access
+
+    - actions:
+        - view_agents
+        - test_agent
+        - create_agent
+      effect: EFFECT_ALLOW
+      roles:
+        - operator
+        - developer
+      name: agent_factory_dev_access
+
+    - actions:
+        - deploy_agent
+      effect: EFFECT_ALLOW
+      roles:
+        - developer
+      condition:
+        match:
+          expr: request.resource.attr.environment == 'staging'
+      name: developer_staging_only
+---
+# Module 8: API & Developer Portal
+apiVersion: api.cerbos.dev/v1
+resourcePolicy:
+  version: default
+  resource: api_developer_portal
+  rules:
+    - actions:
+        - manage_api_keys
+        - manage_rate_limits
+        - manage_webhooks
+        - manage_documentation
+      effect: EFFECT_ALLOW
+      roles:
+        - superadmin
+        - admin
+        - devops_admin
+      name: api_portal_full_access
+
+    - actions:
+        - view_api_keys
+        - view_documentation
+        - view_usage
+      effect: EFFECT_ALLOW
+      roles:
+        - operator
+        - developer
+        - viewer
+      name: api_portal_read_access
+---
+# Module 9: Communication Hub
+apiVersion: api.cerbos.dev/v1
+resourcePolicy:
+  version: default
+  resource: communication_hub
+  rules:
+    - actions:
+        - manage_announcements
+        - manage_email_templates
+        - manage_push_notifications
+        - manage_onboarding
+      effect: EFFECT_ALLOW
+      roles:
+        - superadmin
+        - admin
+        - marketing_admin
+      name: comms_full_access
+
+    - actions:
+        - view_announcements
+        - view_campaigns
+      effect: EFFECT_ALLOW
+      roles:
+        - operator
+        - viewer
+      name: comms_read_access
+---
+# Module 10: Legal & Compliance
+apiVersion: api.cerbos.dev/v1
+resourcePolicy:
+  version: default
+  resource: legal_compliance
+  rules:
+    - actions:
+        - manage_tos
+        - manage_contracts
+        - manage_gdpr_requests
+        - manage_retention_policies
+      effect: EFFECT_ALLOW
+      roles:
+        - superadmin
+        - legal_admin
+      name: legal_full_access
+
+    - actions:
+        - view_tos
+        - view_contracts
+        - view_compliance_status
+      effect: EFFECT_ALLOW
+      roles:
+        - admin
+        - operator
+        - viewer
+      name: legal_read_access
+---
+# Module 11: Partner & Affiliate Portal
+apiVersion: api.cerbos.dev/v1
+resourcePolicy:
+  version: default
+  resource: partner_affiliate_portal
+  rules:
+    - actions:
+        - "*"
+      effect: EFFECT_ALLOW
+      roles:
+        - superadmin
+        - partner_admin
+      name: partner_full_access
+
+    - actions:
+        - view_partners
+        - view_commissions
+        - view_affiliates
+      effect: EFFECT_ALLOW
+      roles:
+        - admin
+        - operator
+      name: partner_read_access
+
+    - actions:
+        - approve_payout
+        - modify_commission_rates
+      effect: EFFECT_ALLOW
+      roles:
+        - partner_admin
+        - finance_admin
+      condition:
+        match:
+          expr: request.resource.attr.payout_amount <= 50000
+      name: limited_payout_approval
+---
+# Module 12: Infrastructure Control
+apiVersion: api.cerbos.dev/v1
+resourcePolicy:
+  version: default
+  resource: infrastructure_control
+  rules:
+    - actions:
+        - manage_backups
+        - manage_failover
+        - manage_scaling
+        - manage_maintenance
+      effect: EFFECT_ALLOW
+      roles:
+        - superadmin
+        - devops_admin
+      name: infra_full_access
+
+    - actions:
+        - view_backups
+        - view_capacity
+        - view_costs
+      effect: EFFECT_ALLOW
+      roles:
+        - admin
+        - operator
+        - viewer
+      name: infra_read_access
+---
+# Module 13: SEO & Analytics (Already Built)
+apiVersion: api.cerbos.dev/v1
+resourcePolicy:
+  version: default
+  resource: seo_analytics
+  rules:
+    - actions:
+        - manage_seo
+        - manage_experiments
+        - manage_tracking
+      effect: EFFECT_ALLOW
+      roles:
+        - superadmin
+        - admin
+        - marketing_admin
+      name: seo_full_access
+
+    - actions:
+        - view_seo
+        - view_analytics
+        - view_experiments
+      effect: EFFECT_ALLOW
+      roles:
+        - operator
+        - viewer
+      name: seo_read_access
+---
+# Module 14: Business Intelligence
+apiVersion: api.cerbos.dev/v1
+resourcePolicy:
+  version: default
+  resource: business_intelligence
+  rules:
+    - actions:
+        - view_arr
+        - view_churn
+        - view_cohorts
+        - view_forecasts
+        - manage_dashboards
+      effect: EFFECT_ALLOW
+      roles:
+        - superadmin
+        - admin
+        - finance_admin
+      name: bi_full_access
+
+    - actions:
+        - view_arr
+        - view_cohorts
+      effect: EFFECT_ALLOW
+      roles:
+        - operator
+        - viewer
+      name: bi_read_access

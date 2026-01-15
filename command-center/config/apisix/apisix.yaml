@@ -1,0 +1,156 @@
+# Apache APISIX Routes Configuration
+# FinACEverse Command Center - API Routing & Security
+
+routes:
+  # ============================================
+  # COMMAND CENTER API ROUTES
+  # ============================================
+  
+  # Health Check (No Auth)
+  - uri: /health
+    name: health-check
+    methods: ["GET"]
+    upstream:
+      type: roundrobin
+      nodes:
+        "backend:3000": 1
+    plugins:
+      response-rewrite:
+        headers:
+          X-Response-Time: "$upstream_response_time"
+  
+  # Identity Routes (Zitadel)
+  - uri: /auth/*
+    name: identity-proxy
+    methods: ["GET", "POST", "PUT", "DELETE"]
+    upstream:
+      type: roundrobin
+      nodes:
+        "zitadel:8080": 1
+    plugins:
+      proxy-rewrite:
+        regex_uri: ["^/auth/(.*)", "/$1"]
+
+  # Command Center API (Protected)
+  - uri: /api/v1/command-center/*
+    name: command-center-api
+    methods: ["GET", "POST", "PUT", "DELETE", "PATCH"]
+    upstream:
+      type: roundrobin
+      nodes:
+        "backend:3000": 1
+    plugins:
+      # JWT Validation via Zitadel
+      openid-connect:
+        client_id: finaceverse-command-center
+        client_secret: "${OIDC_CLIENT_SECRET}"
+        discovery: http://zitadel:8080/.well-known/openid-configuration
+        bearer_only: true
+        realm: FinACEverse
+      # Rate Limiting
+      limit-count:
+        count: 500
+        time_window: 60
+        key_type: var
+        key: remote_addr
+      # Request ID for tracing
+      request-id:
+        include_in_response: true
+      # Security Headers
+      response-rewrite:
+        headers:
+          X-Content-Type-Options: nosniff
+          X-Frame-Options: DENY
+          X-XSS-Protection: "1; mode=block"
+          Strict-Transport-Security: "max-age=31536000; includeSubDomains"
+          Content-Security-Policy: "default-src 'self'"
+
+  # Financial Operations Module
+  - uri: /api/v1/billing/*
+    name: billing-api
+    methods: ["GET", "POST", "PUT", "DELETE"]
+    upstream:
+      type: roundrobin
+      nodes:
+        "lago:3000": 1
+    plugins:
+      openid-connect:
+        client_id: finaceverse-billing
+        client_secret: "${OIDC_CLIENT_SECRET}"
+        discovery: http://zitadel:8080/.well-known/openid-configuration
+        bearer_only: true
+      limit-count:
+        count: 200
+        time_window: 60
+        key_type: var
+        key: remote_addr
+
+  # Support Module (Chatwoot)
+  - uri: /api/v1/support/*
+    name: support-api
+    methods: ["GET", "POST", "PUT", "DELETE"]
+    upstream:
+      type: roundrobin
+      nodes:
+        "chatwoot:3000": 1
+    plugins:
+      openid-connect:
+        client_id: finaceverse-support
+        client_secret: "${OIDC_CLIENT_SECRET}"
+        discovery: http://zitadel:8080/.well-known/openid-configuration
+        bearer_only: true
+
+  # ============================================
+  # HONEYPOT ROUTES (Security Traps)
+  # ============================================
+  
+  - uri: /admin
+    name: honeypot-admin
+    methods: ["GET", "POST"]
+    plugins:
+      fault-injection:
+        delay:
+          duration: 5
+        abort:
+          http_status: 403
+          body: '{"error": "Access denied"}'
+      # Log to SIEM
+      opentelemetry:
+        sampler:
+          name: always_on
+
+  - uri: /wp-admin
+    name: honeypot-wordpress
+    methods: ["GET", "POST"]
+    plugins:
+      fault-injection:
+        delay:
+          duration: 10
+        abort:
+          http_status: 404
+          body: '<!DOCTYPE html><html><body>Not Found</body></html>'
+
+  - uri: /.env
+    name: honeypot-env
+    methods: ["GET"]
+    plugins:
+      fault-injection:
+        abort:
+          http_status: 404
+          body: ''
+      ip-restriction:
+        # Immediately block IPs that hit this
+        whitelist: ["0.0.0.0/32"]
+
+  - uri: /api/debug
+    name: honeypot-debug
+    methods: ["GET", "POST"]
+    plugins:
+      fault-injection:
+        delay:
+          duration: 15
+        abort:
+          http_status: 500
+          body: '{"error": "Internal server error"}'
+
+#END

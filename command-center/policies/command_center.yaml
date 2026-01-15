@@ -1,0 +1,100 @@
+# FinACEverse Command Center - Core RBAC Policies
+# Role-Based Access Control for Admin Operations
+# Version: 1.0 | Date: January 14, 2026
+#
+# 14 Operational Modules:
+#   1. Financial Operations Center    8. API & Developer Portal
+#   2. Platform Health Center         9. Communication Hub
+#   3. DevOps Center                 10. Legal & Compliance
+#   4. User Operations Center        11. Partner & Affiliate Portal
+#   5. Support Center                12. Infrastructure Control
+#   6. Security Operations Center    13. SEO & Analytics
+#   7. AI Agent Factory              14. Business Intelligence
+---
+apiVersion: api.cerbos.dev/v1
+resourcePolicy:
+  version: default
+  resource: command_center
+  rules:
+    # ============================================
+    # SUPERADMIN - God Mode (Full Access)
+    # ============================================
+    - actions:
+        - "*"
+      effect: EFFECT_ALLOW
+      roles:
+        - superadmin
+      name: superadmin_full_access
+
+    # ============================================
+    # ADMIN - Full Module Access (No Deletion)
+    # ============================================
+    - actions:
+        - view
+        - create
+        - update
+        - manage_users
+        - manage_billing
+        - manage_support
+        - view_analytics
+        - manage_products
+        - manage_security
+        - view_audit_logs
+      effect: EFFECT_ALLOW
+      roles:
+        - admin
+      name: admin_manage_access
+
+    - actions:
+        - delete
+        - manage_superadmins
+        - system_config
+      effect: EFFECT_DENY
+      roles:
+        - admin
+      name: admin_deny_destructive
+
+    # ============================================
+    # OPERATOR - Day-to-Day Operations
+    # ============================================
+    - actions:
+        - view
+        - create
+        - update
+        - manage_support
+        - view_analytics
+      effect: EFFECT_ALLOW
+      roles:
+        - operator
+      name: operator_operations_access
+
+    - actions:
+        - delete
+        - manage_users
+        - manage_billing
+        - manage_security
+        - system_config
+      effect: EFFECT_DENY
+      roles:
+        - operator
+      name: operator_deny_admin
+
+    # ============================================
+    # VIEWER - Read-Only Access
+    # ============================================
+    - actions:
+        - view
+        - view_analytics
+      effect: EFFECT_ALLOW
+      roles:
+        - viewer
+      name: viewer_read_only
+
+    - actions:
+        - create
+        - update
+        - delete
+      effect: EFFECT_DENY
+      roles:
+        - viewer
+      name: viewer_deny_write

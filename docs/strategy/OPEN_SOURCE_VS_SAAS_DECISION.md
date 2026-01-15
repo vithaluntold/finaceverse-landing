@@ -1,8 +1,8 @@
 # Open Source vs SaaS: Strategic Decision Document
 
-**Document Version:** 1.0  
-**Date:** January 8, 2026  
-**Status:** Decision Pending  
+**Document Version:** 1.1  
+**Date:** January 14, 2026  
+**Status:** ✅ APPROVED  
 **Decision Maker:** Vithal Valluri, Founder & CEO
 
 ---
@@ -429,7 +429,7 @@ SaaS vendors manage their supply chain security. We don't have that visibility o
 | Function | Provider | Rationale |
 |----------|----------|-----------|
 | Billing | Chargebee | India-focused, GST support |
-| Payments | Razorpay | Already integrated, trusted |
+| Payments | Cashfree | Preferred payment gateway |
 | Identity | Auth0 | Enterprise SSO, compliance |
 | Support | Intercom | Best-in-class, AI features |
 | Monitoring | Datadog | Comprehensive, reliable |
@@ -450,9 +450,9 @@ SaaS vendors manage their supply chain security. We don't have that visibility o
 | Date | Decision | Rationale | Approved By |
 |------|----------|-----------|-------------|
 | 2026-01-08 | Document created | Strategic analysis required | - |
-| | | | |
+| 2026-01-14 | SaaS Stack Approved | Payments changed to Cashfree | Vithal Valluri |
 
 ---
 
 *Document prepared for FinACEverse strategic planning*  
-*Last updated: January 8, 2026*
+*Last updated: January 14, 2026*
