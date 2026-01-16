@@ -18,7 +18,7 @@ FinACEverse is designed as a **modular, multi-tenant, AI-native platform** that 
 
 ## 🏛️ High-Level Architecture
 
-```
+```text
 ┌─────────────────────────────────────────────────────────────────────────────────┐
 │                              CLIENT LAYER                                        │
 ├─────────────────────────────────────────────────────────────────────────────────┤
@@ -111,16 +111,18 @@ FinACEverse is designed as a **modular, multi-tenant, AI-native platform** that 
 ## 🧱 Core Components
 
 ### 1. Client Layer
+
 | Component | Technology | Purpose |
-|-----------|------------|---------|
+| ----------- | ------------ | --------- |
 | Web App | React + TypeScript | Primary user interface |
 | Mobile App | React Native | iOS/Android access |
 | Desktop | Electron | Offline-capable desktop client |
 | CLI | Node.js | Developer and admin tools |
 
 ### 2. API Gateway
+
 | Feature | Implementation |
-|---------|----------------|
+| --------- | ---------------- |
 | Authentication | JWT + OAuth 2.0 + SAML SSO |
 | Rate Limiting | Token bucket per tenant/user |
 | Request Routing | Path-based to microservices |
@@ -128,8 +130,9 @@ FinACEverse is designed as a **modular, multi-tenant, AI-native platform** that 
 | API Versioning | URL-based (v1, v2) |
 
 ### 3. Service Mesh
+
 | Technology | Purpose |
-|------------|---------|
+| ------------ | --------- |
 | Kubernetes | Container orchestration |
 | Istio/Linkerd | Service mesh, mTLS |
 | Envoy | Sidecar proxy |
@@ -138,7 +141,7 @@ FinACEverse is designed as a **modular, multi-tenant, AI-native platform** that 
 
 ### 4. Core Platform Services
 
-```
+```text
 ┌─────────────────────────────────────────────────────────────────┐
 │                    CORE PLATFORM SERVICES                        │
 ├─────────────────────────────────────────────────────────────────┤
@@ -189,7 +192,7 @@ FinACEverse is designed as a **modular, multi-tenant, AI-native platform** that 
 
 ## 🔄 Data Flow Architecture
 
-```
+```text
                                 USER REQUEST
                                      │
                                      ▼
@@ -237,7 +240,7 @@ FinACEverse is designed as a **modular, multi-tenant, AI-native platform** that 
 
 ## 🌐 Multi-Tenant Isolation
 
-```
+```text
 ┌─────────────────────────────────────────────────────────────────┐
 │                     TENANT ISOLATION MODEL                       │
 ├─────────────────────────────────────────────────────────────────┤
@@ -282,7 +285,7 @@ FinACEverse is designed as a **modular, multi-tenant, AI-native platform** that 
 
 ## 🔐 Security Architecture
 
-```
+```text
 ┌─────────────────────────────────────────────────────────────────┐
 │                    SECURITY LAYERS                               │
 ├─────────────────────────────────────────────────────────────────┤
@@ -337,7 +340,7 @@ FinACEverse is designed as a **modular, multi-tenant, AI-native platform** that 
 ## 📊 Scaling Strategy
 
 | Component | Horizontal Scaling | Vertical Scaling |
-|-----------|-------------------|------------------|
+| ----------- | ------------------- | ------------------ |
 | API Gateway | Load balancer + replicas | Larger instances |
 | Product Services | Pod autoscaling (HPA) | Resource limits |
 | PostgreSQL | Read replicas, partitioning | Instance sizing |
@@ -347,7 +350,7 @@ FinACEverse is designed as a **modular, multi-tenant, AI-native platform** that 
 
 ### Database Scaling
 
-```
+```text
 ┌─────────────────────────────────────────────────────────────────┐
 │                    DATABASE ARCHITECTURE                         │
 ├─────────────────────────────────────────────────────────────────┤

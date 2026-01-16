@@ -9,7 +9,7 @@ This directory contains the complete PostgreSQL database schema for FinACEverse,
 ## 📁 Schema Files
 
 | File | Description |
-|------|-------------|
+| ------ | ------------- |
 | `00_extensions_and_types.sql` | PostgreSQL extensions and 25+ custom ENUM types |
 | `01_core_identity.sql` | Multi-tenant identity, RBAC, SSO, API keys, consent |
 | `02_audit_security.sql` | Audit logs (partitioned), security events, compliance frameworks |
@@ -62,7 +62,7 @@ psql -d finaceverse -f 01_core_identity.sql
 
 ### Multi-Tenant Design
 
-```
+```text
 ┌─────────────────────────────────────────────────────────────┐
 │                    SHARED INFRASTRUCTURE                     │
 ├─────────────────────────────────────────────────────────────┤
@@ -102,7 +102,7 @@ CREATE POLICY tenant_isolation_policy ON documents
 High-volume tables are partitioned for performance:
 
 | Table | Partition Key | Interval |
-|-------|---------------|----------|
+| ------- | --------------- | ---------- |
 | `audit_logs` | `timestamp` | Monthly |
 | `agent_executions` | `created_at` | Quarterly |
 | `page_views` | `viewed_at` | Monthly |
@@ -115,42 +115,50 @@ High-volume tables are partitioned for performance:
 ## 📊 Products Covered
 
 ### 1. VAMN (Verification & Calculation)
+
 - Triple-stream architecture (Human, AI, Verification)
 - Calculation sessions with audit trails
 - 99.99% accuracy targeting
 
 ### 2. Accute (Practice Management)
+
 - 16+ AI agents for accounting firms
 - Time tracking, engagements, clients
 - AI Roundtable for complex decisions
 
 ### 3. Cyloid (Document Intelligence)
+
 - Truth Engine with 3-way matching
 - Entity extraction and verification
 - Fact Graph for audit trails
 
 ### 4. Luca AI (Conversational Finance)
+
 - 10 chat modes (accountant, analyst, advisor, etc.)
 - 36 specialized agents
 - Tax research and calculations
 
 ### 5. Fin(Ai)d Hub (Agent Factory)
+
 - Universal Document Intelligence (UDI)
 - Custom agent builder
 - ERP connectors
 
 ### 6. Finory (ERP)
+
 - Chart of Accounts
 - Journal entries with AI verification
 - Zero-Fallback Protocol (must balance)
 
 ### 7. EPI-Q (Process Mining)
+
 - BPMN process modeling
 - Task mining and activity logs
 - Digital Twin and simulations
 - PMQL (Process Mining Query Language)
 
 ### 8. SumBuddy (Marketplace)
+
 - B2B and B2C services
 - Provider management
 - Orders, scheduling, reviews
@@ -160,7 +168,7 @@ High-volume tables are partitioned for performance:
 ## 🔧 Command Center Modules
 
 | # | Module | Tables |
-|---|--------|--------|
+| --- | -------- | -------- |
 | 1 | Financial Operations | `subscriptions`, `invoices`, `payments`, `revenue_*` |
 | 2 | Platform Health | `system_health_metrics`, `system_metrics_timeseries`, `incidents` |
 | 3 | DevOps Center | `feature_flags`, `deployments`, `custom_modules` |
@@ -181,11 +189,13 @@ High-volume tables are partitioned for performance:
 ## 🔐 Security Features
 
 ### Compliance Ready
+
 - **SOC 2**: Full audit logging, access controls, encryption at rest
 - **GDPR**: Consent management, data subject requests, right to erasure
 - **HIPAA**: Data classification, encryption, access logging
 
 ### Security Tables
+
 - `security_events` - Threat detection and response
 - `security_rules` - Automated security policies
 - `ip_access_lists` - IP whitelisting/blacklisting
@@ -198,11 +208,13 @@ High-volume tables are partitioned for performance:
 ## 📈 Scaling Strategies
 
 ### Horizontal Scaling
+
 - Partitioned tables for time-series data
 - Efficient indexes (B-tree, GIN, GIST)
 - Materialized views for dashboard performance
 
 ### Indexing Patterns
+
 ```sql
 -- Tenant isolation
 CREATE INDEX idx_documents_tenant_id ON documents(tenant_id);
@@ -218,8 +230,9 @@ CREATE INDEX idx_users_metadata ON users USING GIN(metadata);
 ```
 
 ### Materialized Views
+
 | View | Refresh | Purpose |
-|------|---------|---------|
+| ------ | --------- | --------- |
 | `mv_platform_metrics` | Hourly | Platform-wide KPIs |
 | `mv_product_usage_daily` | Daily | Product usage trends |
 | `mv_tenant_health` | Hourly | Tenant health scores |
@@ -262,7 +275,7 @@ SELECT cron.schedule('refresh_mvs', '0 * * * *', 'SELECT refresh_all_materialize
 ## 📋 Table Count Summary
 
 | Category | Tables |
-|----------|--------|
+| ---------- | -------- |
 | Core Identity | 12 |
 | Audit & Security | 15 |
 | AI & Federated | 14 |
@@ -316,6 +329,7 @@ SELECT * FROM create_tenant(
 ## 📞 Support
 
 For questions about the schema:
+
 1. Check the inline comments in each SQL file
 2. Review the ERD diagrams (if available)
 3. Contact the FinACEverse platform team

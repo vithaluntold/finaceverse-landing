@@ -72,6 +72,94 @@ After running `./start.sh init`, credentials are stored in `.env` file.
 
 ---
 
+## 🔒 SuperAdmin Authentication (Phase 5)
+
+All Command Center services are protected by SuperAdmin authentication. Access requires a valid JWT token obtained through the login endpoint.
+
+### Authentication Flow
+
+1. **Login** → Get access token and refresh token
+2. **Use access token** → Include in `Authorization: Bearer <token>` header
+3. **Refresh token** → When access token expires, use refresh token to get new one
+4. **Logout** → Invalidate session
+
+### API Endpoints
+
+#### Orchestrator (Port 3500)
+
+| Endpoint | Method | Auth | Description |
+| -------- | ------ | ---- | ----------- |
+| `/api/v1/auth/login` | POST | None | Login with username/password |
+| `/api/v1/auth/refresh` | POST | None | Refresh access token |
+| `/api/v1/auth/logout` | POST | Bearer | Logout and invalidate session |
+| `/api/v1/health` | GET | None | Health check |
+| `/api/v1/workflows` | GET | Bearer (operator+) | List workflows |
+| `/api/v1/workflows` | POST | Bearer (admin+) | Create workflow |
+| `/api/v1/workflows/:id/execute` | POST | Bearer (operator+) | Execute workflow |
+| `/api/v1/audit` | GET | Bearer (superadmin) | View audit logs |
+
+#### Partner Portal (Port 3501)
+
+| Endpoint | Method | Auth | Description |
+| -------- | ------ | ---- | ----------- |
+| `/api/v1/auth/login` | POST | None | Login with username/password |
+| `/api/v1/auth/refresh` | POST | None | Refresh access token |
+| `/api/v1/auth/logout` | POST | Bearer | Logout and invalidate session |
+| `/api/v1/health` | GET | None | Health check |
+| `/api/v1/partners` | GET | Bearer (admin+) | List partners |
+| `/api/v1/partners` | POST | Bearer (admin+) | Create partner |
+| `/api/v1/commissions` | GET | Bearer (admin+) | List commissions |
+| `/api/v1/audit` | GET | Bearer (superadmin) | View audit logs |
+
+### Role Hierarchy
+
+| Role | Level | Access |
+| ---- | ----- | ------ |
+| `superadmin` | 100 | Full access to all resources |
+| `admin` | 80 | Create, update, delete resources |
+| `operator` | 60 | Execute workflows, view data |
+| `viewer` | 40 | Read-only access |
+| `partner` | 30 | Partner-specific access only |
+
+### Login Example
+
+```bash
+# Login to Orchestrator
+curl -X POST http://localhost:3500/api/v1/auth/login \
+  -H "Content-Type: application/json" \
+  -d '{"username": "superadmin", "password": "your-password"}'
+
+# Response
+{
+  "success": true,
+  "accessToken": "eyJhbGc...",
+  "refreshToken": "abc123...",
+  "user": {
+    "id": "uuid",
+    "username": "superadmin",
+    "role": "superadmin"
+  },
+  "expiresIn": 3600000
+}
+
+# Use token in subsequent requests
+curl http://localhost:3500/api/v1/workflows \
+  -H "Authorization: Bearer eyJhbGc..."
+```
+
+### Environment Variables
+
+| Variable | Description | Default |
+|----------|-------------|---------|
+| `JWT_SECRET` | Secret for signing JWT tokens | Auto-generated |
+| `JWT_ISSUER` | JWT issuer claim | `finaceverse-platform` |
+| `SUPERADMIN_MASTER_KEY` | Master key for multi-factor auth | Auto-generated |
+| `SERVICE_SECRET` | Secret for service-to-service communication | Auto-generated |
+| `COMMAND_CENTER_LOCAL_MODE` | `true` = standalone, `false` = platform integrated | `false` |
+| `PLATFORM_URL` | URL of main platform (for token validation) | `http://localhost:3001` |
+
+---
+
 ## 📁 Directory Structure
 
 ```

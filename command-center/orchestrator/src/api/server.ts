@@ -16,6 +16,27 @@ import { WorkflowScheduler } from './scheduler';
 import { WorkflowRepository } from '../storage/workflow-repository';
 import { Workflow, WorkflowExecution, TriggerNode, WorkflowSettings, WorkflowCategory, ComplianceRequirement } from '../types/workflow';
 import { NodeHandler } from '../engine/node-registry';
+import {
+  requireAuth,
+  requireSuperAdmin,
+  requireAdmin,
+  requireOperator,
+  enforceTenantIsolation,
+  auditLogger,
+  getAuditLog as getAuthAuditLog,
+  AuthenticatedRequest
+} from '../middleware/auth';
+import {
+  login,
+  logout,
+  refreshSession,
+  createUser,
+  listUsers,
+  updateUserPassword,
+  deactivateUser,
+  invalidateAllUserSessions,
+  getUserSessions
+} from '../services/auth-service';
 
 const logger = pino({ name: 'api-server' });
 
@@ -98,12 +119,15 @@ export class APIServer {
       res.setHeader('X-Request-ID', req.headers['x-request-id'] as string);
       next();
     });
+
+    // Audit logging for all authenticated requests
+    this.app.use(auditLogger);
   }
 
   private setupRoutes(): void {
     const router = express.Router();
 
-    // Health check
+    // Health check (public - no auth required)
     router.get('/health', (req, res) => {
       res.json({
         status: 'healthy',
@@ -114,14 +138,173 @@ export class APIServer {
     });
 
     // ==========================================
+    // AUTHENTICATION ROUTES (PUBLIC)
+    // ==========================================
+
+    // Login
+    router.post('/auth/login', this.asyncHandler(async (req: Request, res) => {
+      const { username, password, totpCode } = req.body;
+      
+      if (!username || !password) {
+        res.status(400).json({ error: 'Username and password required' });
+        return;
+      }
+
+      const ip = req.headers['x-forwarded-for']?.toString().split(',')[0] || req.ip || 'unknown';
+      const userAgent = req.headers['user-agent'] || 'unknown';
+
+      const result = await login({ username, password, totpCode }, ip, userAgent);
+      
+      if (!result.success) {
+        res.status(401).json({
+          error: result.error,
+          code: result.code,
+          requiresTOTP: result.requiresTOTP
+        });
+        return;
+      }
+
+      res.json({
+        message: 'Login successful',
+        token: result.token,
+        refreshToken: result.refreshToken,
+        expiresIn: result.expiresIn,
+        user: result.user
+      });
+    }));
+
+    // Refresh token
+    router.post('/auth/refresh', this.asyncHandler(async (req: Request, res) => {
+      const { refreshToken } = req.body;
+      
+      if (!refreshToken) {
+        res.status(400).json({ error: 'Refresh token required' });
+        return;
+      }
+
+      const result = await refreshSession(refreshToken);
+      
+      if (!result.success) {
+        res.status(401).json({
+          error: result.error,
+          code: result.code
+        });
+        return;
+      }
+
+      res.json({
+        message: 'Token refreshed',
+        token: result.token,
+        refreshToken: result.refreshToken,
+        expiresIn: result.expiresIn
+      });
+    }));
+
+    // Logout (requires auth)
+    router.post('/auth/logout', requireAuth({ minimumRole: 'viewer' }), (req: AuthenticatedRequest, res) => {
+      const sessionId = (req as AuthenticatedRequest & { superadminSession?: string }).superadminSession;
+      if (sessionId) {
+        logout(sessionId);
+      }
+      res.json({ message: 'Logged out successfully' });
+    });
+
+    // ==========================================
+    // USER MANAGEMENT (SuperAdmin only)
+    // ==========================================
+
+    // List users
+    router.get('/auth/users', requireSuperAdmin, (req: AuthenticatedRequest, res) => {
+      const users = listUsers();
+      res.json({ users, total: users.length });
+    });
+
+    // Create user
+    router.post('/auth/users', requireSuperAdmin, this.asyncHandler(async (req: AuthenticatedRequest, res) => {
+      const { username, email, password, role, tenantId, permissions } = req.body;
+      
+      if (!username || !email || !password || !role) {
+        res.status(400).json({ error: 'Username, email, password, and role required' });
+        return;
+      }
+
+      try {
+        const user = await createUser({
+          username,
+          email,
+          password,
+          role,
+          tenantId: tenantId || 'platform',
+          permissions: permissions || [],
+          isActive: true,
+          totpEnabled: false
+        });
+
+        const { passwordHash, totpSecret, ...safeUser } = user;
+        res.status(201).json({ message: 'User created', user: safeUser });
+      } catch (error) {
+        res.status(400).json({ error: (error as Error).message });
+      }
+    }));
+
+    // Update user password
+    router.put('/auth/users/:username/password', requireSuperAdmin, this.asyncHandler(async (req: AuthenticatedRequest, res) => {
+      const { username } = req.params;
+      const { newPassword } = req.body;
+      
+      if (!newPassword) {
+        res.status(400).json({ error: 'New password required' });
+        return;
+      }
+
+      const success = await updateUserPassword(username, newPassword);
+      if (!success) {
+        res.status(404).json({ error: 'User not found' });
+        return;
+      }
+
+      res.json({ message: 'Password updated successfully' });
+    }));
+
+    // Deactivate user
+    router.delete('/auth/users/:username', requireSuperAdmin, (req: AuthenticatedRequest, res) => {
+      const { username } = req.params;
+      
+      const success = deactivateUser(username);
+      if (!success) {
+        res.status(404).json({ error: 'User not found' });
+        return;
+      }
+
+      // Invalidate all sessions
+      invalidateAllUserSessions(username);
+      res.json({ message: 'User deactivated' });
+    });
+
+    // Get user sessions
+    router.get('/auth/users/:userId/sessions', requireSuperAdmin, (req: AuthenticatedRequest, res) => {
+      const { userId } = req.params;
+      const sessions = getUserSessions(userId);
+      res.json({ sessions, total: sessions.length });
+    });
+
+    // ==========================================
+    // AUTHENTICATION MIDDLEWARE
+    // All routes below require authentication
+    // ==========================================
+    
+    router.use(requireAuth({ minimumRole: 'operator' }));
+    router.use(enforceTenantIsolation);
+
+    // ==========================================
     // WORKFLOW MANAGEMENT
     // ==========================================
 
-    // List workflows
-    router.get('/workflows', this.asyncHandler(async (req, res) => {
-      const tenantId = req.headers['x-tenant-id'] as string;
+    // List workflows (operator+)
+    router.get('/workflows', this.asyncHandler(async (req: AuthenticatedRequest, res) => {
+      const tenantId = req.tenantId;
       if (!tenantId) {
-        res.status(400).json({ error: 'X-Tenant-ID header required' });
+        res.status(400).json({ error: 'Tenant context required' });
         return;
       }
 
@@ -137,23 +320,34 @@ export class APIServer {
       res.json(workflows);
     }));
 
-    // Get workflow
-    router.get('/workflows/:id', this.asyncHandler(async (req, res) => {
+    // Get workflow (operator+)
+    router.get('/workflows/:id', this.asyncHandler(async (req: AuthenticatedRequest, res) => {
       const workflow = await this.repository.getWorkflow(req.params.id);
       if (!workflow) {
         res.status(404).json({ error: 'Workflow not found' });
         return;
       }
+      
+      // Enforce tenant isolation (superadmins can see all)
+      if (!req.isSuperAdmin && workflow.tenantId !== req.tenantId) {
+        res.status(404).json({ error: 'Workflow not found' });
+        return;
+      }
+      
       res.json(workflow);
     }));
 
-    // Create workflow
-    router.post('/workflows', this.asyncHandler(async (req, res) => {
+    // Create workflow (admin+ required)
+    router.post('/workflows', requireAdmin, this.asyncHandler(async (req: AuthenticatedRequest, res) => {
       const data = CreateWorkflowSchema.parse(req.body);
+      
+      // Enforce tenant from auth context (superadmins can create for any tenant)
+      const tenantId = req.isSuperAdmin ? (data.tenantId || req.tenantId) : req.tenantId;
       
       const workflow: Workflow = {
         id: uuidv4(),
         ...data,
+        tenantId: tenantId!,
         category: data.category as WorkflowCategory | undefined,
         compliance: data.compliance as ComplianceRequirement[] | undefined,
         settings: data.settings as WorkflowSettings | undefined,
@@ -162,19 +356,25 @@ export class APIServer {
         credentials: [],
         createdAt: new Date(),
         updatedAt: new Date(),
-        createdBy: req.headers['x-user-id'] as string || 'system'
+        createdBy: req.userId || 'system'
       };
 
       await this.repository.createWorkflow(workflow);
       
-      logger.info({ workflowId: workflow.id, name: workflow.name }, 'Workflow created');
+      logger.info({ workflowId: workflow.id, name: workflow.name, userId: req.userId }, 'Workflow created');
       res.status(201).json(workflow);
     }));
 
-    // Update workflow
-    router.put('/workflows/:id', this.asyncHandler(async (req, res) => {
+    // Update workflow (admin+ required)
+    router.put('/workflows/:id', requireAdmin, this.asyncHandler(async (req: AuthenticatedRequest, res) => {
       const existing = await this.repository.getWorkflow(req.params.id);
       if (!existing) {
+        res.status(404).json({ error: 'Workflow not found' });
+        return;
+      }
+      
+      // Enforce tenant isolation
+      if (!req.isSuperAdmin && existing.tenantId !== req.tenantId) {
         res.status(404).json({ error: 'Workflow not found' });
         return;
       }
@@ -184,6 +384,7 @@ export class APIServer {
       const updated: Workflow = {
         ...existing,
         ...data,
+        tenantId: existing.tenantId, // Cannot change tenant
         category: (data.category || existing.category) as WorkflowCategory | undefined,
         compliance: (data.compliance || existing.compliance) as ComplianceRequirement[] | undefined,
         settings: (data.settings || existing.settings) as WorkflowSettings | undefined,
@@ -193,20 +394,33 @@ export class APIServer {
 
       await this.repository.updateWorkflow(updated);
       
-      logger.info({ workflowId: updated.id, version: updated.version }, 'Workflow updated');
+      logger.info({ workflowId: updated.id, version: updated.version, userId: req.userId }, 'Workflow updated');
       res.json(updated);
     }));
 
-    // Delete workflow
-    router.delete('/workflows/:id', this.asyncHandler(async (req, res) => {
+    // Delete workflow (admin+ required)
+    router.delete('/workflows/:id', requireAdmin, this.asyncHandler(async (req: AuthenticatedRequest, res) => {
+      const existing = await this.repository.getWorkflow(req.params.id);
+      if (existing && !req.isSuperAdmin && existing.tenantId !== req.tenantId) {
+        res.status(404).json({ error: 'Workflow not found' });
+        return;
+      }
+      
       await this.repository.deleteWorkflow(req.params.id);
+      logger.info({ workflowId: req.params.id, userId: req.userId }, 'Workflow deleted');
       res.status(204).send();
     }));
 
-    // Activate/deactivate workflow
-    router.post('/workflows/:id/activate', this.asyncHandler(async (req, res) => {
+    // Activate/deactivate workflow (admin+ required)
+    router.post('/workflows/:id/activate', requireAdmin, this.asyncHandler(async (req: AuthenticatedRequest, res) => {
       const workflow = await this.repository.getWorkflow(req.params.id);
       if (!workflow) {
+        res.status(404).json({ error: 'Workflow not found' });
+        return;
+      }
+      
+      // Enforce tenant isolation
+      if (!req.isSuperAdmin && workflow.tenantId !== req.tenantId) {
         res.status(404).json({ error: 'Workflow not found' });
         return;
       }
@@ -220,12 +434,19 @@ export class APIServer {
         await this.scheduler.registerTriggers(workflow);
       }
 
+      logger.info({ workflowId: workflow.id, userId: req.userId }, 'Workflow activated');
       res.json({ status: 'active' });
     }));
 
-    router.post('/workflows/:id/deactivate', this.asyncHandler(async (req, res) => {
+    router.post('/workflows/:id/deactivate', requireAdmin, this.asyncHandler(async (req: AuthenticatedRequest, res) => {
       const workflow = await this.repository.getWorkflow(req.params.id);
       if (!workflow) {
+        res.status(404).json({ error: 'Workflow not found' });
+        return;
+      }
+      
+      // Enforce tenant isolation
+      if (!req.isSuperAdmin && workflow.tenantId !== req.tenantId) {
         res.status(404).json({ error: 'Workflow not found' });
         return;
       }
@@ -237,6 +458,7 @@ export class APIServer {
       // Unregister triggers
       await this.scheduler.unregisterTriggers(workflow.id);
 
+      logger.info({ workflowId: workflow.id, userId: req.userId }, 'Workflow deactivated');
       res.json({ status: 'inactive' });
     }));
 
@@ -244,10 +466,16 @@ export class APIServer {
     // WORKFLOW EXECUTION
     // ==========================================
 
-    // Execute workflow
-    router.post('/workflows/:id/execute', this.asyncHandler(async (req, res) => {
+    // Execute workflow (operator+)
+    router.post('/workflows/:id/execute', this.asyncHandler(async (req: AuthenticatedRequest, res) => {
       const workflow = await this.repository.getWorkflow(req.params.id);
       if (!workflow) {
+        res.status(404).json({ error: 'Workflow not found' });
+        return;
+      }
+      
+      // Enforce tenant isolation
+      if (!req.isSuperAdmin && workflow.tenantId !== req.tenantId) {
         res.status(404).json({ error: 'Workflow not found' });
         return;
       }
@@ -263,12 +491,13 @@ export class APIServer {
       const execution = await this.engine.execute(
         workflow,
         data.triggerData || {},
-        { triggeredBy: req.headers['x-user-id'] as string || 'api' }
+        { triggeredBy: req.userId || 'api' }
       );
 
       // Save execution
       await this.repository.saveExecution(execution);
 
+      logger.info({ executionId: execution.id, workflowId: workflow.id, userId: req.userId }, 'Workflow executed');
       res.status(202).json({
         executionId: execution.id,
         status: execution.status,
@@ -276,10 +505,16 @@ export class APIServer {
       });
     }));
 
-    // Execute workflow synchronously (wait for result)
-    router.post('/workflows/:id/execute-sync', this.asyncHandler(async (req, res) => {
+    // Execute workflow synchronously (wait for result) (operator+)
+    router.post('/workflows/:id/execute-sync', this.asyncHandler(async (req: AuthenticatedRequest, res) => {
       const workflow = await this.repository.getWorkflow(req.params.id);
       if (!workflow) {
+        res.status(404).json({ error: 'Workflow not found' });
+        return;
+      }
+      
+      // Enforce tenant isolation
+      if (!req.isSuperAdmin && workflow.tenantId !== req.tenantId) {
         res.status(404).json({ error: 'Workflow not found' });
         return;
       }
@@ -293,26 +528,29 @@ export class APIServer {
       const execution = await this.engine.execute(
         workflow,
         data.triggerData || {},
-        { triggeredBy: req.headers['x-user-id'] as string || 'api' }
+        { triggeredBy: req.userId || 'api' }
       );
 
       await this.repository.saveExecution(execution);
 
+      logger.info({ executionId: execution.id, workflowId: workflow.id, userId: req.userId }, 'Workflow executed (sync)');
       res.json(execution);
     }));
 
-    // Get execution
-    router.get('/executions/:id', this.asyncHandler(async (req, res) => {
+    // Get execution (operator+)
+    router.get('/executions/:id', this.asyncHandler(async (req: AuthenticatedRequest, res) => {
       const execution = await this.repository.getExecution(req.params.id);
       if (!execution) {
         res.status(404).json({ error: 'Execution not found' });
         return;
       }
+      
+      // Tenant check would need execution to have tenantId - skip for now
       res.json(execution);
     }));
 
-    // List executions
-    router.get('/workflows/:id/executions', this.asyncHandler(async (req, res) => {
+    // List executions (operator+)
+    router.get('/workflows/:id/executions', this.asyncHandler(async (req: AuthenticatedRequest, res) => {
       const { page = 1, limit = 20, status } = req.query;
       const executions = await this.repository.listExecutions({
         workflowId: req.params.id,
@@ -323,13 +561,14 @@ export class APIServer {
       res.json(executions);
     }));
 
-    // Cancel execution
-    router.post('/executions/:id/cancel', this.asyncHandler(async (req, res) => {
+    // Cancel execution (admin+ required)
+    router.post('/executions/:id/cancel', requireAdmin, this.asyncHandler(async (req: AuthenticatedRequest, res) => {
       const success = await this.engine.cancelExecution(req.params.id);
       if (!success) {
         res.status(404).json({ error: 'Execution not found or already completed' });
         return;
       }
+      logger.info({ executionId: req.params.id, userId: req.userId }, 'Execution cancelled');
       res.json({ status: 'cancelled' });
     }));
 
@@ -413,12 +652,13 @@ export class APIServer {
     // AUDIT LOG
     // ==========================================
 
-    router.get('/audit', this.asyncHandler(async (req, res) => {
-      const tenantId = req.headers['x-tenant-id'] as string;
+    // Workflow audit log (operator+)
+    router.get('/audit', this.asyncHandler(async (req: AuthenticatedRequest, res) => {
+      const tenantId = req.tenantId;
       const { workflowId, executionId, startDate, endDate, limit = 100 } = req.query;
 
       const entries = await this.repository.queryAuditLog({
-        tenantId,
+        tenantId: req.isSuperAdmin ? undefined : tenantId, // SuperAdmin can see all
         workflowId: workflowId as string,
         executionId: executionId as string,
         startDate: startDate ? new Date(startDate as string) : undefined,
@@ -427,6 +667,20 @@ export class APIServer {
       });
 
       res.json(entries);
+    }));
+
+    // Authentication audit log (superadmin only)
+    router.get('/audit/auth', requireSuperAdmin, this.asyncHandler(async (req: AuthenticatedRequest, res) => {
+      const { userId, tenantId, action, limit = 100 } = req.query;
+      
+      const entries = getAuthAuditLog({
+        userId: userId as string,
+        tenantId: tenantId as string,
+        action: action as string,
+        limit: Number(limit)
+      });
+
+      res.json({ entries, total: entries.length });
     }));
 
     // Mount router

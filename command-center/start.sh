@@ -108,6 +108,32 @@ ZITADEL_MASTERKEY=${ZITADEL_MASTERKEY}
 ZITADEL_DB_PASSWORD=${ZITADEL_DB_PASSWORD}
 SUPERADMIN_PASSWORD=${SUPERADMIN_PASSWORD}
 
+# ============================================
+# SUPERADMIN INTEGRATION
+# ============================================
+
+# SuperAdmin Master Key (for multi-key auth)
+SUPERADMIN_MASTER_KEY=$(openssl rand -base64 32 | tr -dc 'a-zA-Z0-9' | head -c 32)
+
+# JWT Secret (shared across Command Center services)
+JWT_SECRET=$(openssl rand -base64 48 | tr -dc 'a-zA-Z0-9' | head -c 64)
+JWT_ISSUER=finaceverse-platform
+
+# Service-to-Service Secret
+SERVICE_SECRET=$(openssl rand -base64 32 | tr -dc 'a-zA-Z0-9' | head -c 32)
+
+# Command Center Local Mode (true = standalone, false = platform integrated)
+COMMAND_CENTER_LOCAL_MODE=false
+
+# Platform URL (for token validation in integrated mode)
+PLATFORM_URL=http://localhost:3001
+
+# SuperAdmin URL Secret (generates hidden vault path)
+SUPERADMIN_URL_SECRET=$(openssl rand -base64 24 | tr -dc 'a-zA-Z0-9' | head -c 24)
+
+# IP Whitelist (comma-separated, empty = allow all)
+SUPERADMIN_IP_WHITELIST=
+
 # Vault (Secrets)
 VAULT_ROOT_TOKEN=${VAULT_ROOT_TOKEN}
 
@@ -154,6 +180,11 @@ EOF
     echo ""
     echo -e "${YELLOW}IMPORTANT: Save these credentials securely!${NC}"
     echo ""
+    echo -e "${BLUE}=== SUPERADMIN ACCESS ===${NC}"
+    echo -e "Master Key:     ${BLUE}\${SUPERADMIN_MASTER_KEY}${NC}"
+    echo -e "JWT Secret:     ${BLUE}[Generated - see .env]${NC}"
+    echo -e "Service Secret: ${BLUE}[Generated - see .env]${NC}"
+    echo ""
     echo -e "${BLUE}=== PHASE 1: Core Infrastructure ===${NC}"
     echo -e "SuperAdmin Login:"
     echo -e "  Username: ${BLUE}superadmin${NC}"
@@ -162,6 +193,10 @@ EOF
     echo -e "APISIX Dashboard:"
     echo -e "  Username: ${BLUE}admin${NC}"
     echo -e "  Password: ${BLUE}${APISIX_DASHBOARD_PASSWORD}${NC}"
+    echo ""
+    echo -e "${BLUE}=== COMMAND CENTER SERVICES ===${NC}"
+    echo -e "Orchestrator:   http://localhost:3500"
+    echo -e "Partner Portal: http://localhost:3501"
     echo ""
     echo -e "${BLUE}=== PHASE 2: Billing & Support ===${NC}"
     echo -e "Lago (Billing):     http://localhost:8081"
@@ -184,6 +219,10 @@ start_services() {
     
     echo ""
     echo -e "${GREEN}✓ Services started!${NC}"
+    echo ""
+    echo -e "${BLUE}=== COMMAND CENTER (SuperAdmin Protected) ===${NC}"
+    echo -e "  • Orchestrator API:   http://localhost:3500"
+    echo -e "  • Partner Portal:     http://localhost:3501"
     echo ""
     echo -e "${BLUE}=== PHASE 1: Core Infrastructure ===${NC}"
     echo -e "  • Zitadel Console:    http://localhost:8080"
