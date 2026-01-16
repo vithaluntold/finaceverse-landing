@@ -1,10 +1,11 @@
-# FinACEverse Command Center - Phase 1 + Phase 2
-# Version: 2.0
+# FinACEverse Command Center - Phase 1 + Phase 2 + Phase 3
+# Version: 3.0
 # Last Updated: January 16, 2026
 # 
 # Phase 1: Zitadel (Identity), Cerbos (AuthZ), Vault (Secrets), 
 #          APISIX (API Gateway), SigNoz (APM), PostgreSQL
 # Phase 2: Lago (Billing), Chatwoot (Support), BookStack (Knowledge Base)
+# Phase 3: Accute Orchestrator (Workflows), Unleash (Feature Flags), Wazuh (SIEM)
 #
 # Usage: docker-compose up -d
 # Dashboard URLs:
@@ -15,6 +16,9 @@
 #   - Lago:               http://localhost:3000
 #   - Chatwoot:           http://localhost:3100
 #   - BookStack:          http://localhost:6875
+#   - Orchestrator API:   http://localhost:3050
+#   - Unleash:            http://localhost:4242
+#   - Wazuh Dashboard:    http://localhost:5601
 
 version: '3.8'
 
@@ -31,6 +35,9 @@ volumes:
   lago_storage:
   chatwoot_storage:
   bookstack_data:
+  orchestrator_data:
+  unleash_data:
+  wazuh_data:
 
 services:
   # ============================================
@@ -414,3 +421,160 @@ services:
       MYSQL_PASSWORD: ${BOOKSTACK_DB_PASSWORD:-BookStack_Secure_2026!}
     networks:
       - finaceverse
+
+  # ============================================
+  # PHASE 3: ACCUTE ORCHESTRATOR
+  # Module 7: AI Agent Factory - Custom Workflow Engine
+  # ============================================
+  
+  orchestrator:
+    build:
+      context: ./orchestrator
+      dockerfile: Dockerfile
+    container_name: finaceverse-orchestrator
+    restart: unless-stopped
+    environment:
+      NODE_ENV: production
+      PORT: 3000
+      DATABASE_URL: postgresql://finaceverse:${POSTGRES_PASSWORD:-FinACE_Secure_2026!}@postgres:5432/orchestrator
+      REDIS_URL: redis://orchestrator-redis:6379
+      VAMN_API_URL: ${VAMN_API_URL:-http://vamn:3000}
+      LUCA_API_URL: ${LUCA_API_URL:-http://luca:3000}
+      ENABLE_AI_VERIFICATION: "true"
+      AUDIT_LEVEL: detailed
+      LOG_LEVEL: info
+      MAX_CONCURRENT_EXECUTIONS: 100
+      WORKER_CONCURRENCY: 10
+      # OpenTelemetry
+      OTEL_EXPORTER_OTLP_ENDPOINT: http://signoz-otel-collector:4317
+      OTEL_SERVICE_NAME: accute-orchestrator
+    ports:
+      - "3050:3000"
+    volumes:
+      - orchestrator_data:/app/data
+    networks:
+      - finaceverse
+    depends_on:
+      postgres:
+        condition: service_healthy
+      orchestrator-redis:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:3000/api/v1/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 30s
+
+  orchestrator-redis:
+    image: redis:7-alpine
+    container_name: finaceverse-orchestrator-redis
+    restart: unless-stopped
+    command: redis-server --appendonly yes --maxmemory 256mb --maxmemory-policy allkeys-lru
+    volumes:
+      - orchestrator_data:/data
+    networks:
+      - finaceverse
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # ============================================
+  # PHASE 3: UNLEASH - Feature Flags
+  # Module 3: DevOps Center - Feature Flags
+  # ============================================
+  
+  unleash:
+    image: unleashorg/unleash-server:5.9
+    container_name: finaceverse-unleash
+    restart: unless-stopped
+    environment:
+      DATABASE_URL: postgresql://finaceverse:${POSTGRES_PASSWORD:-FinACE_Secure_2026!}@postgres:5432/unleash
+      DATABASE_SSL: "false"
+      LOG_LEVEL: info
+      INIT_ADMIN_API_TOKENS: "*:*.unleash-admin-api-token-2026"
+      INIT_CLIENT_API_TOKENS: "default:development.unleash-client-token-2026"
+    ports:
+      - "4242:4242"
+    networks:
+      - finaceverse
+    depends_on:
+      postgres:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:4242/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  # ============================================
+  # PHASE 3: WAZUH - SIEM & Security Monitoring
+  # Module 6: Security Operations - SIEM
+  # ============================================
+  
+  wazuh-manager:
+    image: wazuh/wazuh-manager:4.7.2
+    container_name: finaceverse-wazuh-manager
+    restart: unless-stopped
+    hostname: wazuh-manager
+    environment:
+      INDEXER_URL: https://wazuh-indexer:9200
+      INDEXER_USERNAME: admin
+      INDEXER_PASSWORD: ${WAZUH_INDEXER_PASSWORD:-Wazuh_Admin_2026!}
+      FILEBEAT_SSL_VERIFICATION_MODE: full
+      SSL_CERTIFICATE_AUTHORITIES: /etc/ssl/root-ca.pem
+      SSL_CERTIFICATE: /etc/ssl/filebeat.pem
+      SSL_KEY: /etc/ssl/filebeat.key
+    volumes:
+      - wazuh_data:/var/ossec/data
+    ports:
+      - "1514:1514/udp"
+      - "1515:1515"
+      - "514:514/udp"
+      - "55000:55000"
+    networks:
+      - finaceverse
+
+  wazuh-indexer:
+    image: wazuh/wazuh-indexer:4.7.2
+    container_name: finaceverse-wazuh-indexer
+    restart: unless-stopped
+    hostname: wazuh-indexer
+    environment:
+      OPENSEARCH_JAVA_OPTS: "-Xms512m -Xmx512m"
+      bootstrap.memory_lock: "true"
+      discovery.type: single-node
+      plugins.security.ssl.http.enabled: "false"
+    ulimits:
+      memlock:
+        soft: -1
+        hard: -1
+      nofile:
+        soft: 65536
+        hard: 65536
+    networks:
+      - finaceverse
+
+  wazuh-dashboard:
+    image: wazuh/wazuh-dashboard:4.7.2
+    container_name: finaceverse-wazuh-dashboard
+    restart: unless-stopped
+    hostname: wazuh-dashboard
+    environment:
+      INDEXER_USERNAME: admin
+      INDEXER_PASSWORD: ${WAZUH_INDEXER_PASSWORD:-Wazuh_Admin_2026!}
+      WAZUH_API_URL: https://wazuh-manager
+      DASHBOARD_USERNAME: admin
+      DASHBOARD_PASSWORD: ${WAZUH_DASHBOARD_PASSWORD:-WazuhDashboard_2026!}
+      API_USERNAME: wazuh-wui
+      API_PASSWORD: ${WAZUH_API_PASSWORD:-WazuhAPI_2026!}
+    ports:
+      - "5601:5601"
+    networks:
+      - finaceverse
+    depends_on:
+      - wazuh-indexer
+      - wazuh-manager
+

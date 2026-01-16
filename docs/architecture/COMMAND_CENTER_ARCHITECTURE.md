@@ -145,9 +145,11 @@ FinACEverse Command Center is a comprehensive platform administration system con
 
 | Feature | Description |
 |---------|-------------|
-| Drag-Drop Builder | Visual agent construction |
+| **Accute Orchestrator** | Custom AI-native workflow engine (replaces n8n) |
+| Drag-Drop Builder | Visual agent construction with AI assistance |
 | MCP CLI | Command-line agent creation |
-| ERP Connectors | Tally, SAP, Oracle, QuickBooks, Xero |
+| Natural Language Workflows | Create workflows from plain English |
+| ERP Connectors | Tally, SAP, Oracle, QuickBooks, Xero, Zoho Books |
 | Agent Store | Pre-built agents for common tasks |
 | Version Control | Agent versioning with rollback |
 | Testing Sandbox | Safe environment for agent testing |
@@ -155,6 +157,140 @@ FinACEverse Command Center is a comprehensive platform administration system con
 | Data Mapping | Transform data between systems |
 | Error Handling | Retry logic, failure notifications |
 | Agent Analytics | Usage, success rates, latency |
+| **Financial Intelligence** | Built-in tax, compliance, audit logic |
+| **Multi-Agent Orchestration** | Agents that spawn and coordinate sub-agents |
+
+---
+
+## Accute Orchestrator - Custom Workflow Engine
+
+### Why Build Custom (Not n8n)?
+
+| Aspect | n8n | Accute Orchestrator |
+|--------|-----|---------------------|
+| **Financial Logic** | Generic nodes | Built-in tax/compliance/audit |
+| **AI Integration** | Basic LangChain node | Native VAMN/Luca integration |
+| **Multi-Agent** | Single workflow | Agent swarms, hierarchies |
+| **Error Handling** | Basic retry | Financial-grade with rollback |
+| **Audit Trail** | Logs only | Immutable blockchain-style audit |
+| **Compliance** | None | GST, ASC 606, DPDP built-in |
+| **Natural Language** | None | "Create invoice when payment received" |
+| **ERP Native** | Connectors needed | Deep Tally/SAP/Oracle integration |
+
+### Architecture
+
+```
+┌─────────────────────────────────────────────────────────────────────┐
+│                     ACCUTE ORCHESTRATOR                              │
+├─────────────────────────────────────────────────────────────────────┤
+│                                                                      │
+│  ┌──────────────────┐  ┌──────────────────┐  ┌──────────────────┐  │
+│  │   Visual Studio  │  │   NL Composer    │  │   MCP CLI        │  │
+│  │   (Drag & Drop)  │  │  (Plain English) │  │   (Developers)   │  │
+│  └────────┬─────────┘  └────────┬─────────┘  └────────┬─────────┘  │
+│           └────────────────────┬┴─────────────────────┘             │
+│                                ▼                                     │
+│  ┌─────────────────────────────────────────────────────────────────┤
+│  │              WORKFLOW DEFINITION LAYER (YAML/JSON)              │
+│  │   - Declarative workflow specs                                   │
+│  │   - Version controlled                                           │
+│  │   - Git-based deployment                                         │
+│  └─────────────────────────────────────────────────────────────────┤
+│                                ▼                                     │
+│  ┌─────────────────────────────────────────────────────────────────┤
+│  │              EXECUTION ENGINE                                    │
+│  │   ┌───────────┐  ┌───────────┐  ┌───────────┐  ┌───────────┐   │
+│  │   │ Scheduler │  │  Workers  │  │   Queue   │  │   State   │   │
+│  │   │  (Cron)   │  │  (Pool)   │  │  (Redis)  │  │  Machine  │   │
+│  │   └───────────┘  └───────────┘  └───────────┘  └───────────┘   │
+│  └─────────────────────────────────────────────────────────────────┤
+│                                ▼                                     │
+│  ┌─────────────────────────────────────────────────────────────────┤
+│  │              AI LAYER                                            │
+│  │   ┌───────────┐  ┌───────────┐  ┌───────────┐  ┌───────────┐   │
+│  │   │   VAMN    │  │   Luca    │  │  Cyloid   │  │  OpenAI   │   │
+│  │   │ (Verify)  │  │  (Reason) │  │  (Docs)   │  │ (Fallback)│   │
+│  │   └───────────┘  └───────────┘  └───────────┘  └───────────┘   │
+│  └─────────────────────────────────────────────────────────────────┤
+│                                ▼                                     │
+│  ┌─────────────────────────────────────────────────────────────────┤
+│  │              CONNECTOR LAYER                                     │
+│  │   ┌───────┐ ┌───────┐ ┌───────┐ ┌───────┐ ┌───────┐ ┌───────┐ │
+│  │   │ Tally │ │  SAP  │ │Oracle │ │  Xero │ │  QB   │ │ Zoho  │ │
+│  │   └───────┘ └───────┘ └───────┘ └───────┘ └───────┘ └───────┘ │
+│  │   ┌───────┐ ┌───────┐ ┌───────┐ ┌───────┐ ┌───────┐ ┌───────┐ │
+│  │   │Stripe │ │Cashfree│ │Razorpay│ │ Email │ │  SMS  │ │Webhook│ │
+│  │   └───────┘ └───────┘ └───────┘ └───────┘ └───────┘ └───────┘ │
+│  └─────────────────────────────────────────────────────────────────┤
+│                                ▼                                     │
+│  ┌─────────────────────────────────────────────────────────────────┤
+│  │              AUDIT & COMPLIANCE LAYER                            │
+│  │   - Immutable execution logs                                     │
+│  │   - GST compliance validation                                    │
+│  │   - ASC 606 revenue recognition                                  │
+│  │   - DPDP Act data handling                                       │
+│  └─────────────────────────────────────────────────────────────────┤
+│                                                                      │
+└─────────────────────────────────────────────────────────────────────┘
+```
+
+### Core Components
+
+| Component | Technology | Purpose |
+|-----------|------------|---------|
+| **Visual Studio** | React + React Flow | Drag-drop workflow builder |
+| **NL Composer** | GPT-4 + Luca | Natural language to workflow |
+| **Execution Engine** | Node.js + Bull MQ | Workflow execution |
+| **State Machine** | XState | Complex workflow states |
+| **Scheduler** | Node-cron + Redis | Timed triggers |
+| **Connector SDK** | TypeScript | Build custom connectors |
+
+### Killer Features (n8n Can't Do This)
+
+1. **Financial Intelligence Nodes**
+   - GST Calculator Node (auto-calculates HSN codes)
+   - TDS Deduction Node (section 194 compliance)
+   - Invoice Reconciliation Node (3-way matching)
+   - Revenue Recognition Node (ASC 606)
+
+2. **AI-Powered Error Handling**
+   - When workflow fails, Luca analyzes and suggests fixes
+   - Auto-retry with exponential backoff
+   - Rollback to last known good state
+
+3. **Natural Language Workflows**
+   ```
+   User: "When a payment comes in from Razorpay, create a 
+          receipt in Tally and email the customer"
+   
+   Orchestrator: Creates complete workflow with:
+   - Razorpay webhook trigger
+   - Customer lookup
+   - Tally receipt creation
+   - Email template selection
+   - Error handling
+   ```
+
+4. **Multi-Agent Orchestration**
+   - One agent can spawn sub-agents
+   - Parent-child execution hierarchies
+   - Agent swarms for complex tasks
+
+5. **ERP Deep Integration**
+   - Not just API calls - understands Tally ledgers
+   - SAP business logic awareness
+   - QuickBooks chart of accounts mapping
+
+### Implementation Schedule
+
+| Week | Phase | Deliverables |
+|------|-------|--------------|
+| 1-2 | Core Engine | Execution engine, state machine, job queue |
+| 3-4 | Visual Builder | React Flow canvas, node palette, connections |
+| 5-6 | Connectors | Tally, Razorpay, Email, Webhook (4 core) |
+| 7-8 | AI Layer | Luca integration, NL workflow creation |
+| 9-10 | ERP Deep | SAP, Oracle, QuickBooks connectors |
+| 11-12 | Polish | Testing, docs, agent store |
 
 ### Module 8: API & Developer Portal
 
@@ -440,18 +576,30 @@ Level 2: TEAM MEMBERS
 
 #### Module 7: AI Agent Factory
 
-| Feature | Open Source Option | Maturity | Effort to Adapt |
-|---------|-------------------|----------|-----------------|
-| Agent Framework | **LangChain** | ⭐⭐⭐⭐ | Medium |
-| | **AutoGen** (Microsoft) | ⭐⭐⭐ | Medium |
-| Workflow Builder | **n8n** | ⭐⭐⭐⭐⭐ | Low |
-| | **Windmill** | ⭐⭐⭐⭐ | Low |
-| MCP Server | Our existing implementation | ⭐⭐⭐⭐ | - |
+| Feature | Decision | Rationale |
+|---------|----------|-----------|
+| Workflow Engine | **CUSTOM BUILD: Accute Orchestrator** | n8n lacks financial intelligence |
+| Agent Framework | **LangChain + Custom** | AI agent logic |
+| MCP Server | Our existing implementation | Already built |
+| Visual Builder | **React Flow (Custom UI)** | Full control over UX |
+| NL Composer | **Luca AI Integration** | Plain English workflows |
 
-**Recommended Stack:**
-- **n8n** for visual workflow builder (excellent UI, 400+ integrations)
-- **LangChain** for AI agent logic
-- Our MCP implementation for CLI/API access
+**Why NOT n8n:**
+- No built-in financial/tax logic
+- Generic error handling (not financial-grade)
+- No natural language workflow creation
+- No multi-agent orchestration
+- No deep ERP understanding (just API calls)
+
+**Accute Orchestrator Advantages:**
+- GST/TDS/ASC 606 compliance built-in
+- Luca AI for intelligent error handling
+- "Create workflow from plain English"
+- Agent swarms and hierarchies
+- Deep Tally/SAP/Oracle integration (not just REST)
+
+**Estimated Build Time:** 12 weeks
+**Team Required:** 2-3 developers
 
 ---
 
@@ -758,11 +906,13 @@ Column names also obfuscated with mapping in Vault
 - [ ] Configure Code-Server for sandboxed IDE
 - [ ] Build deployment pipeline
 
-**Week 11-12: AI Agents**
-- [ ] Deploy n8n for workflow building
+**Week 11-12: AI Agents (Accute Orchestrator)**
+- [ ] Deploy Accute Orchestrator core engine
+- [ ] Launch Visual Workflow Builder (React Flow)
 - [ ] Build first ERP connector (Tally)
 - [ ] Create agent testing sandbox
 - [ ] Document agent creation process
+- [ ] Deploy multi-agent collaboration layer
 
 ### Phase 4: Business Intelligence (Weeks 13-16)
 
@@ -789,15 +939,24 @@ Column names also obfuscated with mapping in Vault
 | Support | Chatwoot, BookStack | Voice/Remote assist integration |
 | DevOps | Unleash, Gitea, Code-Server | AI Dev Agent |
 | Security | Wazuh, Vault | 121 layers, honeypots |
-| Workflow | n8n | ERP connectors |
+| **Workflow** | **- (NOT n8n)** | **Accute Orchestrator (Full Custom)** |
 | BI | Metabase | Health scores, forecasting |
 | Partner | - | Entire module |
 | Legal | - | Compliance workflows |
 
-**Total Open Source Components:** 18
-**Total Custom Components:** 12
+**Total Open Source Components:** 17 (removed n8n)
+**Total Custom Components:** 13 (added Accute Orchestrator)
 **Estimated Time to MVP:** 16 weeks
 **Estimated Team Required:** 4-6 developers
+
+### 🚀 Accute Orchestrator - The n8n Killer
+
+**Why Custom Build?**
+- n8n lacks financial intelligence and compliance awareness
+- Accute is AI-native from day 1, not bolted on
+- Multi-agent orchestration for complex financial workflows
+- Natural language workflow creation
+- Deep integration with Luca AI and all FinACEverse products
 
 ---
 
