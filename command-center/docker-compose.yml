@@ -1,11 +1,12 @@
-# FinACEverse Command Center - Phase 1 + Phase 2 + Phase 3
-# Version: 3.0
+# FinACEverse Command Center - Phase 1 + Phase 2 + Phase 3 + Phase 4
+# Version: 4.0
 # Last Updated: January 16, 2026
 # 
 # Phase 1: Zitadel (Identity), Cerbos (AuthZ), Vault (Secrets), 
 #          APISIX (API Gateway), SigNoz (APM), PostgreSQL
 # Phase 2: Lago (Billing), Chatwoot (Support), BookStack (Knowledge Base)
 # Phase 3: Accute Orchestrator (Workflows), Unleash (Feature Flags), Wazuh (SIEM)
+# Phase 4: Metabase (Business Intelligence), Partner Portal (Custom)
 #
 # Usage: docker-compose up -d
 # Dashboard URLs:
@@ -19,6 +20,8 @@
 #   - Orchestrator API:   http://localhost:3050
 #   - Unleash:            http://localhost:4242
 #   - Wazuh Dashboard:    http://localhost:5601
+#   - Metabase:           http://localhost:3400
+#   - Partner Portal API: http://localhost:3500
 
 version: '3.8'
 
@@ -38,6 +41,8 @@ volumes:
   orchestrator_data:
   unleash_data:
   wazuh_data:
+  metabase_data:
+  partner_portal_data:
 
 services:
   # ============================================
@@ -578,3 +583,57 @@ services:
       - wazuh-indexer
       - wazuh-manager
 
+  # ============================================
+  # PHASE 4: BUSINESS INTELLIGENCE
+  # ============================================
+
+  # Metabase - Business Intelligence & Analytics
+  metabase:
+    image: metabase/metabase:v0.48.3
+    container_name: finaceverse-metabase
+    restart: unless-stopped
+    environment:
+      MB_DB_TYPE: postgres
+      MB_DB_DBNAME: metabase
+      MB_DB_PORT: 5432
+      MB_DB_USER: metabase
+      MB_DB_PASS: ${METABASE_DB_PASSWORD:-Metabase_Secure_2026!}
+      MB_DB_HOST: postgres
+      MB_ENCRYPTION_SECRET_KEY: ${METABASE_SECRET:-FinACEverse_Metabase_Secret_2026_Key}
+    ports:
+      - "3400:3000"
+    volumes:
+      - metabase_data:/metabase-data
+    networks:
+      - finaceverse
+    depends_on:
+      postgres:
+        condition: service_healthy
+
+  # Partner Portal API - Custom Built
+  partner-portal:
+    build:
+      context: ./partner-portal
+      dockerfile: Dockerfile
+    container_name: finaceverse-partner-portal
+    restart: unless-stopped
+    environment:
+      NODE_ENV: production
+      PORT: 3500
+      DATABASE_URL: postgresql://partner_portal:${PARTNER_DB_PASSWORD:-PartnerPortal_2026!}@postgres:5432/partner_portal
+      JWT_SECRET: ${PARTNER_JWT_SECRET:-FinACEverse_Partner_JWT_Secret_2026}
+      REDIS_URL: redis://redis:6379
+      STRIPE_SECRET_KEY: ${STRIPE_SECRET_KEY}
+      RAZORPAY_KEY_ID: ${RAZORPAY_KEY_ID}
+      RAZORPAY_KEY_SECRET: ${RAZORPAY_KEY_SECRET}
+    ports:
+      - "3500:3500"
+    volumes:
+      - partner_portal_data:/app/data
+    networks:
+      - finaceverse
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_started
